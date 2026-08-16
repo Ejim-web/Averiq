@@ -1,0 +1,2540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Averiq — Earn, Connect, Grow</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <meta name="description" content="Averiq is a digital rewards and future cryptocurrency ecosystem. Earn AVQ through mining sessions, daily check-ins, and referrals." />
+    <meta property="og:title" content="Averiq — Earn, Connect, Grow" />
+    <meta property="og:description" content="Join Averiq and start earning AVQ rewards today. Future blockchain integration planned." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ejim-web.github.io/Averiq/" />
+    <meta name="theme-color" content="#0b0e14" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛏️</text></svg>" />
+    <style>
+        /* ===== ROOT ===== */
+        :root {
+            --bg-primary: #0b0e14;
+            --bg-secondary: #131a24;
+            --bg-card: #1a2430;
+            --bg-card-hover: #22303f;
+            --bg-input: #0f1822;
+            --text-primary: #f0f4fa;
+            --text-secondary: #94a9c9;
+            --text-muted: #5a7395;
+            --accent: #00d4aa;
+            --accent-glow: rgba(0, 212, 170, 0.25);
+            --accent-dim: rgba(0, 212, 170, 0.10);
+            --gold: #f5b342;
+            --gold-glow: rgba(245, 179, 66, 0.20);
+            --red: #ff6b6b;
+            --green: #51cf66;
+            --border: #2a3a4e;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            --radius: 20px;
+            --radius-sm: 12px;
+            --radius-xs: 8px;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --transition: 0.25s ease;
+            --nav-height: 72px;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --header-height: 64px;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html,
+        body {
+            height: 100%;
+            font-family: var(--font);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--bg-primary);
+            position: relative;
+            overflow: hidden;
+        }
+        .main-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 16px calc(var(--nav-height) + 24px + var(--safe-bottom));
+            scroll-behavior: smooth;
+        }
+
+        /* ===== HEADERS ===== */
+        .public-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            min-height: 60px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .public-header .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .public-header .brand .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(145deg, var(--accent), #00b894);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 800;
+            color: #0b0e14;
+        }
+        .public-header .brand h1 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .public-header .brand h1 span {
+            -webkit-text-fill-color: var(--accent);
+        }
+        .public-nav {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .public-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 4px 6px;
+            border-bottom: 2px solid transparent;
+        }
+        .public-nav a:hover {
+            color: var(--text-primary);
+            border-bottom-color: var(--accent);
+        }
+        .public-nav .btn-sm {
+            padding: 6px 14px;
+            font-size: 12px;
+            border-radius: 30px;
+            background: var(--accent);
+            color: #0b0e14;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .public-nav .btn-sm:hover {
+            opacity: 0.8;
+        }
+        .public-nav .btn-sm-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            font-size: 12px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+        .public-nav .btn-sm-outline:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px 8px 20px;
+            background: var(--bg-primary);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .app-header .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .app-header .brand .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(145deg, var(--accent), #00b894);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 800;
+            color: #0b0e14;
+        }
+        .app-header .brand h1 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .app-header .brand h1 span {
+            -webkit-text-fill-color: var(--accent);
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header-actions .badge-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg-card);
+            padding: 4px 12px 4px 8px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        .badge-status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .dot.green {
+            background: var(--green);
+            box-shadow: 0 0 8px rgba(81, 207, 102, 0.4);
+        }
+        .header-actions .icon-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .header-actions .icon-btn:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        /* ===== PUBLIC PAGES ===== */
+        .public-page {
+            display: none;
+            padding: 12px 0 40px;
+        }
+        .public-page.active {
+            display: block;
+            animation: fadeUp 0.3s ease;
+        }
+        .public-page .page-title {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .public-page .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+        .public-page .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+        .public-page .card h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+        .public-page .card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 14px 0 6px;
+            color: var(--text-primary);
+        }
+        .public-page .card p,
+        .public-page .card li {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 14px;
+        }
+        .public-page .card ul {
+            padding-left: 18px;
+        }
+        .public-page .card ul li {
+            margin-bottom: 4px;
+        }
+        .public-page .card .highlight {
+            background: var(--accent-dim);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--accent);
+            margin: 10px 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .public-page .card .highlight strong {
+            color: var(--text-primary);
+        }
+
+        .adsense-placeholder {
+            background: var(--bg-input);
+            border: 1px dashed var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+            margin: 16px 0;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== APP PAGES ===== */
+        .app-page {
+            display: none;
+            animation: fadeUp 0.3s ease;
+        }
+        .app-page.active {
+            display: block;
+        }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 480px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            height: var(--nav-height);
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 100;
+            padding-bottom: var(--safe-bottom);
+            padding-top: 4px;
+        }
+        .bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 9px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 4px 10px;
+            transition: var(--transition);
+            position: relative;
+            font-family: var(--font);
+        }
+        .bottom-nav .nav-item i {
+            font-size: 18px;
+            transition: var(--transition);
+        }
+        .bottom-nav .nav-item span {
+            transition: var(--transition);
+            font-size: 9px;
+        }
+        .bottom-nav .nav-item.active {
+            color: var(--accent);
+        }
+        .bottom-nav .nav-item.active i {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 12px var(--accent-glow));
+        }
+        .bottom-nav .nav-item .nav-badge {
+            position: absolute;
+            top: 0;
+            right: 2px;
+            background: var(--red);
+            color: #fff;
+            font-size: 8px;
+            font-weight: 700;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
+        /* ===== SHARED COMPONENTS ===== */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 18px;
+            margin-bottom: 14px;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        .card:hover {
+            border-color: rgba(0, 212, 170, 0.2);
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            font-family: var(--font);
+        }
+        .btn-primary {
+            background: linear-gradient(145deg, var(--accent), #00b894);
+            color: #0b0e14;
+            box-shadow: 0 4px 24px var(--accent-glow);
+        }
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px var(--accent-glow);
+        }
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-secondary {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            border-color: var(--accent);
+        }
+        .btn-gold {
+            background: linear-gradient(145deg, var(--gold), #e6a020);
+            color: #0b0e14;
+            box-shadow: 0 4px 24px var(--gold-glow);
+        }
+        .btn-gold:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+        .btn-sm {
+            padding: 8px 14px;
+            font-size: 12px;
+            width: auto;
+        }
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 30px;
+            font-size: 10px;
+            font-weight: 600;
+            background: var(--bg-input);
+            color: var(--text-secondary);
+        }
+        .tag.accent {
+            background: var(--accent-glow);
+            color: var(--accent);
+        }
+        .tag.green {
+            background: rgba(81, 207, 102, 0.15);
+            color: var(--green);
+        }
+        .tag.gold {
+            background: rgba(245, 179, 66, 0.15);
+            color: var(--gold);
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .text-muted {
+            color: var(--text-muted);
+        }
+        .mt-8 {
+            margin-top: 8px;
+        }
+        .mt-16 {
+            margin-top: 16px;
+        }
+        .mb-8 {
+            margin-bottom: 8px;
+        }
+        .mb-16 {
+            margin-bottom: 16px;
+        }
+        .gap-8 {
+            gap: 8px;
+        }
+        .gap-12 {
+            gap: 12px;
+        }
+        .flex {
+            display: flex;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 14px 0;
+        }
+
+        /* ===== APP-SPECIFIC STYLES ===== */
+        .balance-display {
+            text-align: center;
+            padding: 6px 0 4px 0;
+        }
+        .balance-display .amount {
+            font-size: 40px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .balance-display .label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        .balance-display .usd {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        .mining-status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-input);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            margin: 10px 0 6px 0;
+            border-left: 3px solid var(--accent);
+        }
+        .mining-status-bar .status-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .mining-status-bar .status-label .pulse {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+        }
+        .mining-status-bar .status-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin: 10px 0 4px 0;
+        }
+        .stat-item {
+            background: var(--bg-input);
+            border-radius: var(--radius-sm);
+            padding: 10px 6px;
+            text-align: center;
+        }
+        .stat-item .num {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .stat-item .lbl {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .countdown-ring {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 6px 0 10px 0;
+        }
+        .countdown-ring .time {
+            font-size: 32px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 1px;
+            color: var(--text-primary);
+        }
+        .countdown-ring .label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .tx-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .tx-item:last-child {
+            border-bottom: none;
+        }
+        .tx-item .tx-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .tx-item .tx-info .tx-type {
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .tx-item .tx-info .tx-date {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .tx-item .tx-amount {
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .tx-item .tx-amount.positive {
+            color: var(--green);
+        }
+        .tx-item .tx-amount.negative {
+            color: var(--red);
+        }
+        .wallet-address {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-input);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-family: monospace;
+            font-size: 13px;
+            color: var(--text-secondary);
+            word-break: break-all;
+        }
+        .wallet-address .copy-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            transition: var(--transition);
+            padding: 4px;
+        }
+        .wallet-address .copy-btn:hover {
+            color: var(--accent);
+        }
+        .referral-code-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-input);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-family: monospace;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: var(--accent);
+            margin: 6px 0;
+        }
+        .referral-code-box .copy-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: auto;
+            transition: var(--transition);
+        }
+        .referral-code-box .copy-btn:hover {
+            color: var(--accent);
+        }
+        .checkin-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-input);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            margin: 6px 0;
+        }
+        .checkin-status .streak {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .checkin-status .streak i {
+            color: var(--gold);
+            margin-right: 4px;
+        }
+        .reward-summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .reward-summary-item {
+            background: var(--bg-input);
+            border-radius: var(--radius-sm);
+            padding: 10px;
+            text-align: center;
+        }
+        .reward-summary-item .num {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .reward-summary-item .num.green {
+            color: var(--green);
+        }
+        .reward-summary-item .num.gold {
+            color: var(--gold);
+        }
+        .reward-summary-item .num.accent {
+            color: var(--accent);
+        }
+        .reward-summary-item .lbl {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .reward-history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .reward-history-item:last-child {
+            border-bottom: none;
+        }
+        .reward-history-item .left {
+            display: flex;
+            flex-direction: column;
+        }
+        .reward-history-item .left .type {
+            font-weight: 500;
+            font-size: 13px;
+        }
+        .reward-history-item .left .date {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .reward-history-item .right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .reward-history-item .right .amount {
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .reward-history-item .right .status-tag {
+            font-size: 9px;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        .status-tag.eligible {
+            background: var(--accent-dim);
+            color: var(--accent);
+        }
+        .status-tag.claimed {
+            background: rgba(81, 207, 102, 0.15);
+            color: var(--green);
+        }
+        .status-tag.pending {
+            background: rgba(245, 179, 66, 0.15);
+            color: var(--gold);
+        }
+        .status-tag.rejected {
+            background: rgba(255, 107, 107, 0.15);
+            color: var(--red);
+        }
+
+        /* ===== ADMIN ===== */
+        .admin-section {
+            margin-top: 16px;
+        }
+        .admin-section .admin-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .admin-section .admin-title i {
+            color: var(--gold);
+        }
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .admin-grid .admin-stat {
+            background: var(--bg-input);
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            text-align: center;
+        }
+        .admin-grid .admin-stat .num {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .admin-grid .admin-stat .lbl {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .admin-config .config-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .admin-config .config-row .key {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .admin-config .config-row .value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .admin-config .config-row .value input,
+        .admin-config .config-row .value select {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px 6px;
+            color: var(--text-primary);
+            width: 90px;
+            font-family: var(--font);
+            font-size: 12px;
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            max-width: 420px;
+            width: 92%;
+            pointer-events: none;
+        }
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            margin-bottom: 6px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: auto;
+            animation: slideDown 0.3s ease;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .toast .toast-icon {
+            font-size: 18px;
+        }
+        .toast .toast-msg {
+            font-size: 13px;
+            flex: 1;
+            color: var(--text-primary);
+        }
+        .toast .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .toast.success {
+            border-left: 3px solid var(--green);
+        }
+        .toast.error {
+            border-left: 3px solid var(--red);
+        }
+        .toast.info {
+            border-left: 3px solid var(--accent);
+        }
+        @keyframes slideDown {
+            0% {
+                opacity: 0;
+                transform: translateY(-16px) scale(0.96);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ===== MODAL ===== */
+        #modalOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #modalOverlay .modal-box {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            max-width: 400px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 20px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+        .input-group {
+            margin-bottom: 14px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: var(--font);
+            transition: var(--transition);
+            outline: none;
+        }
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        /* ===== EXPANDER ===== */
+        .expander {
+            background: var(--bg-input);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .expander .expander-header {
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .expander .expander-header:hover {
+            color: var(--text-primary);
+        }
+        .expander .expander-header i {
+            transition: var(--transition);
+        }
+        .expander .expander-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, padding 0.35s ease;
+            padding: 0 14px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+        .expander.open .expander-body {
+            max-height: 600px;
+            padding: 0 14px 14px 14px;
+        }
+        .expander.open .expander-header i {
+            transform: rotate(180deg);
+        }
+        .expander .expander-body ul {
+            padding-left: 16px;
+        }
+        .expander .expander-body ul li {
+            margin-bottom: 3px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 400px) {
+            .public-nav a {
+                font-size: 10px;
+                padding: 3px 4px;
+            }
+            .public-nav .btn-sm {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+            .public-nav .btn-sm-outline {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+            .public-header .brand h1 {
+                font-size: 15px;
+            }
+            .balance-display .amount {
+                font-size: 32px;
+            }
+            .stat-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .stat-grid .stat-item:last-child {
+                grid-column: span 2;
+            }
+        }
+        @media (max-width: 360px) {
+            .public-nav a:not(.keep) {
+                display: none;
+            }
+            .bottom-nav .nav-item {
+                padding: 4px 6px;
+            }
+            .bottom-nav .nav-item i {
+                font-size: 16px;
+            }
+            .bottom-nav .nav-item span {
+                font-size: 8px;
+            }
+        }
+        @media (min-width: 481px) {
+            #app {
+                border-left: 1px solid var(--border);
+                border-right: 1px solid var(--border);
+                box-shadow: 0 0 60px rgba(0, 0, 0, 0.5);
+            }
+        }
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== TOAST ===== -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- ===== APP ===== -->
+    <div id="app">
+
+        <!-- ===== PUBLIC HEADER ===== -->
+        <header class="public-header" id="publicHeader">
+            <div class="brand">
+                <div class="logo-icon">⛏️</div>
+                <h1>Averiq<span>.</span></h1>
+            </div>
+            <nav class="public-nav" id="publicNav">
+                <a href="#home" data-route="home">Home</a>
+                <a href="#about" data-route="about">About</a>
+                <a href="#how-it-works" data-route="how-it-works">How It Works</a>
+                <a href="#avq" data-route="avq">AVQ</a>
+                <a href="#faq" data-route="faq">FAQ</a>
+                <a href="#contact" data-route="contact">Contact</a>
+                <button class="btn-sm-outline" id="publicLoginBtn">Log In</button>
+                <button class="btn-sm" id="publicSignupBtn">Sign Up</button>
+            </nav>
+        </header>
+
+        <!-- ===== APP HEADER ===== -->
+        <header class="app-header hidden" id="appHeader">
+            <div class="brand">
+                <div class="logo-icon">⛏️</div>
+                <h1>Averiq<span>.</span></h1>
+            </div>
+            <div class="header-actions">
+                <div class="badge-status">
+                    <span class="dot green" id="statusDot"></span>
+                    <span id="statusText">Online</span>
+                </div>
+                <button class="icon-btn" id="themeToggle"><i class="fas fa-moon"></i></button>
+            </div>
+        </header>
+
+        <!-- ===== MAIN SCROLL ===== -->
+        <div class="main-scroll" id="mainScroll">
+
+            <!-- ==========================================================
+            PUBLIC PAGES
+            ========================================================== -->
+
+            <!-- HOME -->
+            <section class="public-page active" id="pageHome">
+                <div class="card" style="background:linear-gradient(145deg,#0f1a26,#1a2430);border-color:rgba(0,212,170,0.2);">
+                    <div style="font-size:44px;text-align:center;margin-bottom:6px;">⛏️</div>
+                    <h1 class="page-title" style="text-align:center;font-size:28px;">Earn. Connect. Grow.</h1>
+                    <p class="page-subtitle" style="text-align:center;">Averiq is a digital rewards ecosystem with future blockchain integration.</p>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px;">
+                        <button class="btn btn-primary btn-sm" onclick="showLoginModal()" style="flex:1;min-width:100px;">
+                            <i class="fas fa-sign-in-alt"></i> Log In
+                        </button>
+                        <button class="btn btn-gold btn-sm" onclick="showLoginModal()" style="flex:1;min-width:100px;">
+                            <i class="fas fa-user-plus"></i> Create Account
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="navigatePublic('how-it-works')" style="flex:1;min-width:100px;">
+                            Learn More
+                        </button>
+                    </div>
+                </div>
+
+                <div class="adsense-placeholder"><span>ADVERTISEMENT</span></div>
+
+                <div class="card">
+                    <h2>What is Averiq?</h2>
+                    <p>Averiq is a platform that lets you earn <strong>AVQ</strong> rewards through daily check‑ins, mining sessions, and referrals. It is being developed as a future cryptocurrency ecosystem, with plans for a dedicated blockchain and on‑chain token.</p>
+                    <p style="margin-top:6px;font-size:13px;color:var(--text-muted);">Currently, AVQ is an internal reward ledger. On‑chain withdrawals will become available when the AVQ blockchain infrastructure is launched.</p>
+                </div>
+
+                <div class="card">
+                    <h2>What can you do on Averiq?</h2>
+                    <ul>
+                        <li><strong>Daily Check‑In</strong> — Earn AVQ every day and build your streak.</li>
+                        <li><strong>Mining Sessions</strong> — Start a session and earn rewards based on time.</li>
+                        <li><strong>Referrals</strong> — Invite friends and earn bonus AVQ.</li>
+                        <li><strong>Wallet</strong> — Manage your AVQ balance and transactions.</li>
+                        <li><strong>Future Blockchain</strong> — AVQ will become a real cryptocurrency with on‑chain transfers.</li>
+                    </ul>
+                </div>
+
+                <div class="adsense-placeholder"><span>ADVERTISEMENT</span></div>
+            </section>
+
+            <!-- ABOUT -->
+            <section class="public-page" id="pageAbout">
+                <h1 class="page-title">About Averiq</h1>
+                <p class="page-subtitle">Our mission: to create a fair and transparent digital rewards ecosystem.</p>
+                <div class="card">
+                    <h2>Our Vision</h2>
+                    <p>Averiq is designed to be a community‑driven platform where users are rewarded for their participation. We are building a system that will eventually transition to a fully decentralized blockchain network, giving users true ownership of their AVQ tokens.</p>
+                </div>
+                <div class="card">
+                    <h2>Current Phase</h2>
+                    <p>Currently, Averiq operates as a rewards ledger. Users earn AVQ through daily check‑ins, mining sessions, and referrals. All rewards are recorded on the server and are eligible for future conversion to on‑chain tokens.</p>
+                    <div class="highlight"><strong>Important:</strong> AVQ is not yet a blockchain cryptocurrency. On‑chain withdrawals will be enabled after the AVQ blockchain is launched.</div>
+                </div>
+                <div class="card">
+                    <h2>Future Plans</h2>
+                    <ul>
+                        <li><strong>AVQ Blockchain</strong> — A dedicated network with consensus mechanisms (PoW, PoS, or PoA).</li>
+                        <li><strong>Real Wallets</strong> — Users will hold AVQ in their own wallets.</li>
+                        <li><strong>On‑Chain Transactions</strong> — Send and receive AVQ on the blockchain.</li>
+                        <li><strong>Decentralized Governance</strong> — Community voting on key decisions.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- HOW IT WORKS -->
+            <section class="public-page" id="pageHowItWorks">
+                <h1 class="page-title">How Averiq Works</h1>
+                <p class="page-subtitle">Simple steps to start earning AVQ.</p>
+                <div class="card"><h2>1. Create an Account</h2><p>Sign up with your email or username. No personal information is required beyond basic details.</p></div>
+                <div class="card"><h2>2. Start an AVQ Mining Session</h2><p>Navigate to the Mining page and tap <strong>START MINING</strong>. Your session will run for a configured duration (e.g., 1 hour). After the session completes, your reward becomes <strong>eligible</strong> to claim.</p><div class="highlight"><strong>Note:</strong> This is <strong>not</strong> Proof‑of‑Work blockchain mining. It is a participation‑based reward system. Future versions may incorporate real blockchain consensus.</div></div>
+                <div class="card"><h2>3. Daily Check‑In</h2><p>Visit the app daily and tap <strong>CHECK IN</strong> to earn a reward. Your streak increases with consecutive days, unlocking higher rewards.</p></div>
+                <div class="card"><h2>4. Claim Eligible Rewards</h2><p>When your mining session completes or you check in, rewards become <strong>eligible</strong>. Go to the Rewards page and tap <strong>CLAIM REWARDS</strong> to add them to your balance.</p></div>
+                <div class="card"><h2>5. Invite Friends</h2><p>Use your unique referral code to invite others. When they join and participate, you earn referral bonuses.</p></div>
+                <div class="card"><h2>6. Manage Your Wallet</h2><p>Your AVQ balance is displayed on the Wallet page. You can view transaction history and, in the future, withdraw AVQ to external wallets once the blockchain is live.</p></div>
+            </section>
+
+            <!-- AVQ -->
+            <section class="public-page" id="pageAvq">
+                <h1 class="page-title">AVQ Token</h1>
+                <p class="page-subtitle">Information about the Averiq token.</p>
+                <div class="card">
+                    <h2>Token Details</h2>
+                    <ul>
+                        <li><strong>Name:</strong> Averiq</li>
+                        <li><strong>Ticker:</strong> AVQ</li>
+                        <li><strong>Current Status:</strong> Internal reward ledger (not yet on‑chain)</li>
+                        <li><strong>Maximum Supply:</strong> To be determined (configurable)</li>
+                        <li><strong>Decimals:</strong> 8</li>
+                    </ul>
+                    <div class="highlight"><strong>Important:</strong> AVQ is currently an internal reward token. It is not a live cryptocurrency and has no market price, exchange listings, or circulating supply. All on‑chain features are <strong>planned</strong> and not yet available.</div>
+                </div>
+                <div class="card">
+                    <h2>Future Blockchain Plans</h2>
+                    <p>We are developing a dedicated blockchain for AVQ. Once launched, AVQ will become a tradable cryptocurrency with:</p>
+                    <ul>
+                        <li>On‑chain transactions</li>
+                        <li>Real wallet integration</li>
+                        <li>Decentralized consensus (PoW, PoS, or PoA)</li>
+                        <li>Transparent supply and emission schedule</li>
+                    </ul>
+                    <p>All existing rewards will be migrated to the new blockchain.</p>
+                </div>
+                <div class="card">
+                    <h2>Withdrawal Status</h2>
+                    <p><span class="tag accent">Planned</span> — Withdrawals to external wallets are not yet available. They will be enabled after the AVQ blockchain is deployed and tested.</p>
+                </div>
+                <div class="adsense-placeholder"><span>ADVERTISEMENT</span></div>
+            </section>
+
+            <!-- FAQ -->
+            <section class="public-page" id="pageFaq">
+                <h1 class="page-title">Frequently Asked Questions</h1>
+                <p class="page-subtitle">Find answers to common questions about Averiq.</p>
+                <div class="card"><h3>What is Averiq?</h3><p>Averiq is a digital rewards platform that allows users to earn AVQ through daily check‑ins, mining sessions, and referrals. It is being developed as a future cryptocurrency ecosystem.</p></div>
+                <div class="card"><h3>What is AVQ?</h3><p>AVQ is the native token of the Averiq ecosystem. Currently, it is an internal reward balance. Future plans include launching a dedicated blockchain and on‑chain token.</p></div>
+                <div class="card"><h3>How does AVQ Mining work?</h3><p>Mining sessions are time‑based activities where you earn AVQ for participating. This is <strong>not</strong> Proof‑of‑Work mining; it is a participation reward. Future versions may include real blockchain mining.</p></div>
+                <div class="card"><h3>Is Averiq currently a blockchain?</h3><p>No, Averiq is currently a centralized reward ledger. A blockchain is planned for the future.</p></div>
+                <div class="card"><h3>Is the current Mining Session Proof‑of‑Work?</h3><p>No, the current mining session is a participation reward. It does not perform any cryptographic work. It is clearly labeled as "AVQ Mining Session" to avoid confusion.</p></div>
+                <div class="card"><h3>How do I earn rewards?</h3><p>Rewards are earned by completing daily check‑ins, running mining sessions, and referring friends. All rewards become eligible for claiming after verification.</p></div>
+                <div class="card"><h3>How does Daily Check‑In work?</h3><p>Each day you can check in once. Your streak increases with consecutive check‑ins, and the reward amount grows based on your streak.</p></div>
+                <div class="card"><h3>How do I claim rewards?</h3><p>Go to the Rewards page, view your eligible rewards, and tap <strong>CLAIM REWARDS</strong>. The system will verify and credit your balance.</p></div>
+                <div class="card"><h3>How do referrals work?</h3><p>Each user has a unique referral code. Share it with friends; when they sign up and participate, you earn referral bonuses.</p></div>
+                <div class="card"><h3>Can I withdraw AVQ?</h3><p>Currently, withdrawals are not available. On‑chain withdrawals will be enabled after the AVQ blockchain is launched. This is a <strong>planned</strong> feature.</p></div>
+                <div class="card"><h3>When will on‑chain withdrawals be available?</h3><p>We are actively developing the AVQ blockchain. An estimated timeline will be announced as we progress.</p></div>
+                <div class="card"><h3>Does AVQ have a market price?</h3><p>No, AVQ is not yet a traded cryptocurrency. It has no market price, and we do not speculate on future value.</p></div>
+                <div class="card"><h3>How can I contact Averiq?</h3><p>You can reach us via the <a href="#contact" onclick="navigatePublic('contact')" style="color:var(--accent);text-decoration:none;">Contact page</a>.</p></div>
+            </section>
+
+            <!-- PRIVACY -->
+            <section class="public-page" id="pagePrivacy">
+                <h1 class="page-title">Privacy Policy</h1>
+                <p class="page-subtitle">Last updated: August 2026</p>
+                <div class="card"><h2>Information We Collect</h2><p>We collect information you provide directly, such as your username, email address, and referral data. We also collect usage data via localStorage and cookies for authentication and preferences.</p></div>
+                <div class="card"><h2>How We Use Information</h2><p>We use your information to operate and improve the platform, authenticate your account, process rewards, and communicate with you about updates and support.</p></div>
+                <div class="card"><h2>Cookies and Local Storage</h2><p>We use localStorage to store your session and preferences. No third‑party cookies are used unless you enable future advertising or analytics.</p></div>
+                <div class="card"><h2>Analytics and Advertising</h2><p>We may use analytics tools to improve the user experience. Advertising may be displayed via Google AdSense or similar, which may use cookies.</p></div>
+                <div class="card"><h2>Data Security</h2><p>We implement industry‑standard security measures to protect your data. However, no method of transmission over the internet is 100% secure.</p></div>
+                <div class="card"><h2>Your Rights</h2><p>You may access, correct, or delete your data by contacting us. You can also opt out of analytics and advertising cookies.</p></div>
+                <div class="card"><h2>Contact</h2><p>For privacy inquiries, please contact us at: <strong>support@YOURDOMAIN.com</strong> (replace with your actual support email).</p></div>
+            </section>
+
+            <!-- TERMS -->
+            <section class="public-page" id="pageTerms">
+                <h1 class="page-title">Terms & Conditions</h1>
+                <p class="page-subtitle">Last updated: August 2026</p>
+                <div class="card"><h2>Acceptance of Terms</h2><p>By using Averiq, you agree to these terms. If you do not agree, please do not use the platform.</p></div>
+                <div class="card"><h2>Account Use</h2><p>You are responsible for your account credentials. You must not create multiple accounts or use automated systems to gain unfair advantages.</p></div>
+                <div class="card"><h2>Rewards and Mining Sessions</h2><p>Rewards are earned through legitimate participation. Abuse, such as manipulating sessions or check‑ins, may result in forfeiture of rewards and account suspension.</p></div>
+                <div class="card"><h2>Referrals</h2><p>Referral bonuses are subject to anti‑abuse measures. Fraudulent referrals may be rejected and accounts may be suspended.</p></div>
+                <div class="card"><h2>Wallet and Withdrawals</h2><p>Your AVQ balance is an internal record. Withdrawals to external wallets are not yet available. When available, they will be subject to network fees and security checks.</p></div>
+                <div class="card"><h2>Future AVQ Token</h2><p>AVQ may be converted to a blockchain token in the future. This is not guaranteed and is subject to development milestones.</p></div>
+                <div class="card"><h2>Prohibited Activities</h2><ul><li>Using the platform for illegal purposes</li><li>Attempting to hack or disrupt the service</li><li>Creating fake accounts or referrals</li><li>Manipulating rewards or claims</li><li>Misleading other users</li></ul></div>
+                <div class="card"><h2>Risk Disclosure</h2><p>AVQ is a developing asset. Its value, if any, is not guaranteed. You should not invest money you cannot afford to lose. The platform is provided "as is" without warranties.</p></div>
+                <div class="card"><h2>Modifications</h2><p>We reserve the right to update these terms. Continued use constitutes acceptance of the updated terms.</p></div>
+            </section>
+
+            <!-- CONTACT -->
+            <section class="public-page" id="pageContact">
+                <h1 class="page-title">Contact / Support</h1>
+                <p class="page-subtitle">We're here to help.</p>
+                <div class="card">
+                    <h2>Support Email</h2>
+                    <p>For general inquiries and support, please email us at:</p>
+                    <p style="font-size:18px;font-weight:600;color:var(--accent);">support@YOURDOMAIN.com</p>
+                    <p class="text-muted" style="font-size:12px;">(Replace YOURDOMAIN.com with your actual domain.)</p>
+                </div>
+                <div class="card"><h2>Response Time</h2><p>We aim to respond within 24‑48 hours. Please include your username and a detailed description of your issue.</p></div>
+                <div class="adsense-placeholder"><span>ADVERTISEMENT</span></div>
+            </section>
+
+            <!-- ==========================================================
+            APP PAGES
+            ========================================================== -->
+
+            <!-- APP: HOME -->
+            <section class="app-page" id="appHome">
+                <div class="card" style="background:linear-gradient(145deg,#0f1a26,#1a2430);border-color:rgba(0,212,170,0.15);">
+                    <div class="balance-display">
+                        <div class="label">AVQ BALANCE</div>
+                        <div class="amount" id="avqBalance">0.0000</div>
+                        <div class="usd" id="usdEstimate">≈ $0.00 USD</div>
+                    </div>
+                    <div class="mining-status-bar">
+                        <span class="status-label"><span class="pulse" id="miningPulse"></span>Mining Status</span>
+                        <span class="status-value" id="miningStatusText">Inactive</span>
+                    </div>
+                    <div class="stat-grid">
+                        <div class="stat-item"><div class="num" id="statSessions">0</div><div class="lbl">Sessions</div></div>
+                        <div class="stat-item"><div class="num" id="statRewards">0.00</div><div class="lbl">Total Rewards</div></div>
+                        <div class="stat-item"><div class="num" id="statReferrals">0</div><div class="lbl">Referrals</div></div>
+                    </div>
+                </div>
+
+                <div class="card checkin-card" id="checkinCard">
+                    <div class="flex-between"><span style="font-weight:600;font-size:14px;">🎁 Daily Check-In</span><span class="tag" id="checkinTag">Check in daily</span></div>
+                    <p class="text-muted" style="font-size:12px;margin:6px 0;">Check in every day to earn AVQ rewards.</p>
+                    <div class="checkin-status">
+                        <span class="streak"><i class="fas fa-fire"></i> <span id="streakDisplay">0</span> day streak</span>
+                        <span id="nextRewardDisplay" class="text-muted" style="font-size:12px;">Next: +1 AVQ</span>
+                    </div>
+                    <button class="btn btn-primary" id="checkinBtn" style="margin-top:4px;padding:10px;">
+                        <i class="fas fa-calendar-check"></i> CHECK IN
+                    </button>
+                    <div id="checkinMessage" class="text-muted" style="font-size:11px;margin-top:6px;text-align:center;"></div>
+                </div>
+
+                <div class="flex gap-12" style="margin-bottom:12px;">
+                    <button class="btn btn-primary btn-sm" id="quickMineBtn" style="flex:1;padding:8px;"><i class="fas fa-play"></i> Start Mining</button>
+                    <button class="btn btn-secondary btn-sm" id="quickWithdrawBtn" style="flex:1;padding:8px;"><i class="fas fa-arrow-up"></i> Withdraw</button>
+                    <button class="btn btn-gold btn-sm" id="quickRewardsBtn" style="flex:1;padding:8px;"><i class="fas fa-gift"></i> Rewards</button>
+                </div>
+
+                <div class="card">
+                    <div class="flex-between"><span style="font-weight:600;font-size:14px;">⛏️ How AVQ Mining Works</span><span class="tag accent">Phase 1</span></div>
+                    <div class="expander" id="howExpander">
+                        <div class="expander-header" onclick="toggleExpander('howExpander')"><span>Read more</span><i class="fas fa-chevron-down"></i></div>
+                        <div class="expander-body">
+                            <p><strong>AVQ Mining Session</strong> — Rewards are recorded in the Averiq reward ledger. On-chain withdrawals will become available when the AVQ blockchain/token infrastructure is launched.</p>
+                            <ul><li>Start a mining session to earn AVQ rewards.</li><li>Your phone is <strong>not</strong> performing Proof-of-Work mining in this phase.</li><li>Rewards are calculated server-side and verified.</li><li>Future: real blockchain consensus (PoW / PoS / PoA).</li></ul>
+                            <p style="font-size:12px;color:var(--text-muted);margin-top:6px;">⚠️ Never promise guaranteed profits. AVQ is a developing ecosystem.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="flex-between mb-8"><span style="font-weight:600;font-size:14px;">Recent Activity</span><span class="text-muted" style="font-size:11px;" id="recentCount">0 transactions</span></div>
+                    <div id="recentActivity"><div class="text-muted" style="text-align:center;padding:16px 0;font-size:13px;">No activity yet. Start mining!</div></div>
+                </div>
+            </section>
+
+            <!-- APP: MINING -->
+            <section class="app-page" id="appMining">
+                <div class="card" style="border-color:rgba(0,212,170,0.2);">
+                    <div class="balance-display" style="padding:4px 0;">
+                        <div class="label">AVQ BALANCE</div>
+                        <div class="amount" style="font-size:34px;" id="miningBalance">0.0000</div>
+                    </div>
+                </div>
+                <div class="card" style="background:linear-gradient(145deg,#0f1a26,#16212e);border-color:rgba(0,212,170,0.25);">
+                    <div class="text-center"><div style="font-size:40px;margin-bottom:2px;">⛏️</div><h3 style="font-size:18px;font-weight:700;margin-bottom:2px;">AVQ Mining Session</h3><p class="text-muted" style="font-size:12px;">Earn rewards by participating in the Averiq network</p></div>
+                    <div class="divider"></div>
+                    <div class="mining-status-bar" style="border-left-color:var(--gold);">
+                        <span class="status-label"><span class="pulse" id="miningPagePulse" style="background:var(--gold);"></span>Status</span>
+                        <span class="status-value" id="miningPageStatus">Idle</span>
+                    </div>
+                    <div class="stat-grid">
+                        <div class="stat-item"><div class="num" id="miningSpeed">0.00</div><div class="lbl">AVQ / hour</div></div>
+                        <div class="stat-item"><div class="num" id="miningSessionTime">00:00:00</div><div class="lbl">Session time</div></div>
+                        <div class="stat-item"><div class="num" id="miningNextReward">--:--</div><div class="lbl">Next reward</div></div>
+                    </div>
+                    <div class="countdown-ring"><div class="time" id="countdownDisplay">--:--:--</div><div class="label">Time until next reward</div></div>
+                    <button class="btn btn-primary" id="startMiningBtn" style="margin-top:6px;padding:10px;"><i class="fas fa-play"></i> START MINING</button>
+                    <button class="btn btn-secondary hidden" id="stopMiningBtn" style="margin-top:6px;padding:10px;"><i class="fas fa-stop"></i> Stop Session</button>
+                    <div class="text-center mt-8"><span class="tag" id="miningTag">⛏️ Participation Rewards</span><p class="text-muted" style="font-size:11px;margin-top:4px;">Rewards are recorded in the Averiq reward ledger. On-chain withdrawals available after AVQ blockchain launch.</p></div>
+                </div>
+                <div class="card">
+                    <div class="flex-between mb-8"><span style="font-weight:600;font-size:14px;">Mining History</span></div>
+                    <div id="miningHistory"><div class="text-muted" style="text-align:center;padding:10px 0;font-size:12px;">No mining sessions yet.</div></div>
+                </div>
+            </section>
+
+            <!-- APP: REWARDS -->
+            <section class="app-page" id="appRewards">
+                <div class="card" style="background:linear-gradient(145deg,#0f1a26,#1a2430);border-color:rgba(212,175,55,0.2);">
+                    <div class="balance-display" style="padding:4px 0;">
+                        <div class="label">🎁 REWARDS</div>
+                        <div class="amount" style="font-size:34px;background:linear-gradient(135deg,var(--gold),#e6a020);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="rewardsClaimable">0.0000</div>
+                        <div class="label" style="font-size:12px;">Available to Claim</div>
+                    </div>
+                </div>
+                <div class="reward-summary-grid">
+                    <div class="reward-summary-item"><div class="num gold" id="rewardsPending">0.0000</div><div class="lbl">Pending</div></div>
+                    <div class="reward-summary-item"><div class="num green" id="rewardsTotalEarned">0.0000</div><div class="lbl">Total Earned</div></div>
+                    <div class="reward-summary-item"><div class="num accent" id="rewardsTotalClaimed">0.0000</div><div class="lbl">Total Claimed</div></div>
+                    <div class="reward-summary-item"><div class="num" id="rewardsStreak">0</div><div class="lbl">🔥 Streak</div></div>
+                </div>
+                <button class="btn btn-gold" id="claimRewardsBtn" style="padding:10px;"><i class="fas fa-hand-holding-usd"></i> CLAIM REWARDS</button>
+                <p class="text-muted" style="font-size:11px;text-align:center;margin-top:6px;">Claim all eligible rewards at once.</p>
+
+                <div class="card" style="margin-top:12px;">
+                    <div class="flex-between mb-8"><span style="font-weight:600;font-size:14px;">Reward History</span><span class="text-muted" style="font-size:11px;" id="rewardHistoryCount">0 items</span></div>
+                    <div id="rewardHistoryList"><div class="text-muted" style="text-align:center;padding:10px 0;font-size:12px;">No reward records yet.</div></div>
+                </div>
+
+                <div class="card" style="margin-top:8px;">
+                    <div class="flex-between"><span style="font-weight:600;font-size:14px;">👥 Referrals</span><span class="tag accent">Invite & Earn</span></div>
+                    <p class="text-muted" style="font-size:12px;margin:4px 0;">Share your code and earn AVQ bonuses.</p>
+                    <div class="referral-code-box"><span id="referralCodeRewards">------</span><button class="copy-btn" onclick="copyReferralCode()" title="Copy code"><i class="fas fa-copy"></i></button></div>
+                    <div class="flex gap-8 mt-8"><button class="btn btn-secondary btn-sm" style="flex:1;" onclick="copyReferralLink()"><i class="fas fa-link"></i> Copy Link</button><button class="btn btn-secondary btn-sm" style="flex:1;" onclick="shareReferral()"><i class="fas fa-share-alt"></i> Share</button></div>
+                    <div class="stat-grid mt-8">
+                        <div class="stat-item"><div class="num" id="refTotalRewards">0</div><div class="lbl">Total Referrals</div></div>
+                        <div class="stat-item"><div class="num" id="refEarnedRewards">0.00</div><div class="lbl">AVQ Earned</div></div>
+                        <div class="stat-item"><div class="num" id="refPendingRewards">0</div><div class="lbl">Pending</div></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- APP: WALLET -->
+            <section class="app-page" id="appWallet">
+                <div class="card" style="background:linear-gradient(145deg,#0f1a26,#1a2430);border-color:rgba(0,212,170,0.15);">
+                    <div class="balance-display" style="padding:4px 0;">
+                        <div class="label">WALLET BALANCE</div>
+                        <div class="amount" style="font-size:36px;" id="walletBalance">0.0000</div>
+                        <div class="usd" id="walletUsd">≈ $0.00 USD</div>
+                    </div>
+                    <div class="flex gap-8 mt-8">
+                        <button class="btn btn-primary btn-sm" style="flex:1;padding:8px;" onclick="showReceiveModal()"><i class="fas fa-arrow-down"></i> Receive</button>
+                        <button class="btn btn-secondary btn-sm" style="flex:1;padding:8px;" onclick="showSendModal()"><i class="fas fa-arrow-up"></i> Send</button>
+                        <button class="btn btn-secondary btn-sm" style="flex:1;padding:8px;" onclick="showWithdrawModal()"><i class="fas fa-external-link-alt"></i> Withdraw</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="flex-between mb-8"><span style="font-weight:600;font-size:14px;">Network</span><span class="tag accent" id="walletNetwork">Averiq Testnet</span></div>
+                    <div class="wallet-address"><span id="walletAddressDisplay">0x0000...0000</span><button class="copy-btn" onclick="copyWalletAddress()"><i class="fas fa-copy"></i></button></div>
+                    <div class="flex gap-8 mt-8"><button class="btn btn-secondary btn-sm" style="flex:1;padding:8px;" onclick="openExplorer()"><i class="fas fa-globe"></i> Explorer</button><button class="btn btn-secondary btn-sm" style="flex:1;padding:8px;" onclick="disconnectWallet()"><i class="fas fa-sign-out-alt"></i> Disconnect</button></div>
+                </div>
+                <div class="card">
+                    <div class="flex-between mb-8"><span style="font-weight:600;font-size:14px;">Transaction History</span><span class="text-muted" style="font-size:11px;" id="txCount">0 tx</span></div>
+                    <div id="txHistory"><div class="text-muted" style="text-align:center;padding:16px 0;font-size:13px;">No transactions yet.</div></div>
+                </div>
+            </section>
+
+            <!-- APP: PROFILE -->
+            <section class="app-page" id="appProfile">
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:48px;margin-bottom:2px;">👤</div>
+                    <h3 style="font-size:18px;font-weight:700;" id="profileUsername">User</h3>
+                    <p class="text-muted" style="font-size:13px;" id="profileEmail">user@averiq.io</p>
+                    <span class="tag accent" id="profileStatus">Active</span>
+                </div>
+                <div class="card">
+                    <div class="config-row" style="padding:4px 0;"><span class="key">User ID</span><span class="value" id="profileUserId" style="font-size:12px;font-family:monospace;">---</span></div>
+                    <div class="config-row" style="padding:4px 0;"><span class="key">Member since</span><span class="value" id="profileJoined">---</span></div>
+                    <div class="config-row" style="padding:4px 0;"><span class="key">Total sessions</span><span class="value" id="profileSessions">0</span></div>
+                    <div class="config-row" style="padding:4px 0;"><span class="key">Total rewards</span><span class="value" id="profileTotalRewards">0.00 AVQ</span></div>
+                    <div class="config-row" style="padding:4px 0;"><span class="key">Check-in streak</span><span class="value" id="profileStreak">0 days</span></div>
+                </div>
+                <div class="card"><button class="btn btn-secondary" onclick="logout()" style="width:100%;padding:10px;"><i class="fas fa-sign-out-alt"></i> Sign Out</button></div>
+                <div id="adminShortcut" class="hidden"><div class="card" style="border-color:var(--gold);"><button class="btn btn-gold" onclick="showAdmin()" style="width:100%;padding:10px;"><i class="fas fa-crown"></i> Admin Dashboard</button></div></div>
+                <div class="card" style="background:var(--bg-input);"><p style="font-size:11px;color:var(--text-muted);text-align:center;line-height:1.6;">⚠️ <strong>AVQ is a developing ecosystem.</strong> Rewards are recorded in the Averiq reward ledger. On-chain withdrawals will become available when the AVQ blockchain/token infrastructure is launched. Never invest more than you can afford to lose.</p></div>
+            </section>
+
+            <!-- APP: ADMIN -->
+            <section class="app-page" id="appAdmin">
+                <div class="flex-between"><h2 style="font-size:20px;font-weight:700;"><i class="fas fa-crown" style="color:var(--gold);"></i> Admin</h2><button class="btn btn-secondary btn-sm" onclick="hideAdmin()"><i class="fas fa-arrow-left"></i> Back</button></div>
+                <div class="admin-section">
+                    <div class="admin-title"><i class="fas fa-chart-pie"></i> Overview</div>
+                    <div class="admin-grid">
+                        <div class="admin-stat"><div class="num" id="adminUsers">0</div><div class="lbl">Users</div></div>
+                        <div class="admin-stat"><div class="num" id="adminSessions">0</div><div class="lbl">Sessions</div></div>
+                        <div class="admin-stat"><div class="num" id="adminPool">0.00</div><div class="lbl">Reward Pool</div></div>
+                        <div class="admin-stat"><div class="num" id="adminWithdrawals">0</div><div class="lbl">Withdrawals</div></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="admin-title"><i class="fas fa-sliders-h"></i> Mining Config</div>
+                    <div class="admin-config" id="adminConfig"></div>
+                    <button class="btn btn-primary btn-sm mt-16" onclick="saveAdminConfig()" style="padding:10px;"><i class="fas fa-save"></i> Save Configuration</button>
+                </div>
+                <div class="card">
+                    <div class="admin-title"><i class="fas fa-calendar-check"></i> Check-In & Rewards</div>
+                    <div class="admin-config" id="adminCheckinConfig"></div>
+                    <button class="btn btn-primary btn-sm mt-16" onclick="saveAdminCheckinConfig()" style="padding:10px;"><i class="fas fa-save"></i> Save Check-In Settings</button>
+                </div>
+                <div class="card">
+                    <div class="admin-title"><i class="fas fa-cog"></i> Reward Engine</div>
+                    <div class="config-row"><span class="key">Current Engine</span><span class="value" id="adminEngine">Simulated</span></div>
+                    <div class="config-row"><span class="key">Status</span><span class="value"><span class="tag green">Active</span></span></div>
+                    <div class="config-row"><span class="key">Emission</span><span class="value" id="adminEmission">0.00 AVQ</span></div>
+                </div>
+                <div class="card">
+                    <div class="admin-title"><i class="fas fa-shield-alt"></i> Security</div>
+                    <div class="config-row"><span class="key">Fraud Alerts</span><span class="value" id="adminFraudAlerts">0</span></div>
+                    <div class="config-row"><span class="key">Rate Limiting</span><span class="value"><span class="tag green">Active</span></span></div>
+                    <div class="config-row"><span class="key">Audit Log</span><span class="value"><span class="tag">Enabled</span></span></div>
+                </div>
+            </section>
+
+        </div><!-- /main-scroll -->
+
+        <!-- ===== BOTTOM NAV ===== -->
+        <nav class="bottom-nav hidden" id="bottomNav">
+            <button class="nav-item" data-app="appHome" onclick="navigateApp('appHome')"><i class="fas fa-home"></i><span>Home</span></button>
+            <button class="nav-item" data-app="appMining" onclick="navigateApp('appMining')"><i class="fas fa-hammer"></i><span>Mining</span></button>
+            <button class="nav-item" data-app="appRewards" onclick="navigateApp('appRewards')"><i class="fas fa-gift"></i><span>Rewards</span><span class="nav-badge" id="rewardsBadge" style="display:none;">!</span></button>
+            <button class="nav-item" data-app="appWallet" onclick="navigateApp('appWallet')"><i class="fas fa-wallet"></i><span>Wallet</span></button>
+            <button class="nav-item" data-app="appProfile" onclick="navigateApp('appProfile')"><i class="fas fa-user"></i><span>Profile</span></button>
+        </nav>
+
+    </div><!-- /app -->
+
+    <!-- ===== MODAL ===== -->
+    <div id="modalOverlay" onclick="if(event.target===this)closeModal()">
+        <div class="modal-box">
+            <div class="flex-between mb-16"><h3 style="font-size:17px;font-weight:700;" id="modalTitle">Modal</h3><button style="background:none;border:none;color:var(--text-muted);font-size:22px;cursor:pointer;" onclick="closeModal()">&times;</button></div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    JAVASCRIPT
+    ============================================================ -->
+    <script>
+        // ===== CONFIG =====
+        const DEFAULT_CONFIG = {
+            tokenName: 'Averiq',
+            ticker: 'AVQ',
+            decimals: 8,
+            maxSupply: 100000000,
+            network: 'Averiq Testnet',
+            chainId: 1,
+            contractAddress: '',
+            explorer: 'https://explorer.averiq.io',
+            rpc: 'https://rpc.averiq.io',
+            baseRewardRate: 2.5,
+            sessionDuration: 3600,
+            dailyMax: 60,
+            maxUserReward: 5000,
+            referralBonus: 0.5,
+            dailyBonus: 1.0,
+            halvingInterval: 210000,
+            rewardReduction: 0.5,
+            currentEmission: 2.5,
+            minWithdrawal: 10,
+            maxWithdrawal: 1000,
+            rewardEngine: 'simulated',
+            miningActive: true,
+            stopEarlyPenalty: 0.8,
+            checkinEnabled: true,
+            checkinReward: 1.0,
+            streakRewards: [1, 1, 2, 2, 3, 3, 5],
+            maxDailyClaim: 10,
+            maxMonthlyClaim: 100,
+            minClaimAmount: 0.01,
+            claimCooldown: 0,
+            rewardExpiryDays: 7,
+            enableClaiming: true,
+        };
+
+        // ===== STATE =====
+        let STATE = {
+            user: null,
+            session: null,
+            rewards: [],
+            referrals: [],
+            transactions: [],
+            miningHistory: [],
+            config: { ...DEFAULT_CONFIG },
+            isMining: false,
+            miningInterval: null,
+            countdownInterval: null,
+            sessionTime: 0,
+            currentRewardRate: DEFAULT_CONFIG.baseRewardRate,
+            lastCheckIn: null,
+            checkInStreak: 0,
+            lastStreakDate: null,
+        };
+
+        // ===== STORAGE =====
+        function loadState() {
+            try {
+                const saved = localStorage.getItem('averiq_state');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    STATE = { ...STATE, ...parsed };
+                    if (!STATE.rewards) STATE.rewards = [];
+                    if (!STATE.referrals) STATE.referrals = [];
+                    if (!STATE.transactions) STATE.transactions = [];
+                    if (!STATE.miningHistory) STATE.miningHistory = [];
+                    if (!STATE.config) STATE.config = { ...DEFAULT_CONFIG };
+                    for (let key in DEFAULT_CONFIG) {
+                        if (!(key in STATE.config)) STATE.config[key] = DEFAULT_CONFIG[key];
+                    }
+                    if (STATE.session && STATE.session.status === 'active') {
+                        const now = Date.now();
+                        const elapsed = (now - STATE.session.startTime) / 1000;
+                        if (elapsed < STATE.session.duration) {
+                            STATE.isMining = true;
+                            STATE.sessionTime = Math.floor(elapsed);
+                            startMiningLoop();
+                        } else {
+                            completeMiningSession();
+                        }
+                    }
+                }
+            } catch (e) { console.warn('State load error', e); }
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem('averiq_state', JSON.stringify(STATE));
+            } catch (e) { console.warn('State save error', e); }
+        }
+
+        // ===== UTILITY =====
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
+        }
+
+        function formatTime(seconds) {
+            const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+            const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+            const s = String(Math.floor(seconds % 60)).padStart(2, '0');
+            return `${h}:${m}:${s}`;
+        }
+
+        function formatDate(ts) {
+            return new Date(ts).toLocaleString();
+        }
+
+        function formatBalance(val) {
+            return Number(val).toFixed(4);
+        }
+
+        function generateReferralCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
+            return code;
+        }
+
+        function getWalletAddress() {
+            if (!STATE.user) return '0x0000...0000';
+            const id = STATE.user.id;
+            let addr = '0x';
+            for (let i = 0; i < 40; i++) {
+                const char = id.charCodeAt(i % id.length) % 16;
+                addr += char.toString(16);
+            }
+            return addr;
+        }
+
+        function getUserBalance() {
+            if (!STATE.user) return 0;
+            const totalClaimed = STATE.rewards.filter(r => r.userId === STATE.user.id && r.status === 'claimed')
+                .reduce((sum, r) => sum + r.amount, 0);
+            const totalSpent = STATE.transactions.filter(t => t.userId === STATE.user.id && (t.type === 'withdraw' || t.type ===
+                    'send') && t.status === 'completed')
+                .reduce((sum, t) => sum + t.amount, 0);
+            return totalClaimed - totalSpent;
+        }
+
+        function getUserTotalRewards() {
+            if (!STATE.user) return 0;
+            return STATE.rewards.filter(r => r.userId === STATE.user.id && (r.status === 'claimed' || r.status === 'eligible' ||
+                    r.status === 'pending'))
+                .reduce((sum, r) => sum + r.amount, 0);
+        }
+
+        function getUserClaimableRewards() {
+            if (!STATE.user) return 0;
+            return STATE.rewards.filter(r => r.userId === STATE.user.id && r.status === 'eligible')
+                .reduce((sum, r) => sum + r.amount, 0);
+        }
+
+        function getUserPendingRewards() {
+            if (!STATE.user) return 0;
+            return STATE.rewards.filter(r => r.userId === STATE.user.id && r.status === 'pending')
+                .reduce((sum, r) => sum + r.amount, 0);
+        }
+
+        function getUserTotalClaimed() {
+            if (!STATE.user) return 0;
+            return STATE.rewards.filter(r => r.userId === STATE.user.id && r.status === 'claimed')
+                .reduce((sum, r) => sum + r.amount, 0);
+        }
+
+        function getUserSessions() {
+            if (!STATE.user) return 0;
+            return STATE.miningHistory.filter(h => h.userId === STATE.user.id).length;
+        }
+
+        function getUserReferrals() {
+            if (!STATE.user) return 0;
+            return STATE.referrals.filter(r => r.userId === STATE.user.id).length;
+        }
+
+        function getUserReferralEarnings() {
+            if (!STATE.user) return 0;
+            return STATE.referrals.filter(r => r.userId === STATE.user.id && r.status === 'completed')
+                .reduce((sum, r) => sum + (r.reward || 0), 0);
+        }
+
+        // ===== ROUTING =====
+        function navigatePublic(page) {
+            document.querySelectorAll('.public-page').forEach(el => el.classList.remove('active'));
+            const target = document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1));
+            if (target) target.classList.add('active');
+            document.getElementById('publicHeader').classList.remove('hidden');
+            document.getElementById('appHeader').classList.add('hidden');
+            document.getElementById('bottomNav').classList.add('hidden');
+            document.querySelectorAll('.app-page').forEach(el => el.classList.remove('active'));
+            window.location.hash = page;
+            window.scrollTo(0, 0);
+            document.querySelectorAll('.public-nav a[data-route]').forEach(a => {
+                a.style.borderBottomColor = (a.getAttribute('data-route') === page) ? 'var(--accent)' : 'transparent';
+            });
+        }
+
+        function navigateApp(page) {
+            document.querySelectorAll('.public-page').forEach(el => el.classList.remove('active'));
+            document.getElementById('publicHeader').classList.add('hidden');
+            document.getElementById('appHeader').classList.remove('hidden');
+            document.getElementById('bottomNav').classList.remove('hidden');
+            document.querySelectorAll('.app-page').forEach(el => el.classList.remove('active'));
+            const target = document.getElementById(page);
+            if (target) target.classList.add('active');
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(el => el.classList.remove('active'));
+            const navBtn = document.querySelector(`.bottom-nav .nav-item[data-app="${page}"]`);
+            if (navBtn) navBtn.classList.add('active');
+            window.location.hash = 'app/' + page;
+            window.scrollTo(0, 0);
+            if (['appHome', 'appMining', 'appRewards', 'appWallet', 'appProfile'].includes(page)) renderAll();
+            if (page === 'appAdmin') renderAdmin();
+        }
+
+        function handleRoute() {
+            const hash = window.location.hash.replace('#', '');
+            if (hash.startsWith('app/')) {
+                const page = hash.substring(4);
+                if (['appHome', 'appMining', 'appRewards', 'appWallet', 'appProfile', 'appAdmin'].includes(page)) {
+                    if (STATE.user) { navigateApp(page); return; } else { navigatePublic('home');
+                        showLoginModal(); return; }
+                }
+            }
+            const publicPages = ['home', 'about', 'how-it-works', 'avq', 'faq', 'privacy', 'terms', 'contact'];
+            if (publicPages.includes(hash) && hash !== '') navigatePublic(hash);
+            else navigatePublic('home');
+        }
+
+        // ===== AUTH =====
+        function login(username, email) {
+            let user = STATE.user;
+            if (!user) {
+                const newUser = {
+                    id: generateId(),
+                    username: username || 'User_' + Math.floor(Math.random() * 10000),
+                    email: email || 'user@averiq.io',
+                    referralCode: generateReferralCode(),
+                    balance: 0,
+                    joined: Date.now(),
+                    isAdmin: false,
+                };
+                const existingUsers = JSON.parse(localStorage.getItem('averiq_users') || '[]');
+                if (existingUsers.length === 0) newUser.isAdmin = true;
+                existingUsers.push(newUser);
+                localStorage.setItem('averiq_users', JSON.stringify(existingUsers));
+                STATE.user = newUser;
+            } else {
+                if (username) user.username = username;
+                if (email) user.email = email;
+            }
+            saveState();
+            renderAll();
+            return STATE.user;
+        }
+
+        function logout() {
+            STATE.user = null;
+            STATE.isMining = false;
+            if (STATE.miningInterval) clearInterval(STATE.miningInterval);
+            if (STATE.countdownInterval) clearInterval(STATE.countdownInterval);
+            saveState();
+            navigatePublic('home');
+            renderAll();
+            showToast('Signed out', 'info');
+        }
+
+        function showLoginModal() {
+            document.getElementById('modalTitle').textContent = 'Welcome to Averiq';
+            document.getElementById('modalBody').innerHTML = `
+                    <p class="text-muted" style="margin-bottom:14px;">Sign in or create your Averiq account to start earning.</p>
+                    <div class="input-group"><label>Username</label><input type="text" id="loginUsername" placeholder="Enter username" value="User_${Math.floor(Math.random()*10000)}" /></div>
+                    <div class="input-group"><label>Email (optional)</label><input type="email" id="loginEmail" placeholder="your@email.com" /></div>
+                    <button class="btn btn-primary" onclick="handleLogin()" style="padding:10px;"><i class="fas fa-rocket"></i> Start Earning</button>
+                    <p class="text-muted" style="font-size:11px;margin-top:10px;text-align:center;">By continuing you agree to the Averiq Terms of Service.</p>
+                `;
+            document.getElementById('modalOverlay').style.display = 'flex';
+        }
+
+        function handleLogin() {
+            const username = document.getElementById('loginUsername').value.trim() || 'User_' + Math.floor(Math.random() * 10000);
+            const email = document.getElementById('loginEmail').value.trim() || 'user@averiq.io';
+            login(username, email);
+            closeModal();
+            showToast('Welcome ' + STATE.user.username + '!', 'success');
+            navigateApp('appHome');
+            renderAll();
+        }
+
+        // ===== MINING ENGINE =====
+        class RewardEngine {
+            constructor(config) { this.config = config;
+                this.engine = config.rewardEngine || 'simulated'; }
+            calculateReward(sessionDuration, userTotalRewards, dailyTotal) {
+                const baseRate = this.config.baseRewardRate || 2.5;
+                const hourlyRate = baseRate / 3600;
+                let reward = sessionDuration * hourlyRate;
+                const dailyMax = this.config.dailyMax || 60;
+                if (dailyTotal + reward > dailyMax) reward = Math.max(0, dailyMax - dailyTotal);
+                const maxUser = this.config.maxUserReward || 5000;
+                if (userTotalRewards + reward > maxUser) reward = Math.max(0, maxUser - userTotalRewards);
+                const emission = this.config.currentEmission || 2.5;
+                const ratio = emission / (this.config.baseRewardRate || 2.5);
+                reward = reward * ratio;
+                return Math.max(0, reward);
+            }
+            verifySession(session) {
+                if (!session) return { valid: false, reason: 'No session' };
+                if (session.status !== 'active') return { valid: false, reason: 'Session not active' };
+                const now = Date.now();
+                const elapsed = (now - session.startTime) / 1000;
+                const duration = session.duration || 3600;
+                if (elapsed < duration) return { valid: false, reason: 'Session not complete' };
+                if (elapsed > duration + 300) return { valid: false, reason: 'Session expired' };
+                return { valid: true, reason: 'OK' };
+            }
+        }
+
+        // ===== MINING SESSION =====
+        function startMining() {
+            if (!checkAuth()) return;
+            if (STATE.isMining) { showToast('Mining already active', 'info'); return; }
+            if (!STATE.config.miningActive) { showToast('Mining paused by admin', 'error'); return; }
+            const today = new Date().toDateString();
+            const dailyTotal = STATE.rewards.filter(r => r.userId === STATE.user.id && new Date(r.timestamp).toDateString() ===
+                    today && r.status !== 'rejected')
+                .reduce((sum, r) => sum + r.amount, 0);
+            if (dailyTotal >= STATE.config.dailyMax) { showToast('Daily mining limit reached.', 'error'); return; }
+            const session = { id: generateId(), userId: STATE.user.id, startTime: Date.now(), endTime: null, status: 'active',
+                rewardRate: STATE.config.baseRewardRate, duration: STATE.config.sessionDuration || 3600,
+                verificationStatus: 'pending' };
+            STATE.session = session;
+            STATE.isMining = true;
+            STATE.sessionTime = 0;
+            STATE.currentRewardRate = STATE.config.baseRewardRate;
+            saveState();
+            startMiningLoop();
+            renderAll();
+            showToast('⛏️ Mining started!', 'success');
+        }
+
+        function startMiningLoop() {
+            if (STATE.miningInterval) clearInterval(STATE.miningInterval);
+            if (STATE.countdownInterval) clearInterval(STATE.countdownInterval);
+            STATE.miningInterval = setInterval(() => {
+                if (!STATE.isMining || !STATE.session) { clearInterval(STATE.miningInterval); return; }
+                STATE.sessionTime = Math.floor((Date.now() - STATE.session.startTime) / 1000);
+                updateMiningUI();
+            }, 1000);
+            STATE.countdownInterval = setInterval(() => {
+                if (!STATE.isMining || !STATE.session) { clearInterval(STATE.countdownInterval); return; }
+                const nextReward = STATE.session.startTime + (STATE.session.duration * 1000);
+                const remaining = Math.max(0, Math.floor((nextReward - Date.now()) / 1000));
+                const el = document.getElementById('countdownDisplay');
+                if (el) el.textContent = formatTime(remaining);
+                if (remaining === 0) completeMiningSession();
+            }, 1000);
+        }
+
+        function updateMiningUI() {
+            const speedEl = document.getElementById('miningSpeed');
+            const timeEl = document.getElementById('miningSessionTime');
+            const statusEl = document.getElementById('miningPageStatus');
+            const pulseEl = document.getElementById('miningPagePulse');
+            const nextEl = document.getElementById('miningNextReward');
+            if (speedEl) speedEl.textContent = STATE.currentRewardRate.toFixed(2);
+            if (timeEl) timeEl.textContent = formatTime(STATE.sessionTime);
+            if (statusEl) { statusEl.textContent = STATE.isMining ? '⛏️ Active' : 'Idle';
+                statusEl.style.color = STATE.isMining ? 'var(--green)' : 'var(--text-muted)'; }
+            if (pulseEl) pulseEl.style.background = STATE.isMining ? 'var(--green)' : 'var(--text-muted)';
+            if (nextEl && STATE.session) {
+                const nextReward = STATE.session.startTime + (STATE.session.duration * 1000);
+                const remaining = Math.max(0, Math.floor((nextReward - Date.now()) / 1000));
+                nextEl.textContent = formatTime(remaining);
+            }
+            const balEl = document.getElementById('miningBalance');
+            if (balEl) balEl.textContent = formatBalance(getUserBalance());
+            const startBtn = document.getElementById('startMiningBtn');
+            if (startBtn) {
+                startBtn.disabled = STATE.isMining;
+                startBtn.innerHTML = STATE.isMining ? '<i class="fas fa-spinner fa-spin"></i> Mining Active' :
+                    '<i class="fas fa-play"></i> START MINING';
+            }
+            const statusText = document.getElementById('miningStatusText');
+            if (statusText) statusText.textContent = STATE.isMining ? '⛏️ Active' : 'Inactive';
+            const pulseDot = document.getElementById('miningPulse');
+            if (pulseDot) { pulseDot.style.background = STATE.isMining ? 'var(--green)' : 'var(--text-muted)';
+                pulseDot.style.animation = STATE.isMining ? 'pulse 1.5s infinite' : 'none'; }
+        }
+
+        function completeMiningSession() {
+            if (!STATE.session || STATE.session.status !== 'active') return;
+            const engine = new RewardEngine(STATE.config);
+            const verification = engine.verifySession(STATE.session);
+            if (!verification.valid) { showToast('Session verification failed: ' + verification.reason, 'error');
+                STATE.isMining = false;
+                STATE.session.status = 'failed';
+                saveState();
+                renderAll(); return; }
+            const today = new Date().toDateString();
+            const dailyTotal = STATE.rewards.filter(r => r.userId === STATE.user.id && new Date(r.timestamp).toDateString() ===
+                    today && r.status !== 'rejected')
+                .reduce((sum, r) => sum + r.amount, 0);
+            const userTotal = getUserTotalRewards();
+            const reward = engine.calculateReward(STATE.session.duration || 3600, userTotal, dailyTotal);
+            if (reward <= 0.0001) { showToast('No reward earned (limit reached).', 'info');
+                STATE.isMining = false;
+                STATE.session.status = 'completed';
+                STATE.session.endTime = Date.now();
+                saveState();
+                renderAll(); return; }
+            STATE.rewards.push({ id: generateId(), userId: STATE.user.id, amount: reward, type: 'mining', timestamp: Date.now(),
+                sessionId: STATE.session.id, status: 'eligible', verificationStatus: 'verified', txId: null });
+            STATE.session.status = 'completed';
+            STATE.session.endTime = Date.now();
+            STATE.session.verificationStatus = 'verified';
+            STATE.miningHistory.push({ id: generateId(), userId: STATE.user.id, startTime: STATE.session.startTime,
+                endTime: Date.now(), duration: STATE.session.duration || 3600, reward: reward, status: 'completed' });
+            STATE.isMining = false;
+            if (STATE.miningInterval) clearInterval(STATE.miningInterval);
+            if (STATE.countdownInterval) clearInterval(STATE.countdownInterval);
+            saveState();
+            renderAll();
+            showToast(`⛏️ Mining complete! +${reward.toFixed(4)} AVQ eligible.`, 'success');
+        }
+
+        function stopMining() {
+            if (!STATE.isMining) return;
+            if (STATE.session) { STATE.session.status = 'stopped';
+                STATE.session.endTime = Date.now();
+                showToast('Mining stopped. No reward earned.', 'info'); }
+            STATE.isMining = false;
+            if (STATE.miningInterval) clearInterval(STATE.miningInterval);
+            if (STATE.countdownInterval) clearInterval(STATE.countdownInterval);
+            saveState();
+            renderAll();
+        }
+
+        // ===== CHECK-IN =====
+        function performCheckIn() {
+            if (!checkAuth()) return;
+            if (!STATE.config.checkinEnabled) { showToast('Check-in is disabled by admin.', 'error'); return; }
+            const now = Date.now();
+            const today = new Date(now).toDateString();
+            if (STATE.lastCheckIn) {
+                const lastDate = new Date(STATE.lastCheckIn).toDateString();
+                if (lastDate === today) { showToast('Already checked in today.', 'info');
+                    updateCheckInUI(); return; }
+                const yesterday = new Date(now);
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = yesterday.toDateString();
+                if (lastDate === yesterdayStr) STATE.checkInStreak += 1;
+                else STATE.checkInStreak = 1;
+            } else { STATE.checkInStreak = 1; }
+            const streakRewards = STATE.config.streakRewards || [1, 1, 2, 2, 3, 3, 5];
+            const index = (STATE.checkInStreak - 1) % streakRewards.length;
+            const rewardAmount = streakRewards[index] || 1;
+            STATE.rewards.push({ id: generateId(), userId: STATE.user.id, amount: rewardAmount, type: 'checkin',
+                timestamp: now, sessionId: null, status: 'eligible', verificationStatus: 'verified', txId: null });
+            STATE.lastCheckIn = now;
+            STATE.lastStreakDate = today;
+            saveState();
+            renderAll();
+            updateCheckInUI();
+            showToast(`✅ Check-in successful! +${rewardAmount.toFixed(2)} AVQ`, 'success');
+        }
+
+        function updateCheckInUI() {
+            const streak = STATE.checkInStreak || 0;
+            document.getElementById('streakDisplay').textContent = streak;
+            const streakRewards = STATE.config.streakRewards || [1, 1, 2, 2, 3, 3, 5];
+            const index = (streak) % streakRewards.length;
+            const nextReward = streakRewards[index] || 1;
+            document.getElementById('nextRewardDisplay').textContent = `Next: +${nextReward} AVQ`;
+            const today = new Date().toDateString();
+            const lastDate = STATE.lastCheckIn ? new Date(STATE.lastCheckIn).toDateString() : null;
+            const isCheckedIn = (lastDate === today);
+            const btn = document.getElementById('checkinBtn');
+            const msg = document.getElementById('checkinMessage');
+            if (isCheckedIn) { btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> Checked In';
+                msg.textContent = 'Come back tomorrow for more rewards!'; } else { btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-calendar-check"></i> CHECK IN';
+                msg.textContent = ''; }
+            const claimable = getUserClaimableRewards();
+            const badge = document.getElementById('rewardsBadge');
+            badge.style.display = (claimable > 0) ? 'inline' : 'none';
+        }
+
+        // ===== CLAIM REWARDS =====
+        function claimRewards() {
+            if (!checkAuth()) return;
+            if (!STATE.config.enableClaiming) { showToast('Claiming is disabled by admin.', 'error'); return; }
+            const user = STATE.user;
+            const eligibleRewards = STATE.rewards.filter(r => r.userId === user.id && r.status === 'eligible');
+            if (eligibleRewards.length === 0) { showToast('No eligible rewards to claim.', 'info'); return; }
+            const today = new Date().toDateString();
+            const dailyClaimed = STATE.rewards.filter(r => r.userId === user.id && r.status === 'claimed' && new Date(r
+                    .timestamp).toDateString() === today)
+                .reduce((sum, r) => sum + r.amount, 0);
+            if (dailyClaimed >= STATE.config.maxDailyClaim) { showToast(
+                    `Daily claim limit (${STATE.config.maxDailyClaim} AVQ) reached.`, 'error'); return; }
+            const now = new Date();
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+            const monthlyClaimed = STATE.rewards.filter(r => r.userId === user.id && r.status === 'claimed' && r.timestamp >=
+                    monthStart)
+                .reduce((sum, r) => sum + r.amount, 0);
+            if (monthlyClaimed >= STATE.config.maxMonthlyClaim) { showToast(
+                    `Monthly claim limit (${STATE.config.maxMonthlyClaim} AVQ) reached.`, 'error'); return; }
+            const totalAmount = eligibleRewards.reduce((sum, r) => sum + r.amount, 0);
+            if (totalAmount < (STATE.config.minClaimAmount || 0.01)) { showToast(
+                    `Minimum claim amount is ${(STATE.config.minClaimAmount||0.01).toFixed(2)} AVQ.`, 'error'); return; }
+            if (STATE.config.claimCooldown > 0) {
+                const lastClaim = STATE.transactions.filter(t => t.userId === user.id && t.type === 'claim' && t.status ===
+                        'completed')
+                    .sort((a, b) => b.timestamp - a.timestamp)[0];
+                if (lastClaim) {
+                    const elapsed = (Date.now() - lastClaim.timestamp) / 1000;
+                    if (elapsed < STATE.config.claimCooldown) {
+                        const remaining = Math.ceil(STATE.config.claimCooldown - elapsed);
+                        showToast(`Wait ${remaining}s before claiming again.`, 'error');
+                        return;
+                    }
+                }
+            }
+            const claimedIds = eligibleRewards.map(r => r.id);
+            STATE.rewards.forEach(r => { if (claimedIds.includes(r.id)) r.status = 'claimed'; });
+            STATE.transactions.push({ id: generateId(), userId: user.id, type: 'claim', amount: totalAmount, address: null,
+                status: 'completed', txHash: null, timestamp: Date.now() });
+            saveState();
+            renderAll();
+            showToast(`🎉 Claimed ${totalAmount.toFixed(4)} AVQ!`, 'success');
+            showClaimSuccessModal(totalAmount);
+        }
+
+        function showClaimSuccessModal(amount) {
+            const balance = getUserBalance();
+            document.getElementById('modalTitle').textContent = '🎉 Rewards Claimed!';
+            document.getElementById('modalBody').innerHTML = `
+                    <div style="text-align:center;padding:6px 0;">
+                        <div style="font-size:40px;margin-bottom:4px;">✅</div>
+                        <h3 style="font-size:22px;font-weight:700;color:var(--gold);">+${amount.toFixed(4)} AVQ</h3>
+                        <p class="text-muted" style="font-size:13px;margin:6px 0;">New Balance</p>
+                        <div style="font-size:26px;font-weight:700;color:var(--text-primary);">${formatBalance(balance)} AVQ</div>
+                        <p style="font-size:11px;color:var(--text-muted);margin-top:12px;">Recorded in Averiq reward ledger.</p>
+                        <button class="btn btn-primary btn-sm mt-16" onclick="closeModal()" style="padding:8px;">Done</button>
+                    </div>
+                `;
+            document.getElementById('modalOverlay').style.display = 'flex';
+        }
+
+        function checkAuth() {
+            if (!STATE.user) { showLoginModal(); return false; }
+            return true;
+        }
+
+        // ===== REFERRAL =====
+        function getReferralCode() { if (!STATE.user) return '------'; return STATE.user.referralCode; }
+
+        function copyReferralCode() {
+            const code = getReferralCode();
+            if (code && code !== '------') {
+                navigator.clipboard.writeText(code).then(() => { showToast('Referral code copied!', 'success'); }).catch(
+                () => {
+                    const el = document.getElementById('referralCodeRewards');
+                    if (el) { const range = document.createRange();
+                        range.selectNode(el);
+                        window.getSelection().removeAllRanges();
+                        window.getSelection().addRange(range);
+                        document.execCommand('copy');
+                        showToast('Referral code copied!', 'success'); }
+                });
+            }
+        }
+
+        function copyReferralLink() {
+            const code = getReferralCode();
+            if (code && code !== '------') {
+                const link = `https://ejim-web.github.io/Averiq/?ref=${code}`;
+                navigator.clipboard.writeText(link).then(() => { showToast('Referral link copied!', 'success'); }).catch(
+                    () => { prompt('Copy this link:', link); });
+            }
+        }
+
+        function shareReferral() {
+            const code = getReferralCode();
+            if (code && code !== '------') {
+                const text =
+                    `Join me on Averiq and earn AVQ rewards! Use my referral code: ${code} → https://ejim-web.github.io/Averiq/?ref=${code}`;
+                if (navigator.share) { navigator.share({ title: 'Averiq Referral', text: text }).catch(() => {}); } else {
+                    navigator.clipboard.writeText(text).then(() => { showToast('Referral text copied!', 'success'); }); }
+            }
+        }
+
+        // ===== WALLET =====
+        function copyWalletAddress() {
+            const addr = getWalletAddress();
+            if (addr && addr !== '0x0000...0000') {
+                navigator.clipboard.writeText(addr).then(() => { showToast('Wallet address copied!', 'success'); }).catch(
+                    () => { prompt('Copy this address:', addr); });
+            }
+        }
+
+        function openExplorer() {
+            const addr = getWalletAddress();
+            if (addr && addr !== '0x0000...0000') { window.open(`${STATE.config.explorer}/address/${addr}`, '_blank'); } else {
+                showToast('Explorer not available yet', 'info'); }
+        }
+
+        function disconnectWallet() { showToast('Wallet disconnected', 'info'); }
+
+        function showReceiveModal() {
+            const addr = getWalletAddress();
+            document.getElementById('modalTitle').textContent = 'Receive AVQ';
+            document.getElementById('modalBody').innerHTML = `
+                    <p class="text-muted" style="margin-bottom:10px;">Share this address to receive AVQ:</p>
+                    <div class="wallet-address" style="font-size:13px;">${addr}</div>
+                    <button class="btn btn-secondary btn-sm mt-16" onclick="copyWalletAddress()" style="padding:8px;"><i class="fas fa-copy"></i> Copy Address</button>
+                    <p class="text-muted" style="font-size:11px;margin-top:10px;">⚠️ Only send AVQ on the ${STATE.config.network} network.</p>
+                `;
+            document.getElementById('modalOverlay').style.display = 'flex';
+        }
+
+        function showSendModal() {
+            document.getElementById('modalTitle').textContent = 'Send AVQ';
+            document.getElementById('modalBody').innerHTML = `
+                    <div class="input-group"><label>Recipient Address</label><input type="text" id="sendAddress" placeholder="0x..." /></div>
+                    <div class="input-group"><label>Amount (AVQ)</label><input type="number" id="sendAmount" placeholder="0.00" min="0" step="0.01" /></div>
+                    <button class="btn btn-primary" onclick="handleSend()" style="padding:10px;"><i class="fas fa-paper-plane"></i> Send</button>
+                    <p class="text-muted" style="font-size:11px;margin-top:10px;">Balance: ${formatBalance(getUserBalance())} AVQ</p>
+                `;
+            document.getElementById('modalOverlay').style.display = 'flex';
+        }
+
+        function handleSend() {
+            const address = document.getElementById('sendAddress').value.trim();
+            const amount = parseFloat(document.getElementById('sendAmount').value);
+            if (!address || address.length < 10) { showToast('Please enter a valid address', 'error'); return; }
+            if (!amount || amount <= 0) { showToast('Please enter a valid amount', 'error'); return; }
+            const balance = getUserBalance();
+            if (amount > balance) { showToast('Insufficient balance', 'error'); return; }
+            const tx = { id: generateId(), userId: STATE.user.id, type: 'send', amount: amount, address: address,
+                status: 'pending', txHash: '0x' + generateId(), timestamp: Date.now() };
+            STATE.transactions.push(tx);
+            setTimeout(() => { tx.status = 'completed';
+                saveState();
+                renderAll(); }, 1500);
+            saveState();
+            closeModal();
+            renderAll();
+            showToast(`Sent ${amount.toFixed(4)} AVQ`, 'success');
+        }
+
+        function showWithdrawModal() {
+            document.getElementById('modalTitle').textContent = 'Withdraw AVQ';
+            document.getElementById('modalBody').innerHTML = `
+                    <p class="text-muted" style="margin-bottom:10px;">Withdraw your AVQ to an external wallet.<br><small>Min: ${STATE.config.minWithdrawal} AVQ | Max: ${STATE.config.maxWithdrawal} AVQ</small></p>
+                    <div class="input-group"><label>Destination Address</label><input type="text" id="withdrawAddress" placeholder="0x..." /></div>
+                    <div class="input-group"><label>Amount (AVQ)</label><input type="number" id="withdrawAmount" placeholder="0.00" min="0" step="0.01" /></div>
+                    <div class="input-group"><label>Network</label><select id="withdrawNetwork"><option value="${STATE.config.network}">${STATE.config.network}</option></select></div>
+                    <button class="btn btn-gold" onclick="handleWithdraw()" style="padding:10px;"><i class="fas fa-external-link-alt"></i> Withdraw</button>
+                    <p class="text-muted" style="font-size:11px;margin-top:10px;">Balance: ${formatBalance(getUserBalance())} AVQ<br>⚠️ Withdrawals are manually reviewed for security.</p>
+                `;
+            document.getElementById('modalOverlay').style.display = 'flex';
+        }
+
+        function handleWithdraw() {
+            const address = document.getElementById('withdrawAddress').value.trim();
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const network = document.getElementById('withdrawNetwork').value;
+            if (!address || address.length < 10) { showToast('Please enter a valid destination address', 'error'); return; }
+            if (!amount || amount <= 0) { showToast('Please enter a valid amount', 'error'); return; }
+            if (amount < STATE.config.minWithdrawal) { showToast(`Minimum withdrawal is ${STATE.config.minWithdrawal} AVQ`,
+                    'error'); return; }
+            if (amount > STATE.config.maxWithdrawal) { showToast(`Maximum withdrawal is ${STATE.config.maxWithdrawal} AVQ`,
+                    'error'); return; }
+            const balance = getUserBalance();
+            if (amount > balance) { showToast('Insufficient balance', 'error'); return; }
+            const tx = { id: generateId(), userId: STATE.user.id, type: 'withdraw', amount: amount, address: address,
+                network: network, status: 'pending', txHash: null, timestamp: Date.now() };
+            STATE.transactions.push(tx);
+            STATE.rewards.push({ id: generateId(), userId: STATE.user.id, amount: -amount, type: 'withdraw',
+                timestamp: Date.now(), sessionId: null, status: 'pending', verificationStatus: 'pending', txId: tx.id });
+            setTimeout(() => {
+                tx.status = 'completed';
+                tx.txHash = '0x' + generateId() + generateId().substring(0, 10);
+                const reward = STATE.rewards.find(r => r.txId === tx.id);
+                if (reward) { reward.status = 'claimed';
+                    reward.verificationStatus = 'verified'; }
+                saveState();
+                renderAll();
+                showToast(`Withdrawal of ${amount.toFixed(4)} AVQ completed!`, 'success');
+            }, 3000);
+            saveState();
+            closeModal();
+            renderAll();
+            showToast(`Withdrawal request submitted for ${amount.toFixed(4)} AVQ.`, 'info');
+        }
+
+        // ===== ADMIN =====
+        function showAdmin() {
+            if (!STATE.user || !STATE.user.isAdmin) { showToast('Admin access required', 'error'); return; }
+            navigateApp('appAdmin');
+            renderAdmin();
+        }
+
+        function hideAdmin() { navigateApp('appHome'); }
+
+        function renderAdmin() {
+            const users = JSON.parse(localStorage.getItem('averiq_users') || '[]');
+            document.getElementById('adminUsers').textContent = users.length;
+            document.getElementById('adminSessions').textContent = STATE.miningHistory.length;
+            const pool = STATE.rewards.filter(r => r.status === 'eligible' || r.status === 'pending')
+                .reduce((sum, r) => sum + r.amount, 0);
+            document.getElementById('adminPool').textContent = pool.toFixed(4);
+            document.getElementById('adminWithdrawals').textContent = STATE.transactions.filter(t => t.type === 'withdraw')
+                .length;
+            document.getElementById('adminEngine').textContent = STATE.config.rewardEngine || 'Simulated';
+            document.getElementById('adminEmission').textContent = STATE.config.currentEmission.toFixed(2) + ' AVQ';
+            document.getElementById('adminFraudAlerts').textContent = '0';
+
+            const miningKeys = ['baseRewardRate', 'sessionDuration', 'dailyMax', 'maxUserReward', 'referralBonus',
+                'minWithdrawal', 'maxWithdrawal', 'currentEmission', 'rewardReduction', 'stopEarlyPenalty'
+            ];
+            const configEl = document.getElementById('adminConfig');
+            configEl.innerHTML = miningKeys.map(key => {
+                const val = STATE.config[key] !== undefined ? STATE.config[key] : DEFAULT_CONFIG[key];
+                return `<div class="config-row"><span class="key">${key.replace(/([A-Z])/g,' $1').replace(/^./,str=>str.toUpperCase())}</span><span class="value"><input type="number" id="cfg_${key}" value="${val}" step="0.01" /></span></div>`;
+            }).join('');
+
+            const checkinKeys = ['checkinEnabled', 'checkinReward', 'streakRewards', 'maxDailyClaim', 'maxMonthlyClaim',
+                'minClaimAmount', 'claimCooldown', 'rewardExpiryDays', 'enableClaiming'
+            ];
+            const checkinEl = document.getElementById('adminCheckinConfig');
+            checkinEl.innerHTML = checkinKeys.map(key => {
+                let val = STATE.config[key] !== undefined ? STATE.config[key] : DEFAULT_CONFIG[key];
+                if (key === 'streakRewards') val = val.join(',');
+                const isBool = typeof val === 'boolean';
+                const input = isBool ?
+                    `<select id="cfg_${key}"><option value="true" ${val?'selected':''}>Enabled</option><option value="false" ${!val?'selected':''}>Disabled</option></select>` :
+                    `<input type="text" id="cfg_${key}" value="${val}" />`;
+                return `<div class="config-row"><span class="key">${key.replace(/([A-Z])/g,' $1').replace(/^./,str=>str.toUpperCase())}</span><span class="value">${input}</span></div>`;
+            }).join('');
+        }
+
+        function saveAdminConfig() {
+            if (!STATE.user || !STATE.user.isAdmin) return;
+            const keys = ['baseRewardRate', 'sessionDuration', 'dailyMax', 'maxUserReward', 'referralBonus',
+                'minWithdrawal', 'maxWithdrawal', 'currentEmission', 'rewardReduction', 'stopEarlyPenalty'
+            ];
+            keys.forEach(key => {
+                const el = document.getElementById(`cfg_${key}`);
+                if (el) { const val = parseFloat(el.value); if (!isNaN(val)) STATE.config[key] = val; }
+            });
+            saveState();
+            renderAll();
+            renderAdmin();
+            showToast('Mining config saved!', 'success');
+        }
+
+        function saveAdminCheckinConfig() {
+            if (!STATE.user || !STATE.user.isAdmin) return;
+            const keys = ['checkinEnabled', 'checkinReward', 'streakRewards', 'maxDailyClaim', 'maxMonthlyClaim',
+                'minClaimAmount', 'claimCooldown', 'rewardExpiryDays', 'enableClaiming'
+            ];
+            keys.forEach(key => {
+                const el = document.getElementById(`cfg_${key}`);
+                if (el) {
+                    let val = el.value;
+                    if (key === 'streakRewards') {
+                        val = val.split(',').map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
+                        if (val.length === 0) val = [1, 1, 2, 2, 3, 3, 5];
+                        STATE.config[key] = val;
+                    } else if (typeof DEFAULT_CONFIG[key] === 'boolean') {
+                        STATE.config[key] = (val === 'true');
+                    } else {
+                        const num = parseFloat(val);
+                        if (!isNaN(num)) STATE.config[key] = num;
+                        else STATE.config[key] = val;
+                    }
+                }
+            });
+            saveState();
+            renderAll();
+            renderAdmin();
+            showToast('Check-in config saved!', 'success');
+        }
+
+        // ===== RENDER =====
+        function renderAll() {
+            if (!STATE.user) return;
+            const balance = getUserBalance();
+            document.getElementById('avqBalance').textContent = formatBalance(balance);
+            document.getElementById('miningBalance').textContent = formatBalance(balance);
+            document.getElementById('walletBalance').textContent = formatBalance(balance);
+            const usd = balance * 0.12;
+            document.getElementById('usdEstimate').textContent = `≈ $${usd.toFixed(2)} USD`;
+            document.getElementById('walletUsd').textContent = `≈ $${usd.toFixed(2)} USD`;
+            document.getElementById('statSessions').textContent = getUserSessions();
+            document.getElementById('statRewards').textContent = formatBalance(getUserTotalRewards());
+            document.getElementById('statReferrals').textContent = getUserReferrals();
+            document.getElementById('walletNetwork').textContent = STATE.config.network;
+            const addr = getWalletAddress();
+            const addrEl = document.getElementById('walletAddressDisplay');
+            if (addrEl) {
+                if (addr.length > 20) addrEl.textContent = addr.substring(0, 10) + '...' + addr.substring(addr.length - 8);
+                else addrEl.textContent = addr;
+            }
+
+            const historyEl = document.getElementById('miningHistory');
+            if (historyEl) {
+                const history = STATE.miningHistory.filter(h => h.userId === STATE.user?.id).slice(-10).reverse();
+                if (history.length === 0) historyEl.innerHTML =
+                    '<div class="text-muted" style="text-align:center;padding:10px 0;font-size:12px;">No mining sessions yet.</div>';
+                else historyEl.innerHTML = history.map(h =>
+                    `<div class="tx-item"><div class="tx-info"><span class="tx-type">⛏️ Session ${h.status}</span><span class="tx-date">${formatDate(h.startTime)}</span></div><div class="tx-amount positive">+${h.reward.toFixed(4)} AVQ</div></div>`
+                    ).join('');
+            }
+
+            const txEl = document.getElementById('txHistory');
+            if (txEl) {
+                const txs = STATE.transactions.filter(t => t.userId === STATE.user?.id).slice(-10).reverse();
+                document.getElementById('txCount').textContent = txs.length + ' tx';
+                if (txs.length === 0) txEl.innerHTML =
+                    '<div class="text-muted" style="text-align:center;padding:16px 0;font-size:13px;">No transactions yet.</div>';
+                else txEl.innerHTML = txs.map(t => {
+                    const isPositive = (t.type === 'receive' || t.type === 'claim' || t.type === 'mining');
+                    const sign = isPositive ? '+' : '-';
+                    const cls = isPositive ? 'positive' : 'negative';
+                    const icon = t.type === 'withdraw' ? '📤' : t.type === 'send' ? '📤' : '📥';
+                    return `<div class="tx-item"><div class="tx-info"><span class="tx-type">${icon} ${t.type.charAt(0).toUpperCase()+t.type.slice(1)}</span><span class="tx-date">${formatDate(t.timestamp)} ${t.status==='completed'?'✅':'⏳'}</span></div><div class="tx-amount ${cls}">${sign}${t.amount.toFixed(4)} AVQ</div></div>`;
+                }).join('');
+            }
+
+            const codeEl = document.getElementById('referralCodeRewards');
+            if (codeEl) codeEl.textContent = STATE.user.referralCode || '------';
+            document.getElementById('refTotalRewards').textContent = getUserReferrals();
+            document.getElementById('refEarnedRewards').textContent = formatBalance(getUserReferralEarnings());
+            document.getElementById('refPendingRewards').textContent = STATE.referrals.filter(r => r.userId === STATE.user.id &&
+                r.status === 'pending').length;
+
+            document.getElementById('profileUsername').textContent = STATE.user.username;
+            document.getElementById('profileEmail').textContent = STATE.user.email;
+            document.getElementById('profileUserId').textContent = STATE.user.id.substring(0, 12) + '...';
+            document.getElementById('profileJoined').textContent = formatDate(STATE.user.joined);
+            document.getElementById('profileSessions').textContent = getUserSessions();
+            document.getElementById('profileTotalRewards').textContent = formatBalance(getUserTotalRewards()) + ' AVQ';
+            document.getElementById('profileStreak').textContent = (STATE.checkInStreak || 0) + ' days';
+            document.getElementById('profileStatus').textContent = STATE.isMining ? '⛏️ Mining' : 'Active';
+            document.getElementById('profileStatus').className = 'tag ' + (STATE.isMining ? 'green' : 'accent');
+
+            const adminShort = document.getElementById('adminShortcut');
+            if (STATE.user && STATE.user.isAdmin) adminShort.classList.remove('hidden');
+            else adminShort.classList.add('hidden');
+
+            const claimable = getUserClaimableRewards();
+            const pending = getUserPendingRewards();
+            const totalEarned = getUserTotalRewards();
+            const totalClaimed = getUserTotalClaimed();
+            const streak = STATE.checkInStreak || 0;
+            document.getElementById('rewardsClaimable').textContent = formatBalance(claimable);
+            document.getElementById('rewardsPending').textContent = formatBalance(pending);
+            document.getElementById('rewardsTotalEarned').textContent = formatBalance(totalEarned);
+            document.getElementById('rewardsTotalClaimed').textContent = formatBalance(totalClaimed);
+            document.getElementById('rewardsStreak').textContent = streak;
+            const rewardHist = document.getElementById('rewardHistoryList');
+            const userRewards = STATE.rewards.filter(r => r.userId === STATE.user?.id)
+                .sort((a, b) => b.timestamp - a.timestamp);
+            document.getElementById('rewardHistoryCount').textContent = userRewards.length + ' items';
+            if (userRewards.length === 0) rewardHist.innerHTML =
+                '<div class="text-muted" style="text-align:center;padding:10px 0;font-size:12px;">No reward records yet.</div>';
+            else rewardHist.innerHTML = userRewards.map(r => {
+                const statusClass = r.status;
+                const statusLabel = r.status.charAt(0).toUpperCase() + r.status.slice(1);
+                const sign = r.amount >= 0 ? '+' : '';
+                const cls = r.amount >= 0 ? 'positive' : 'negative';
+                const typeLabel = r.type.charAt(0).toUpperCase() + r.type.slice(1);
+                return `<div class="reward-history-item"><div class="left"><span class="type">${typeLabel}</span><span class="date">${formatDate(r.timestamp)}</span></div><div class="right"><span class="amount ${cls}">${sign}${r.amount.toFixed(4)} AVQ</span><span class="status-tag ${statusClass}">${statusLabel}</span></div></div>`;
+            }).join('');
+            const claimBtn = document.getElementById('claimRewardsBtn');
+            if (claimable > 0 && STATE.config.enableClaiming) {
+                claimBtn.disabled = false;
+                claimBtn.innerHTML = `<i class="fas fa-hand-holding-usd"></i> CLAIM REWARDS (${formatBalance(claimable)} AVQ)`;
+            } else { claimBtn.disabled = true;
+                claimBtn.innerHTML = `<i class="fas fa-hand-holding-usd"></i> NO REWARDS TO CLAIM`; }
+
+            const recentEl = document.getElementById('recentActivity');
+            if (recentEl) {
+                const all = [...STATE.rewards, ...STATE.transactions].filter(item => item.userId === STATE.user?.id)
+                    .sort((a, b) => b.timestamp - a.timestamp).slice(0, 5);
+                document.getElementById('recentCount').textContent = all.length + ' items';
+                if (all.length === 0) recentEl.innerHTML =
+                    '<div class="text-muted" style="text-align:center;padding:16px 0;font-size:13px;">No activity yet. Start mining!</div>';
+                else recentEl.innerHTML = all.map(item => {
+                    const isReward = item.amount !== undefined && item.type !== 'send' && item.type !== 'withdraw' &&
+                        item.type !== 'claim';
+                    const amount = item.amount || 0;
+                    const sign = amount >= 0 ? '+' : '';
+                    const cls = amount >= 0 ? 'positive' : 'negative';
+                    const label = isReward ? '⛏️ Reward' : item.type.charAt(0).toUpperCase() + item.type.slice(1);
+                    return `<div class="tx-item"><div class="tx-info"><span class="tx-type">${label}</span><span class="tx-date">${formatDate(item.timestamp)}</span></div><div class="tx-amount ${cls}">${sign}${Math.abs(amount).toFixed(4)} AVQ</div></div>`;
+                }).join('');
+            }
+            updateCheckInUI();
+            updateMiningUI();
+        }
+
+        // ===== TOAST, MODAL, EXPANDER =====
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+            toast.innerHTML =
+                `<span class="toast-icon">${icons[type]||'ℹ️'}</span><span class="toast-msg">${message}</span><button class="toast-close" onclick="this.parentElement.remove()">&times;</button>`;
+            container.appendChild(toast);
+            setTimeout(() => { if (toast.parentElement) toast.remove(); }, 5000);
+        }
+
+        function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
+        document.getElementById('modalOverlay').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+        function toggleExpander(id) { const el = document.getElementById(id); if (el) el.classList.toggle('open'); }
+
+        // ===== INIT =====
+        function init() {
+            loadState();
+            window.addEventListener('hashchange', handleRoute);
+            handleRoute();
+
+            document.getElementById('publicLoginBtn').addEventListener('click', showLoginModal);
+            document.getElementById('publicSignupBtn').addEventListener('click', showLoginModal);
+
+            const startBtn = document.getElementById('startMiningBtn');
+            if (startBtn) startBtn.addEventListener('click', startMining);
+            const stopBtn = document.getElementById('stopMiningBtn');
+            if (stopBtn) stopBtn.addEventListener('click', stopMining);
+            const quickMine = document.getElementById('quickMineBtn');
+            if (quickMine) quickMine.addEventListener('click', () => { if (STATE.user) { navigateApp('appMining');
+                    startMining(); } else showLoginModal(); });
+            const quickWithdraw = document.getElementById('quickWithdrawBtn');
+            if (quickWithdraw) quickWithdraw.addEventListener('click', () => { if (STATE.user) showWithdrawModal();
+                else showLoginModal(); });
+            const quickRewards = document.getElementById('quickRewardsBtn');
+            if (quickRewards) quickRewards.addEventListener('click', () => { if (STATE.user) navigateApp('appRewards');
+                else showLoginModal(); });
+            const checkinBtn = document.getElementById('checkinBtn');
+            if (checkinBtn) checkinBtn.addEventListener('click', performCheckIn);
+            const claimBtn = document.getElementById('claimRewardsBtn');
+            if (claimBtn) claimBtn.addEventListener('click', claimRewards);
+
+            if (STATE.user) navigateApp('appHome');
+            else navigatePublic('home');
+
+            setInterval(saveState, 30000);
+            console.log('Averiq public website ready.');
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
