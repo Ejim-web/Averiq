@@ -1,0 +1,470 @@
+<!-- =========================================================
+     AVERIQ PHANTOM MOBILE WALLET CONNECTION
+     ========================================================= -->
+
+<script>
+const AVERIQ_URL = "https://ejim-web.github.io/Averiq/";
+const PHANTOM_BROWSE_URL =
+  "https://phantom.app/ul/browse/" +
+  encodeURIComponent(AVERIQ_URL) +
+  "?ref=" +
+  encodeURIComponent(AVERIQ_URL);
+
+let connectedWallet = null;
+
+/* ---------------------------------------------------------
+   Find Phantom
+   --------------------------------------------------------- */
+
+function getPhantomProvider() {
+  if (
+    window.phantom &&
+    window.phantom.solana &&
+    window.phantom.solana.isPhantom
+  ) {
+    return window.phantom.solana;
+  }
+
+  if (
+    window.solana &&
+    window.solana.isPhantom
+  ) {
+    return window.solana;
+  }
+
+  return null;
+}
+
+/* ---------------------------------------------------------
+   Detect mobile
+   --------------------------------------------------------- */
+
+function isMobileDevice() {
+  return /Android|iPhone|iPad|iPod/i.test(
+    navigator.userAgent
+  );
+}
+
+/* ---------------------------------------------------------
+   Connect button
+   --------------------------------------------------------- */
+
+window.connectWallet = async function () {
+
+  const provider = getPhantomProvider();
+
+  /*
+   * If Phantom is already providing its wallet
+   * interface to this page, connect directly.
+   */
+  if (provider) {
+
+    try {
+
+      showMessage("Opening Phantom connection...");
+
+      const result = await provider.connect();
+
+      if (
+        !result ||
+        !result.publicKey
+      ) {
+        throw new Error(
+          "Phantom did not return a wallet address."
+        );
+      }
+
+      connectedWallet = result.publicKey;
+
+      updateWalletDisplay();
+
+      showMessage(
+        "✅ Phantom connected. Loading your AVQ Devnet balance..."
+      );
+
+      if (
+        typeof refreshAVQBalance === "function"
+      ) {
+        await refreshAVQBalance();
+      }
+
+      return;
+
+    } catch (error) {
+
+      console.error(
+        "Phantom connection error:",
+        error
+      );
+
+      /*
+       * 4001 normally means the user rejected
+       * the connection request.
+       */
+      if (
+        error &&
+        error.code === 4001
+      ) {
+
+        showMessage(
+          "Connection cancelled in Phantom."
+        );
+
+        return;
+      }
+
+      showMessage(
+        "Phantom connection failed: " +
+        (error.message || error)
+      );
+
+      return;
+    }
+  }
+
+  /*
+   * Phantom provider is not available.
+   *
+   * On mobile, offer the supported Phantom
+   * in-app-browser route.
+   */
+  if (isMobileDevice()) {
+
+    showMobilePhantomPrompt();
+
+    return;
+  }
+
+  /*
+   * Desktop browser without Phantom.
+   */
+  showMessage(
+    "Phantom was not detected. Install Phantom or open Averiq in a Phantom-enabled browser."
+  );
+};
+
+/* ---------------------------------------------------------
+   Mobile Phantom prompt
+   --------------------------------------------------------- */
+
+function showMobilePhantomPrompt() {
+
+  const existing =
+    document.getElementById(
+      "phantomMobilePrompt"
+    );
+
+  if (existing) {
+    existing.remove();
+  }
+
+  const overlay =
+    document.createElement("div");
+
+  overlay.id =
+    "phantomMobilePrompt";
+
+  overlay.style.cssText = `
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    background:rgba(0,0,0,.78);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  `;
+
+  overlay.innerHTML = `
+
+    <div style="
+      width:100%;
+      max-width:390px;
+      background:#0b1b2a;
+      border:1px solid rgba(18,216,181,.25);
+      border-radius:24px;
+      padding:25px;
+      color:white;
+      text-align:center;
+      box-shadow:0 25px 80px rgba(0,0,0,.5);
+    ">
+
+      <div style="
+        width:65px;
+        height:65px;
+        margin:0 auto 15px;
+        border-radius:18px;
+        background:#ab9ff2;
+        display:grid;
+        place-items:center;
+        font-size:30px;
+        font-weight:900;
+        color:#151129;
+      ">
+        P
+      </div>
+
+      <h2 style="
+        margin:0 0 10px;
+        font-size:22px;
+      ">
+        Connect Phantom
+      </h2>
+
+      <p style="
+        color:#9eb0c4;
+        line-height:1.55;
+        font-size:14px;
+        margin-bottom:22px;
+      ">
+        To connect your Phantom wallet on mobile,
+        open Averiq inside Phantom's secure browser.
+      </p>
+
+      <button
+        id="openPhantomButton"
+        style="
+          width:100%;
+          border:0;
+          border-radius:16px;
+          padding:16px;
+          background:#ab9ff2;
+          color:#151129;
+          font-weight:900;
+          font-size:16px;
+        "
+      >
+        Open Averiq in Phantom
+      </button>
+
+      <button
+        id="cancelPhantomButton"
+        style="
+          width:100%;
+          border:1px solid rgba(255,255,255,.1);
+          border-radius:16px;
+          padding:14px;
+          margin-top:10px;
+          background:#102334;
+          color:white;
+          font-weight:700;
+        "
+      >
+        Cancel
+      </button>
+
+      <p style="
+        color:#70859c;
+        font-size:11px;
+        line-height:1.5;
+        margin-top:17px;
+      ">
+        If Phantom is already installed,
+        the button should open its in-app browser.
+      </p>
+
+    </div>
+  `;
+
+  document.body.appendChild(
+    overlay
+  );
+
+  document
+    .getElementById(
+      "openPhantomButton"
+    )
+    .onclick = function () {
+
+      showMessage(
+        "Opening Averiq in Phantom..."
+      );
+
+      /*
+       * Phantom's supported browse universal link.
+       */
+      window.location.href =
+        PHANTOM_BROWSE_URL;
+    };
+
+  document
+    .getElementById(
+      "cancelPhantomButton"
+    )
+    .onclick = function () {
+
+      overlay.remove();
+
+      showMessage(
+        "Wallet connection cancelled."
+      );
+    };
+}
+
+/* ---------------------------------------------------------
+   Wallet display
+   --------------------------------------------------------- */
+
+function updateWalletDisplay() {
+
+  const status =
+    document.getElementById(
+      "walletStatus"
+    );
+
+  const address =
+    document.getElementById(
+      "walletAddress"
+    );
+
+  if (!connectedWallet) {
+
+    if (status) {
+      status.textContent =
+        "Wallet not connected";
+    }
+
+    if (address) {
+      address.textContent =
+        "No wallet connected";
+    }
+
+    return;
+  }
+
+  const addressText =
+    connectedWallet.toBase58();
+
+  if (status) {
+    status.textContent =
+      "✅ Phantom connected";
+  }
+
+  if (address) {
+    address.textContent =
+      addressText;
+  }
+}
+
+/* ---------------------------------------------------------
+   Automatic reconnection
+   --------------------------------------------------------- */
+
+async function autoConnectPhantom() {
+
+  const provider =
+    getPhantomProvider();
+
+  if (!provider) {
+    return;
+  }
+
+  try {
+
+    const result =
+      await provider.connect({
+        onlyIfTrusted:true
+      });
+
+    if (
+      result &&
+      result.publicKey
+    ) {
+
+      connectedWallet =
+        result.publicKey;
+
+      updateWalletDisplay();
+
+      if (
+        typeof refreshAVQBalance === "function"
+      ) {
+        await refreshAVQBalance();
+      }
+    }
+
+  } catch {
+
+    /*
+     * Normal when this website has not previously
+     * been approved by the user's Phantom wallet.
+     */
+  }
+}
+
+/* ---------------------------------------------------------
+   Phantom account changes
+   --------------------------------------------------------- */
+
+function listenForPhantomChanges() {
+
+  const provider =
+    getPhantomProvider();
+
+  if (
+    !provider ||
+    !provider.on
+  ) {
+    return;
+  }
+
+  provider.on(
+    "accountChanged",
+    async function(publicKey) {
+
+      if (!publicKey) {
+
+        connectedWallet =
+          null;
+
+        updateWalletDisplay();
+
+        const balance =
+          document.getElementById(
+            "avqBalance"
+          );
+
+        if (balance) {
+          balance.textContent = "0";
+        }
+
+        showMessage(
+          "Phantom wallet disconnected."
+        );
+
+        return;
+      }
+
+      connectedWallet =
+        publicKey;
+
+      updateWalletDisplay();
+
+      showMessage(
+        "Wallet changed. Updating AVQ balance..."
+      );
+
+      if (
+        typeof refreshAVQBalance === "function"
+      ) {
+        await refreshAVQBalance();
+      }
+    }
+  );
+}
+
+/* ---------------------------------------------------------
+   Initialize
+   --------------------------------------------------------- */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function() {
+
+    autoConnectPhantom();
+
+    listenForPhantomChanges();
+
+  }
+);
+</script>
