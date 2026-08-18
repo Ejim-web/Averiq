@@ -1,0 +1,4010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#06111c">
+<title>Averiq — AVQ Rewards</title>
+
+<style>
+:root{
+  --bg:#06111c;
+  --card:rgba(16,30,46,.82);
+  --input:#0a1a2a;
+  --text:#eef7ff;
+  --secondary:#8ca0b8;
+  --muted:#6a7f96;
+  --border:rgba(255,255,255,.08);
+  --green:#12d8b5;
+  --gold:#f5b62e;
+  --red:#ff6675;
+}
+
+[data-theme="light"]{
+  --bg:#f0f4f8;
+  --card:rgba(255,255,255,.85);
+  --input:#fff;
+  --text:#1a2332;
+  --secondary:#4a5a6e;
+  --muted:#7a8a9e;
+  --border:rgba(0,0,0,.08);
+}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  min-height:100%;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+button,input{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+button:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+
+#particles{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  z-index:0;
+}
+
+.app{
+  position:relative;
+  z-index:1;
+  max-width:760px;
+  margin:auto;
+  min-height:100vh;
+  padding-bottom:100px;
+}
+
+header{
+  height:82px;
+  padding:12px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:rgba(6,17,28,.82);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+}
+
+[data-theme="light"] header{
+  background:rgba(255,255,255,.82);
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:25px;
+  font-weight:900;
+}
+
+.logo{
+  width:55px;
+  height:55px;
+  border-radius:17px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(145deg,#12d8b5,#0d8a72);
+  color:#06111c;
+  font-size:30px;
+  font-weight:900;
+}
+
+.header-actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+.online{
+  padding:8px 10px;
+  border:1px solid rgba(18,216,181,.35);
+  border-radius:30px;
+  color:var(--green);
+  font-size:10px;
+  font-weight:800;
+}
+
+.dot{
+  display:inline-block;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#37df6d;
+  margin-right:5px;
+}
+
+.theme{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text);
+}
+
+main{
+  padding:18px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:28px;
+  padding:22px;
+  margin-bottom:18px;
+  backdrop-filter:blur(18px);
+  box-shadow:0 10px 35px rgba(0,0,0,.2);
+}
+
+.balance-title{
+  text-align:center;
+  color:var(--secondary);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:2px;
+}
+
+.balance{
+  text-align:center;
+  font-size:clamp(44px,12vw,64px);
+  font-weight:900;
+  margin:8px 0;
+  background:linear-gradient(135deg,#12d8b5,#f5b62e);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.balance-sub{
+  text-align:center;
+  color:var(--secondary);
+  font-size:12px;
+}
+
+.section-title{
+  font-size:14px;
+  font-weight:800;
+  color:var(--secondary);
+}
+
+.clock-container{
+  width:min(88vw,420px);
+  height:min(88vw,420px);
+  margin:15px auto;
+  position:relative;
+}
+
+.clock{
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  position:relative;
+  background:
+    radial-gradient(
+      circle at 40% 35%,
+      #0d3045,
+      #08233a 40%,
+      #041825 68%,
+      #020d18
+    );
+  border:4px solid rgba(18,216,181,.3);
+  box-shadow:
+    0 0 70px rgba(18,216,181,.08),
+    inset 0 0 80px rgba(0,0,0,.5);
+}
+
+[data-theme="light"] .clock{
+  background:
+    radial-gradient(
+      circle at 40% 35%,
+      #d0e4f0,
+      #b8cce0 40%,
+      #a0b8d0 68%,
+      #889ab8
+    );
+}
+
+.number{
+  position:absolute;
+  inset:0;
+  text-align:center;
+  padding:8px;
+  color:#8aaec9;
+  font-size:clamp(14px,3vw,22px);
+  font-weight:800;
+}
+
+[data-theme="light"] .number{
+  color:#2a4a6a;
+}
+
+.number span{
+  display:inline-block;
+  width:30px;
+  height:30px;
+  line-height:30px;
+}
+
+.hand{
+  position:absolute;
+  bottom:50%;
+  left:50%;
+  transform-origin:bottom center;
+  border-radius:5px;
+}
+
+.hour{
+  width:6px;
+  height:28%;
+  margin-left:-3px;
+  background:#fff;
+}
+
+.minute{
+  width:4px;
+  height:35%;
+  margin-left:-2px;
+  background:#d0e4f5;
+}
+
+.second{
+  width:2px;
+  height:38%;
+  margin-left:-1px;
+  background:var(--green);
+  box-shadow:0 0 15px rgba(18,216,181,.4);
+}
+
+.center{
+  position:absolute;
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  background:var(--green);
+  border:2px solid #06111c;
+  z-index:10;
+}
+
+.timer{
+  text-align:center;
+  font-size:clamp(30px,7vw,44px);
+  font-weight:900;
+  letter-spacing:3px;
+}
+
+.status{
+  text-align:center;
+  color:var(--secondary);
+  font-size:13px;
+  margin-top:6px;
+}
+
+.status.active{
+  color:var(--green);
+}
+
+.status.complete{
+  color:var(--gold);
+}
+
+.actions{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+  margin-bottom:18px;
+}
+
+.action{
+  min-height:82px;
+  border-radius:18px;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text);
+  padding:10px 6px;
+  font-size:11px;
+  font-weight:800;
+}
+
+.action.primary{
+  border-color:rgba(18,216,181,.4);
+  background:rgba(18,216,181,.08);
+}
+
+.action .icon{
+  display:block;
+  font-size:20px;
+  margin-bottom:5px;
+}
+
+.action small{
+  display:block;
+  color:var(--muted);
+  font-size:9px;
+  margin-top:4px;
+}
+
+.wallet-button{
+  width:100%;
+  border:0;
+  border-radius:17px;
+  padding:16px;
+  background:linear-gradient(145deg,#12d8b5,#0d8a72);
+  color:#03151a;
+  font-weight:900;
+  font-size:15px;
+}
+
+.wallet-button.connected{
+  background:rgba(18,216,181,.12);
+  color:var(--green);
+  border:1px solid rgba(18,216,181,.35);
+}
+
+.wallet-address{
+  margin-top:12px;
+  padding:13px;
+  border-radius:14px;
+  background:var(--input);
+  border:1px solid var(--border);
+  font-family:monospace;
+  font-size:11px;
+  word-break:break-all;
+}
+
+.wallet-short{
+  color:var(--green);
+  font-weight:800;
+  font-size:14px;
+}
+
+.message{
+  margin-top:12px;
+  padding:13px;
+  border-radius:14px;
+  background:var(--input);
+  border:1px solid var(--border);
+  color:var(--secondary);
+  font-size:12px;
+  line-height:1.5;
+  word-break:break-word;
+}
+
+.message.success{
+  border-left:3px solid var(--green);
+}
+
+.message.error{
+  border-left:3px solid var(--red);
+}
+
+.message.info{
+  border-left:3px solid var(--gold);
+}
+
+.mint{
+  padding:10px;
+  border-radius:10px;
+  background:var(--input);
+  color:var(--green);
+  font-family:monospace;
+  font-size:11px;
+  word-break:break-all;
+}
+
+.info-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:12px;
+}
+
+.info-box{
+  padding:13px;
+  border-radius:15px;
+  background:var(--input);
+  border:1px solid var(--border);
+}
+
+.info-label{
+  color:var(--muted);
+  font-size:10px;
+}
+
+.info-value{
+  margin-top:4px;
+  font-weight:800;
+  font-size:14px;
+}
+
+.nav{
+  position:fixed;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(760px,100%);
+  height:76px;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  background:rgba(6,17,28,.90);
+  backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  z-index:30;
+}
+
+[data-theme="light"] .nav{
+  background:rgba(255,255,255,.92);
+}
+
+.nav button{
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  font-size:10px;
+  font-weight:800;
+}
+
+.nav button.active{
+  color:var(--green);
+}
+
+.nav-icon{
+  display:block;
+  font-size:18px;
+  margin-bottom:3px;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(12px);
+}
+
+.modal-box{
+  width:100%;
+  max-width:400px;
+  max-height:90vh;
+  overflow:auto;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:25px;
+  padding:24px;
+  position:relative;
+}
+
+.close{
+  position:absolute;
+  right:14px;
+  top:10px;
+  border:0;
+  background:none;
+  color:var(--muted);
+  font-size:26px;
+}
+
+.modal h2{
+  margin:0 0 18px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  margin-bottom:12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:var(--input);
+  color:var(--text);
+  outline:none;
+}
+
+input:focus{
+  border-color:var(--green);
+}
+
+.modal-primary{
+  width:100%;
+  border:0;
+  border-radius:15px;
+  padding:14px;
+  background:linear-gradient(145deg,#12d8b5,#0d8a72);
+  color:#03151a;
+  font-weight:900;
+}
+
+.modal-secondary{
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:14px;
+  margin-top:9px;
+  background:transparent;
+  color:var(--text);
+  font-weight:800;
+}
+
+.modal-status{
+  margin-top:12px;
+  color:var(--secondary);
+  font-size:12px;
+  line-height:1.5;
+  word-break:break-word;
+}
+
+.tx{
+  margin-top:10px;
+  padding:10px;
+  background:var(--input);
+  border-radius:10px;
+  font-family:monospace;
+  font-size:10px;
+  word-break:break-all;
+  color:var(--green);
+}
+
+.hidden{
+  display:none!important;
+}
+
+@media(max-width:500px){
+  main{
+    padding:14px;
+  }
+
+  .card{
+    padding:18px;
+  }
+
+  .clock-container{
+    width:min(85vw,340px);
+    height:min(85vw,340px);
+  }
+
+  .online{
+    display:none;
+  }
+}
+
+@media(max-width:400px){
+  .actions{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .brand{
+    font-size:21px;
+  }
+
+  .logo{
+    width:48px;
+    height:48px;
+    font-size:25px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="particles"></canvas>
+
+<div class="app">
+
+<header>
+  <div class="brand">
+    <div class="logo">₳</div>
+    <span>Averiq.</span>
+  </div>
+
+  <div class="header-actions">
+    <div class="online">
+      <span class="dot"></span>
+      Solana Devnet
+    </div>
+
+    <button
+      class="theme"
+      id="themeButton"
+      type="button"
+      onclick="toggleTheme()">
+      ☀️
+    </button>
+  </div>
+</header>
+
+<main>
+
+<!-- BALANCE -->
+<div class="card">
+
+  <div class="balance-title">
+    ON-CHAIN AVQ
+  </div>
+
+  <div class="balance" id="balance">
+    0
+  </div>
+
+  <div class="balance-sub" id="balanceSub">
+    Connect Phantom to read your real AVQ balance
+  </div>
+
+</div>
+
+
+<!-- EARNING -->
+<div class="card" style="text-align:center">
+
+  <div class="section-title">
+    ⛏️ AVQ EARNING SESSION
+  </div>
+
+  <div style="font-size:11px;color:var(--muted);margin-top:5px">
+    Complete a verified 24-hour session to become eligible for an AVQ reward.
+  </div>
+
+  <div class="clock-container">
+
+    <div class="clock">
+
+      <div class="number" style="transform:rotate(30deg)">
+        <span style="transform:rotate(-30deg)">1</span>
+      </div>
+
+      <div class="number" style="transform:rotate(60deg)">
+        <span style="transform:rotate(-60deg)">2</span>
+      </div>
+
+      <div class="number" style="transform:rotate(90deg)">
+        <span style="transform:rotate(-90deg)">3</span>
+      </div>
+
+      <div class="number" style="transform:rotate(120deg)">
+        <span style="transform:rotate(-120deg)">4</span>
+      </div>
+
+      <div class="number" style="transform:rotate(150deg)">
+        <span style="transform:rotate(-150deg)">5</span>
+      </div>
+
+      <div class="number" style="transform:rotate(180deg)">
+        <span style="transform:rotate(-180deg)">6</span>
+      </div>
+
+      <div class="number" style="transform:rotate(210deg)">
+        <span style="transform:rotate(-210deg)">7</span>
+      </div>
+
+      <div class="number" style="transform:rotate(240deg)">
+        <span style="transform:rotate(-240deg)">8</span>
+      </div>
+
+      <div class="number" style="transform:rotate(270deg)">
+        <span style="transform:rotate(-270deg)">9</span>
+      </div>
+
+      <div class="number" style="transform:rotate(300deg)">
+        <span style="transform:rotate(-300deg)">10</span>
+      </div>
+
+      <div class="number" style="transform:rotate(330deg)">
+        <span style="transform:rotate(-330deg)">11</span>
+      </div>
+
+      <div class="number">
+        <span>12</span>
+      </div>
+
+      <div class="hand hour" id="hourHand"></div>
+      <div class="hand minute" id="minuteHand"></div>
+      <div class="hand second" id="secondHand"></div>
+
+      <div class="center"></div>
+
+    </div>
+
+  </div>
+
+  <div class="timer" id="timer">
+    24:00:00
+  </div>
+
+  <div class="status" id="sessionStatus">
+    Connect wallet to start
+  </div>
+
+</div>
+
+
+<!-- ACTIONS -->
+<div class="actions">
+
+  <button
+    class="action primary"
+    type="button"
+    onclick="startEarning()">
+
+    <span class="icon">⛏️</span>
+    Start Earning
+
+    <small>
+      24-hour session
+    </small>
+
+  </button>
+
+
+  <button
+    class="action"
+    type="button"
+    onclick="checkIn()">
+
+    <span class="icon">✅</span>
+    Check-In
+
+    <small>
+      Daily reward
+    </small>
+
+  </button>
+
+
+  <button
+    class="action"
+    type="button"
+    onclick="claimReward()">
+
+    <span class="icon">🎁</span>
+    Claim
+
+    <small>
+      AVQ reward
+    </small>
+
+  </button>
+
+
+  <button
+    class="action"
+    type="button"
+    onclick="showSendModal()">
+
+    <span class="icon">📤</span>
+    Send
+
+    <small>
+      AVQ
+    </small>
+
+  </button>
+
+
+  <button
+    class="action"
+    type="button"
+    onclick="showReceiveModal()">
+
+    <span class="icon">📥</span>
+    Receive
+
+    <small>
+      AVQ
+    </small>
+
+  </button>
+
+
+  <button
+    class="action"
+    type="button"
+    onclick="copyAddress()">
+
+    <span class="icon">📋</span>
+    Copy
+
+    <small>
+      Wallet
+    </small>
+
+  </button>
+
+</div>
+
+
+<!-- WALLET -->
+<div class="card">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+
+    <h2 style="margin:0;font-size:19px">
+      👛 Phantom Wallet
+    </h2>
+
+    <span
+      id="walletStatus"
+      style="font-size:11px;color:var(--muted)">
+      Not connected
+    </span>
+
+  </div>
+
+
+  <button
+    id="walletButton"
+    class="wallet-button"
+    type="button"
+    onclick="connectWallet()"
+    style="margin-top:15px">
+
+    Connect Phantom Wallet
+
+  </button>
+
+
+  <div
+    class="wallet-address"
+    id="walletAddress">
+
+    <div class="wallet-short">
+      No wallet connected
+    </div>
+
+  </div>
+
+
+  <div
+    class="message"
+    id="message">
+
+    Connect Phantom to use AVQ blockchain rewards.
+
+  </div>
+
+</div>
+
+
+<!-- BLOCKCHAIN INFO -->
+<div class="card">
+
+  <h2 style="margin:0 0 14px;font-size:16px">
+    ⛓️ AVQ Blockchain
+  </h2>
+
+
+  <div class="info-grid">
+
+    <div class="info-box">
+      <div class="info-label">
+        NETWORK
+      </div>
+      <div class="info-value">
+        Solana Devnet
+      </div>
+    </div>
+
+
+    <div class="info-box">
+      <div class="info-label">
+        TOKEN
+      </div>
+      <div class="info-value">
+        AVQ
+      </div>
+    </div>
+
+
+    <div class="info-box">
+      <div class="info-label">
+        SESSION REWARD
+      </div>
+      <div class="info-value">
+        10 AVQ
+      </div>
+    </div>
+
+
+    <div class="info-box">
+      <div class="info-label">
+        REWARD TYPE
+      </div>
+      <div class="info-value">
+        On-chain
+      </div>
+    </div>
+
+  </div>
+
+
+  <div style="margin-top:15px;color:var(--muted);font-size:10px">
+    AVQ Mint Address
+  </div>
+
+
+  <div
+    class="mint"
+    id="mintAddress">
+    Ff6oxq9jqbhyJTBre56KtXLCuUFKixa6v5EN2qCAXX36
+  </div>
+
+
+  <button
+    type="button"
+    onclick="copyMint()"
+    style="margin-top:9px;border:0;background:none;color:var(--green);font-size:11px;font-weight:800">
+
+    📋 Copy Mint Address
+
+  </button>
+
+</div>
+
+
+<!-- LAST TRANSACTION -->
+<div class="card">
+
+  <h2 style="margin:0 0 10px;font-size:16px">
+    🔗 Last Blockchain Reward
+  </h2>
+
+  <div
+    id="lastTransaction"
+    style="font-size:12px;color:var(--secondary)">
+
+    No reward transaction yet.
+
+  </div>
+
+</div>
+
+</main>
+</div>
+
+
+<!-- NAV -->
+<nav class="nav">
+
+  <button
+    class="active"
+    type="button">
+
+    <span class="nav-icon">⌂</span>
+    Home
+
+  </button>
+
+
+  <button
+    type="button"
+    onclick="showSendModal()">
+
+    <span class="nav-icon">📤</span>
+    Send
+
+  </button>
+
+
+  <button
+    type="button"
+    onclick="showReceiveModal()">
+
+    <span class="nav-icon">📥</span>
+    Receive
+
+  </button>
+
+
+  <button
+    type="button"
+    onclick="connectWallet()">
+
+    <span class="nav-icon">👛</span>
+    Wallet
+
+  </button>
+
+
+  <button
+    type="button"
+    onclick="showProfile()">
+
+    <span class="nav-icon">●</span>
+    Profile
+
+  </button>
+
+</nav>
+
+
+<!-- MODAL -->
+<div
+  class="modal"
+  id="modal">
+
+  <div class="modal-box">
+
+    <button
+      class="close"
+      type="button"
+      onclick="closeModal()">
+
+      ×
+
+    </button>
+
+
+    <h2 id="modalTitle">
+      AVQ
+    </h2>
+
+
+    <div id="modalBody"></div>
+
+  </div>
+
+</div>
+
+
+<script type="module">
+
+/*
+============================================================
+AVERIQ FRONTEND
+============================================================
+
+This file does NOT contain a mint-authority private key.
+
+The secure architecture is:
+
+USER
+ ↓
+PHANTOM WALLET
+ ↓
+/api/earning
+ ↓
+SECURE SERVER
+ ↓
+DATABASE / SESSION VERIFICATION
+ ↓
+SOLANA
+ ↓
+AVQ TOKEN
+
+The browser must never contain the mint authority private key.
+
+============================================================
+*/
+
+
+import {
+  Connection,
+  PublicKey,
+  Transaction
+} from "https://esm.sh/@solana/web3.js@1.98.4?bundle";
+
+
+import {
+  getAssociatedTokenAddress,
+  getAccount,
+  getMint,
+  createAssociatedTokenAccountInstruction,
+  createTransferInstruction
+} from "https://esm.sh/@solana/spl-token@0.4.14?bundle";
+
+
+/* ==========================================================
+CONFIG
+========================================================== */
+
+const AVQ_MINT =
+  "Ff6oxq9jqbhyJTBre56KtXLCuUFKixa6v5EN2qCAXX36";
+
+const DEVNET_RPC =
+  "https://api.devnet.solana.com";
+
+const EARNING_API =
+  "/api/earning";
+
+const SESSION_LENGTH =
+  24 * 60 * 60 * 1000;
+
+const SESSION_REWARD =
+  10;
+
+const CHECKIN_REWARD =
+  0.25;
+
+
+/* ==========================================================
+SOLANA CONNECTION
+========================================================== */
+
+const connection =
+  new Connection(
+    DEVNET_RPC,
+    {
+      commitment:"confirmed"
+    }
+  );
+
+
+/* ==========================================================
+STATE
+========================================================== */
+
+let wallet = null;
+
+let provider = null;
+
+let mintInfo = null;
+
+let sessionEnd = null;
+
+let sessionCompleted = false;
+
+let timer = null;
+
+let lastCheckIn = null;
+
+let streak = 0;
+
+let connecting = false;
+
+
+/* ==========================================================
+DOM HELPER
+========================================================== */
+
+function $(id){
+  return document.getElementById(id);
+}
+
+
+/* ==========================================================
+MESSAGE
+========================================================== */
+
+function showMessage(
+  text,
+  type="info"
+){
+
+  const el =
+    $("message");
+
+  if(!el)
+    return;
+
+  el.textContent =
+    text;
+
+  el.className =
+    "message " + type;
+}
+
+
+/* ==========================================================
+PHANTOM PROVIDER DETECTION
+========================================================== */
+
+function getProvider(){
+
+  /*
+  Desktop Phantom
+  */
+  if(
+    window.phantom &&
+    window.phantom.solana &&
+    window.phantom.solana.isPhantom
+  ){
+    return window.phantom.solana;
+  }
+
+
+  /*
+  Some browsers expose window.solana
+  */
+  if(
+    window.solana &&
+    window.solana.isPhantom
+  ){
+    return window.solana;
+  }
+
+
+  /*
+  Newer wallet standard provider
+  */
+  if(
+    window.phantom &&
+    window.phantom.solana
+  ){
+    return window.phantom.solana;
+  }
+
+
+  return null;
+}
+
+
+/* ==========================================================
+MOBILE PHANTOM URL
+========================================================== */
+
+function openInPhantom(){
+
+  const currentUrl =
+    window.location.href;
+
+  const phantomUrl =
+    "https://phantom.app/ul/browse/" +
+    encodeURIComponent(
+      currentUrl
+    );
+
+  window.location.href =
+    phantomUrl;
+}
+
+
+/* ==========================================================
+CONNECT WALLET
+========================================================== */
+
+window.connectWallet =
+async function(){
+
+  if(connecting)
+    return;
+
+
+  provider =
+    getProvider();
+
+
+  /*
+  If Phantom is not injected, attempt
+  to open the website inside Phantom.
+  */
+  if(!provider){
+
+    const mobile =
+      /Android|iPhone|iPad|iPod/i.test(
+        navigator.userAgent
+      );
+
+
+    if(mobile){
+
+      showMessage(
+        "Opening this website in Phantom...",
+        "info"
+      );
+
+      setTimeout(
+        openInPhantom,
+        300
+      );
+
+      return;
+    }
+
+
+    showMessage(
+      "Phantom was not detected. Open this website using the Phantom browser or install Phantom.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  try{
+
+    connecting = true;
+
+    showMessage(
+      "Opening Phantom...",
+      "info"
+    );
+
+
+    const result =
+      await provider.connect();
+
+
+    if(
+      !result ||
+      !result.publicKey
+    ){
+
+      throw new Error(
+        "Phantom did not return a wallet address."
+      );
+    }
+
+
+    wallet =
+      result.publicKey;
+
+
+    updateWalletUI();
+
+
+    await afterWalletConnected();
+
+
+  }catch(error){
+
+    console.error(
+      "Phantom connection error:",
+      error
+    );
+
+
+    showMessage(
+      "Wallet connection failed: " +
+      (
+        error?.message ||
+        String(error)
+      ),
+      "error"
+    );
+
+  }finally{
+
+    connecting = false;
+
+  }
+
+};
+
+
+/* ==========================================================
+AFTER WALLET CONNECTION
+========================================================== */
+
+async function afterWalletConnected(){
+
+  showMessage(
+    "Wallet connected. Reading AVQ blockchain data...",
+    "info"
+  );
+
+
+  await loadMintInfo();
+
+  await refreshBalance();
+
+  await restoreSession();
+
+
+  showMessage(
+    "✅ Phantom wallet connected successfully.",
+    "success"
+  );
+
+}
+
+
+/* ==========================================================
+WALLET UI
+========================================================== */
+
+function updateWalletUI(){
+
+  const status =
+    $("walletStatus");
+
+  const address =
+    $("walletAddress");
+
+  const button =
+    $("walletButton");
+
+
+  if(!wallet){
+
+    status.textContent =
+      "Not connected";
+
+
+    address.innerHTML =
+      '<div class="wallet-short">No wallet connected</div>';
+
+
+    button.textContent =
+      "Connect Phantom Wallet";
+
+
+    button.className =
+      "wallet-button";
+
+
+    button.onclick =
+      window.connectWallet;
+
+
+    return;
+  }
+
+
+  const full =
+    wallet.toBase58();
+
+
+  const short =
+    full.slice(0,6) +
+    "..." +
+    full.slice(-6);
+
+
+  status.textContent =
+    "✅ Connected";
+
+
+  address.innerHTML =
+    '<div class="wallet-short">' +
+    short +
+    "</div>" +
+    '<div style="margin-top:5px">' +
+    full +
+    "</div>";
+
+
+  button.textContent =
+    "Disconnect Wallet";
+
+
+  button.className =
+    "wallet-button connected";
+
+
+  button.onclick =
+    window.disconnectWallet;
+
+}
+
+
+/* ==========================================================
+DISCONNECT
+========================================================== */
+
+window.disconnectWallet =
+async function(){
+
+  try{
+
+    if(provider){
+
+      await provider.disconnect();
+
+    }
+
+  }catch(error){
+
+    console.warn(
+      "Disconnect warning:",
+      error
+    );
+
+  }
+
+
+  wallet = null;
+
+  provider = null;
+
+  sessionEnd = null;
+
+  sessionCompleted = false;
+
+
+  if(timer){
+
+    clearInterval(timer);
+
+    timer = null;
+
+  }
+
+
+  updateWalletUI();
+
+
+  $("balance").textContent =
+    "0";
+
+
+  $("balanceSub").textContent =
+    "Connect Phantom to read your real AVQ balance";
+
+
+  updateClock();
+
+
+  showMessage(
+    "Wallet disconnected.",
+    "info"
+  );
+
+};
+
+
+/* ==========================================================
+LOAD MINT
+========================================================== */
+
+async function loadMintInfo(){
+
+  try{
+
+    const mint =
+      new PublicKey(
+        AVQ_MINT
+      );
+
+
+    mintInfo =
+      await getMint(
+        connection,
+        mint
+      );
+
+
+    console.log(
+      "AVQ mint loaded:",
+      AVQ_MINT
+    );
+
+
+    console.log(
+      "AVQ decimals:",
+      mintInfo.decimals
+    );
+
+
+  }catch(error){
+
+    console.error(
+      "Mint loading error:",
+      error
+    );
+
+
+    mintInfo = null;
+
+
+    showMessage(
+      "The AVQ mint could not be read on Solana Devnet. Verify that the mint address exists on Devnet.",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* ==========================================================
+FORMAT TOKEN AMOUNT
+========================================================== */
+
+function formatTokenAmount(
+  rawAmount,
+  decimals
+){
+
+  const raw =
+    BigInt(rawAmount);
+
+
+  if(decimals === 0)
+    return raw.toString();
+
+
+  const divisor =
+    10n ** BigInt(decimals);
+
+
+  const whole =
+    raw / divisor;
+
+
+  const fraction =
+    raw % divisor;
+
+
+  if(fraction === 0n)
+    return whole.toString();
+
+
+  const fractionText =
+    fraction
+      .toString()
+      .padStart(
+        decimals,
+        "0"
+      )
+      .replace(
+        /0+$/,
+        ""
+      );
+
+
+  return (
+    whole.toString() +
+    "." +
+    fractionText
+  );
+
+}
+
+
+/* ==========================================================
+READ REAL AVQ BALANCE
+========================================================== */
+
+async function refreshBalance(){
+
+  if(!wallet)
+    return;
+
+
+  try{
+
+    const mint =
+      new PublicKey(
+        AVQ_MINT
+      );
+
+
+    if(!mintInfo){
+
+      mintInfo =
+        await getMint(
+          connection,
+          mint
+        );
+
+    }
+
+
+    const tokenAccount =
+      await getAssociatedTokenAddress(
+        mint,
+        wallet
+      );
+
+
+    let rawAmount =
+      0n;
+
+
+    try{
+
+      const account =
+        await getAccount(
+          connection,
+          tokenAccount
+        );
+
+
+      rawAmount =
+        BigInt(
+          account.amount
+        );
+
+
+    }catch{
+
+      /*
+      No associated token account means
+      the wallet currently has zero AVQ.
+      */
+
+      rawAmount =
+        0n;
+
+    }
+
+
+    const display =
+      formatTokenAmount(
+        rawAmount,
+        mintInfo.decimals
+      );
+
+
+    $("balance").textContent =
+      display;
+
+
+    $("balanceSub").textContent =
+      "Real AVQ balance from Solana Devnet";
+
+
+  }catch(error){
+
+    console.error(
+      "Balance error:",
+      error
+    );
+
+
+    showMessage(
+      "Unable to read AVQ balance: " +
+      (
+        error?.message ||
+        String(error)
+      ),
+      "error"
+    );
+
+  }
+
+}
+
+
+/* ==========================================================
+BACKEND REQUEST HELPER
+========================================================== */
+
+async function apiRequest(
+  url,
+  options={}
+){
+
+  const response =
+    await fetch(
+      url,
+      {
+        credentials:"same-origin",
+        ...options
+      }
+    );
+
+
+  const text =
+    await response.text();
+
+
+  let data = {};
+
+
+  try{
+
+    data =
+      text
+        ? JSON.parse(text)
+        : {};
+
+  }catch{
+
+    throw new Error(
+      "Server returned invalid JSON."
+    );
+
+  }
+
+
+  if(!response.ok){
+
+    throw new Error(
+      data.error ||
+      data.message ||
+      "Server request failed."
+    );
+
+  }
+
+
+  return data;
+
+}
+
+
+/* ==========================================================
+START EARNING
+========================================================== */
+
+window.startEarning =
+async function(){
+
+  if(!wallet){
+
+    showMessage(
+      "Connect Phantom first.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if(
+    sessionEnd &&
+    sessionEnd > Date.now()
+  ){
+
+    showMessage(
+      "Your earning session is already running.",
+      "info"
+    );
+
+    return;
+
+  }
+
+
+  if(sessionCompleted){
+
+    showMessage(
+      "Your previous session is complete. Claim the reward first.",
+      "info"
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    showMessage(
+      "Starting secure earning session...",
+      "info"
+    );
+
+
+    /*
+    The backend is authoritative.
+    */
+
+    const data =
+      await apiRequest(
+        EARNING_API,
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:JSON.stringify({
+            action:"start",
+            wallet:
+              wallet.toBase58()
+          })
+
+        }
+      );
+
+
+    if(
+      !data.sessionEnd
+    ){
+
+      throw new Error(
+        "Server did not return a session end time."
+      );
+
+    }
+
+
+    sessionEnd =
+      Number(
+        data.sessionEnd
+      );
+
+
+    if(
+      !Number.isFinite(
+        sessionEnd
+      )
+    ){
+
+      throw new Error(
+        "Server returned an invalid session time."
+      );
+
+    }
+
+
+    sessionCompleted =
+      false;
+
+
+    saveLocalSession();
+
+    startTimer();
+
+
+    showMessage(
+      "⛏️ Your 24-hour AVQ earning session has started.",
+      "success"
+    );
+
+
+  }catch(error){
+
+    console.error(
+      "Start earning error:",
+      error
+    );
+
+
+    showMessage(
+      error?.message ||
+      "Could not start earning session.",
+      "error"
+    );
+
+  }
+
+};
+
+
+/* ==========================================================
+CLAIM MODAL
+========================================================== */
+
+window.claimReward =
+function(){
+
+  if(!wallet){
+
+    showMessage(
+      "Connect Phantom first.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if(!sessionCompleted){
+
+    if(
+      sessionEnd &&
+      sessionEnd > Date.now()
+    ){
+
+      showMessage(
+        "Your 24-hour session is still running.",
+        "info"
+      );
+
+    }else{
+
+      showMessage(
+        "Complete a 24-hour earning session first.",
+        "info"
+      );
+
+    }
+
+    return;
+
+  }
+
+
+  $("modalTitle").textContent =
+    "🎁 Claim AVQ";
+
+
+  $("modalBody").innerHTML = `
+
+    <div style="text-align:center">
+
+      <div style="font-size:45px">
+        ⛓️
+      </div>
+
+      <h3>
+        Blockchain Reward
+      </h3>
+
+      <p style="
+        color:var(--secondary);
+        font-size:13px;
+        line-height:1.5">
+
+        Your completed session is eligible
+        for <strong>${SESSION_REWARD} AVQ</strong>.
+
+        The server will verify your session
+        before creating the on-chain reward.
+
+      </p>
+
+
+      <button
+        id="confirmClaim"
+        class="modal-primary"
+        type="button">
+
+        Mint ${SESSION_REWARD} AVQ
+
+      </button>
+
+
+      <div
+        id="claimStatus"
+        class="modal-status">
+      </div>
+
+    </div>
+  `;
+
+
+  $("modal").style.display =
+    "flex";
+
+
+  $("confirmClaim").onclick =
+    mintBlockchainReward;
+
+};
+
+
+/* ==========================================================
+CLAIM BLOCKCHAIN REWARD
+========================================================== */
+
+async function mintBlockchainReward(){
+
+  if(!wallet)
+    return;
+
+
+  const button =
+    $("confirmClaim");
+
+  const status =
+    $("claimStatus");
+
+
+  button.disabled =
+    true;
+
+
+  button.textContent =
+    "Processing...";
+
+
+  status.textContent =
+    "⏳ Verifying your completed session...";
+
+
+  try{
+
+    /*
+    The server must:
+
+    1. Verify wallet.
+    2. Verify completed session.
+    3. Prevent duplicate claim.
+    4. Verify reward amount.
+    5. Use the mint authority securely.
+    6. Mint AVQ to the user's token account.
+    7. Return the Solana signature.
+    */
+
+
+    const data =
+      await apiRequest(
+        EARNING_API,
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:JSON.stringify({
+            action:"claim",
+            wallet:
+              wallet.toBase58()
+          })
+
+        }
+      );
+
+
+    if(!data.signature){
+
+      throw new Error(
+        "The backend did not return a Solana transaction signature."
+      );
+
+    }
+
+
+    status.innerHTML =
+      "✅ AVQ reward minted successfully." +
+      "<div class='tx'>" +
+      escapeHtml(
+        data.signature
+      ) +
+      "</div>";
+
+
+    sessionCompleted =
+      false;
+
+
+    sessionEnd =
+      null;
+
+
+    saveLocalSession();
+
+
+    $("lastTransaction").innerHTML =
+      "✅ Reward transaction:" +
+      "<div class='tx'>" +
+      escapeHtml(
+        data.signature
+      ) +
+      "</div>";
+
+
+    await refreshBalance();
+
+
+    showMessage(
+      "🎉 Your AVQ reward was minted on Solana.",
+      "success"
+    );
+
+
+    button.textContent =
+      "Reward Minted";
+
+
+  }catch(error){
+
+    console.error(
+      "Claim error:",
+      error
+    );
+
+
+    status.textContent =
+      "❌ " +
+      (
+        error?.message ||
+        String(error)
+      );
+
+
+    button.disabled =
+      false;
+
+
+    button.textContent =
+      "Try Again";
+
+
+    showMessage(
+      error?.message ||
+      "Reward claim failed.",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* ==========================================================
+CHECK-IN
+========================================================== */
+
+window.checkIn =
+async function(){
+
+  if(!wallet){
+
+    showMessage(
+      "Connect Phantom first.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const today =
+    new Date()
+      .toISOString()
+      .slice(0,10);
+
+
+  if(
+    lastCheckIn === today
+  ){
+
+    showMessage(
+      "You already checked in today.",
+      "info"
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    showMessage(
+      "Recording secure daily check-in...",
+      "info"
+    );
+
+
+    const data =
+      await apiRequest(
+        EARNING_API,
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:JSON.stringify({
+            action:"checkin",
+            wallet:
+              wallet.toBase58()
+          })
+
+        }
+      );
+
+
+    lastCheckIn =
+      today;
+
+
+    streak =
+      Number(
+        data.streak ||
+        streak + 1
+      );
+
+
+    saveLocalSession();
+
+
+    showMessage(
+      "✅ Daily check-in recorded.",
+      "success"
+    );
+
+
+    if(data.signature){
+
+      $("lastTransaction").innerHTML =
+        "✅ Check-in transaction:" +
+        "<div class='tx'>" +
+        escapeHtml(
+          data.signature
+        ) +
+        "</div>";
+
+
+      await refreshBalance();
+
+    }
+
+  }catch(error){
+
+    console.error(
+      "Check-in error:",
+      error
+    );
+
+
+    showMessage(
+      error?.message ||
+      "Check-in failed.",
+      "error"
+    );
+
+  }
+
+};
+
+
+/* ==========================================================
+STORAGE
+========================================================== */
+
+function storageKey(){
+
+  if(!wallet)
+    return null;
+
+
+  return (
+    "averiq_session_" +
+    wallet.toBase58()
+  );
+
+}
+
+
+function saveLocalSession(){
+
+  if(!wallet)
+    return;
+
+
+  const key =
+    storageKey();
+
+
+  localStorage.setItem(
+    key,
+    JSON.stringify({
+
+      sessionEnd:
+        sessionEnd,
+
+      sessionCompleted:
+        sessionCompleted,
+
+      lastCheckIn:
+        lastCheckIn,
+
+      streak:
+        streak
+
+    })
+  );
+
+}
+
+
+/* ==========================================================
+RESTORE SESSION
+========================================================== */
+
+async function restoreSession(){
+
+  if(!wallet)
+    return;
+
+
+  try{
+
+    /*
+    Local cache is only used for UI recovery.
+    */
+
+    const key =
+      storageKey();
+
+
+    const raw =
+      localStorage.getItem(
+        key
+      );
+
+
+    if(raw){
+
+      try{
+
+        const localData =
+          JSON.parse(
+            raw
+          );
+
+
+        if(
+          localData.sessionEnd !== undefined
+        ){
+
+          sessionEnd =
+            localData.sessionEnd;
+
+        }
+
+
+        if(
+          localData.sessionCompleted !== undefined
+        ){
+
+          sessionCompleted =
+            localData.sessionCompleted;
+
+        }
+
+
+        lastCheckIn =
+          localData.lastCheckIn ||
+          null;
+
+
+        streak =
+          Number(
+            localData.streak ||
+            0
+          );
+
+      }catch{
+
+        console.warn(
+          "Invalid local session data."
+        );
+
+      }
+
+    }
+
+
+    /*
+    The backend remains the source of truth.
+    */
+
+    try{
+
+      const walletAddress =
+        encodeURIComponent(
+          wallet.toBase58()
+        );
+
+
+      const data =
+        await apiRequest(
+          EARNING_API +
+          "?action=status&wallet=" +
+          walletAddress
+        );
+
+
+      if(
+        data.sessionEnd !== undefined
+      ){
+
+        sessionEnd =
+          data.sessionEnd;
+
+      }
+
+
+      if(
+        data.sessionCompleted !== undefined
+      ){
+
+        sessionCompleted =
+          data.sessionCompleted;
+
+      }
+
+
+      if(
+        data.lastCheckIn !== undefined
+      ){
+
+        lastCheckIn =
+          data.lastCheckIn;
+
+      }
+
+
+      if(
+        data.streak !== undefined
+      ){
+
+        streak =
+          Number(
+            data.streak
+          );
+
+      }
+
+
+      saveLocalSession();
+
+    }catch(error){
+
+      /*
+      Don't destroy a locally displayed session
+      just because the status endpoint is temporarily
+      unavailable.
+      */
+
+      console.warn(
+        "Backend status unavailable:",
+        error
+      );
+
+    }
+
+
+    /*
+    If the cached/backend session has expired,
+    show the claim state.
+    */
+
+    if(
+      sessionEnd &&
+      Number(sessionEnd) <= Date.now()
+    ){
+
+      sessionEnd =
+        null;
+
+
+      sessionCompleted =
+        true;
+
+
+      saveLocalSession();
+
+
+      showMessage(
+        "🎉 Your 24-hour session is complete. You can claim your AVQ reward.",
+        "success"
+      );
+
+    }
+
+
+    startTimer();
+
+
+  }catch(error){
+
+    console.error(
+      "Restore session error:",
+      error
+    );
+
+  }
+
+}
+
+
+/* ==========================================================
+TIMER
+========================================================== */
+
+function startTimer(){
+
+  if(timer){
+
+    clearInterval(
+      timer
+    );
+
+  }
+
+
+  timer =
+    setInterval(
+      updateClock,
+      1000
+    );
+
+
+  updateClock();
+
+}
+
+
+function updateClock(){
+
+  const timerEl =
+    $("timer");
+
+  const statusEl =
+    $("sessionStatus");
+
+  const hour =
+    $("hourHand");
+
+  const minute =
+    $("minuteHand");
+
+  const second =
+    $("secondHand");
+
+
+  if(
+    sessionCompleted
+  ){
+
+    timerEl.textContent =
+      "00:00:00";
+
+
+    statusEl.textContent =
+      "🎉 Session Complete — Claim AVQ";
+
+
+    statusEl.className =
+      "status complete";
+
+
+    hour.style.transform =
+      "rotate(0deg)";
+
+
+    minute.style.transform =
+      "rotate(0deg)";
+
+
+    second.style.transform =
+      "rotate(0deg)";
+
+
+    return;
+
+  }
+
+
+  if(!sessionEnd){
+
+    timerEl.textContent =
+      "24:00:00";
+
+
+    statusEl.textContent =
+      wallet
+        ? "Ready to start"
+        : "Connect wallet to start";
+
+
+    statusEl.className =
+      "status";
+
+
+    hour.style.transform =
+      "rotate(0deg)";
+
+
+    minute.style.transform =
+      "rotate(0deg)";
+
+
+    second.style.transform =
+      "rotate(0deg)";
+
+
+    return;
+
+  }
+
+
+  const end =
+    Number(
+      sessionEnd
+    );
+
+
+  const remaining =
+    Math.max(
+      0,
+      end - Date.now()
+    );
+
+
+  if(
+    remaining <= 0
+  ){
+
+    sessionEnd =
+      null;
+
+
+    sessionCompleted =
+      true;
+
+
+    saveLocalSession();
+
+
+    timerEl.textContent =
+      "00:00:00";
+
+
+    statusEl.textContent =
+      "🎉 Session Complete — Claim AVQ";
+
+
+    statusEl.className =
+      "status complete";
+
+
+    return;
+
+  }
+
+
+  const hours =
+    Math.floor(
+      remaining / 3600000
+    );
+
+
+  const minutes =
+    Math.floor(
+      (remaining % 3600000) /
+      60000
+    );
+
+
+  const seconds =
+    Math.floor(
+      (remaining % 60000) /
+      1000
+    );
+
+
+  timerEl.textContent =
+    String(hours).padStart(2,"0") +
+    ":" +
+    String(minutes).padStart(2,"0") +
+    ":" +
+    String(seconds).padStart(2,"0");
+
+
+  statusEl.textContent =
+    "⏳ Earning session running";
+
+
+  statusEl.className =
+    "status active";
+
+
+  /*
+  Analog clock shows remaining session time.
+  */
+
+  const totalSeconds =
+    Math.floor(
+      remaining / 1000
+    );
+
+
+  const h =
+    Math.floor(
+      totalSeconds / 3600
+    ) % 12;
+
+
+  const m =
+    Math.floor(
+      (totalSeconds % 3600) /
+      60
+    );
+
+
+  const s =
+    totalSeconds % 60;
+
+
+  hour.style.transform =
+    "rotate(" +
+    (
+      h * 30 +
+      m * .5
+    ) +
+    "deg)";
+
+
+  minute.style.transform =
+    "rotate(" +
+    (m * 6) +
+    "deg)";
+
+
+  second.style.transform =
+    "rotate(" +
+    (s * 6) +
+    "deg)";
+
+}
+
+
+/* ==========================================================
+SEND AVQ
+========================================================== */
+
+window.showSendModal =
+function(){
+
+  if(!wallet){
+
+    showMessage(
+      "Connect your wallet first.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  $("modalTitle").textContent =
+    "📤 Send AVQ";
+
+
+  $("modalBody").innerHTML = `
+
+    <input
+      id="recipient"
+      placeholder="Recipient Solana address"
+      autocomplete="off">
+
+    <input
+      id="sendAmount"
+      type="number"
+      min="0"
+      step="0.000001"
+      placeholder="Amount">
+
+    <button
+      class="modal-primary"
+      type="button"
+      onclick="sendAVQ()">
+
+      Send AVQ
+
+    </button>
+
+    <div
+      id="sendStatus"
+      class="modal-status">
+    </div>
+
+  `;
+
+
+  $("modal").style.display =
+    "flex";
+
+};
+
+
+/* ==========================================================
+SEND TRANSACTION
+========================================================== */
+
+window.sendAVQ =
+async function(){
+
+  const recipientInput =
+    $("recipient");
+
+
+  const amountInput =
+    $("sendAmount");
+
+
+  const status =
+    $("sendStatus");
+
+
+  if(!recipientInput || !amountInput)
+    return;
+
+
+  const recipient =
+    recipientInput.value.trim();
+
+
+  const amount =
+    Number(
+      amountInput.value
+    );
+
+
+  if(!recipient){
+
+    status.textContent =
+      "Enter a recipient address.";
+
+    return;
+
+  }
+
+
+  if(
+    !Number.isFinite(amount) ||
+    amount <= 0
+  ){
+
+    status.textContent =
+      "Enter a valid amount.";
+
+    return;
+
+  }
+
+
+  try{
+
+    if(!wallet){
+
+      throw new Error(
+        "Wallet is not connected."
+      );
+
+    }
+
+
+    provider =
+      getProvider();
+
+
+    if(!provider){
+
+      throw new Error(
+        "Phantom provider is unavailable."
+      );
+
+    }
+
+
+    const destination =
+      new PublicKey(
+        recipient
+      );
+
+
+    const mint =
+      new PublicKey(
+        AVQ_MINT
+      );
+
+
+    if(!mintInfo){
+
+      mintInfo =
+        await getMint(
+          connection,
+          mint
+        );
+
+    }
+
+
+    const source =
+      await getAssociatedTokenAddress(
+        mint,
+        wallet
+      );
+
+
+    const destinationAccount =
+      await getAssociatedTokenAddress(
+        mint,
+        destination
+      );
+
+
+    const sourceInfo =
+      await getAccount(
+        connection,
+        source
+      );
+
+
+    const decimals =
+      mintInfo.decimals;
+
+
+    /*
+    Convert decimal amount to integer token units
+    without using an unsafe floating point value.
+    */
+
+    const amountString =
+      String(amount);
+
+
+    const parts =
+      amountString.split(".");
+
+
+    const whole =
+      parts[0] || "0";
+
+
+    let fraction =
+      parts[1] || "";
+
+
+    if(
+      fraction.length >
+      decimals
+    ){
+
+      throw new Error(
+        "Amount has too many decimal places."
+      );
+
+    }
+
+
+    fraction =
+      fraction.padEnd(
+        decimals,
+        "0"
+      );
+
+
+    const raw =
+      BigInt(
+        whole
+      ) *
+      (
+        10n **
+        BigInt(decimals)
+      ) +
+      BigInt(
+        fraction || "0"
+      );
+
+
+    if(raw <= 0n){
+
+      throw new Error(
+        "Amount must be greater than zero."
+      );
+
+    }
+
+
+    if(
+      raw >
+      BigInt(
+        sourceInfo.amount
+      )
+    ){
+
+      throw new Error(
+        "Insufficient AVQ balance."
+      );
+
+    }
+
+
+    const tx =
+      new Transaction();
+
+
+    const existing =
+      await connection.getAccountInfo(
+        destinationAccount
+      );
+
+
+    if(!existing){
+
+      tx.add(
+        createAssociatedTokenAccountInstruction(
+          wallet,
+          destinationAccount,
+          destination,
+          mint
+        )
+      );
+
+    }
+
+
+    tx.add(
+      createTransferInstruction(
+        source,
+        destinationAccount,
+        wallet,
+        raw
+      )
+    );
+
+
+    tx.feePayer =
+      wallet;
+
+
+    const latest =
+      await connection.getLatestBlockhash(
+        "confirmed"
+      );
+
+
+    tx.recentBlockhash =
+      latest.blockhash;
+
+
+    status.textContent =
+      "Approve the transaction in Phantom...";
+
+
+    const signed =
+      await provider.signTransaction(
+        tx
+      );
+
+
+    const signature =
+      await connection.sendRawTransaction(
+        signed.serialize()
+      );
+
+
+    status.textContent =
+      "Waiting for blockchain confirmation...";
+
+
+    await connection.confirmTransaction(
+      {
+        signature,
+        blockhash:
+          latest.blockhash,
+        lastValidBlockHeight:
+          latest.lastValidBlockHeight
+      },
+      "confirmed"
+    );
+
+
+    status.innerHTML =
+      "✅ AVQ sent successfully." +
+      "<div class='tx'>" +
+      escapeHtml(signature) +
+      "</div>";
+
+
+    await refreshBalance();
+
+
+    showMessage(
+      "✅ AVQ sent successfully.",
+      "success"
+    );
+
+
+  }catch(error){
+
+    console.error(
+      "Send error:",
+      error
+    );
+
+
+    status.textContent =
+      "❌ " +
+      (
+        error?.message ||
+        String(error)
+      );
+
+
+    showMessage(
+      "Send failed: " +
+      (
+        error?.message ||
+        String(error)
+      ),
+      "error"
+    );
+
+  }
+
+};
+
+
+/* ==========================================================
+RECEIVE
+========================================================== */
+
+window.showReceiveModal =
+function(){
+
+  if(!wallet){
+
+    showMessage(
+      "Connect your wallet first.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const address =
+    wallet.toBase58();
+
+
+  $("modalTitle").textContent =
+    "📥 Receive AVQ";
+
+
+  $("modalBody").innerHTML = `
+
+    <div style="
+      background:var(--input);
+      border-radius:14px;
+      padding:14px;
+      font-family:monospace;
+      font-size:12px;
+      word-break:break-all;
+      color:var(--green)">
+
+      ${escapeHtml(address)}
+
+    </div>
+
+
+    <button
+      class="modal-primary"
+      style="margin-top:12px"
+      type="button"
+      onclick="copyAddress();closeModal()">
+
+      📋 Copy Address
+
+    </button>
+
+
+    <div class="modal-status">
+
+      Network: Solana Devnet<br><br>
+
+      AVQ Mint:
+      ${escapeHtml(AVQ_MINT)}
+
+    </div>
+
+  `;
+
+
+  $("modal").style.display =
+    "flex";
+
+};
+
+
+/* ==========================================================
+COPY WALLET
+========================================================== */
+
+window.copyAddress =
+async function(){
+
+  if(!wallet){
+
+    showMessage(
+      "Connect wallet first.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const address =
+    wallet.toBase58();
+
+
+  try{
+
+    await navigator.clipboard.writeText(
+      address
+    );
+
+
+    showMessage(
+      "✅ Wallet address copied.",
+      "success"
+    );
+
+  }catch{
+
+    prompt(
+      "Copy wallet address:",
+      address
+    );
+
+  }
+
+};
+
+
+/* ==========================================================
+COPY MINT
+========================================================== */
+
+window.copyMint =
+async function(){
+
+  try{
+
+    await navigator.clipboard.writeText(
+      AVQ_MINT
+    );
+
+
+    showMessage(
+      "✅ AVQ mint address copied.",
+      "success"
+    );
+
+  }catch{
+
+    prompt(
+      "Copy AVQ mint:",
+      AVQ_MINT
+    );
+
+  }
+
+};
+
+
+/* ==========================================================
+PROFILE
+========================================================== */
+
+window.showProfile =
+function(){
+
+  if(!wallet){
+
+    showMessage(
+      "Connect your wallet to view your profile.",
+      "info"
+    );
+
+    return;
+
+  }
+
+
+  const address =
+    wallet.toBase58();
+
+
+  showMessage(
+    "👤 Wallet: " +
+    address.slice(0,6) +
+    "..." +
+    address.slice(-6) +
+    " | Streak: " +
+    streak +
+    " days",
+    "info"
+  );
+
+};
+
+
+/* ==========================================================
+MODAL
+========================================================== */
+
+window.closeModal =
+function(){
+
+  $("modal").style.display =
+    "none";
+
+};
+
+
+$("modal").addEventListener(
+  "click",
+  function(event){
+
+    if(
+      event.target ===
+      $("modal")
+    ){
+
+      closeModal();
+
+    }
+
+  }
+);
+
+
+/* ==========================================================
+THEME
+========================================================== */
+
+window.toggleTheme =
+function(){
+
+  const root =
+    document.documentElement;
+
+
+  const current =
+    root.getAttribute(
+      "data-theme"
+    );
+
+
+  if(current === "light"){
+
+    root.setAttribute(
+      "data-theme",
+      "dark"
+    );
+
+
+    $("themeButton").textContent =
+      "☀️";
+
+
+    localStorage.setItem(
+      "averiq_theme",
+      "dark"
+    );
+
+  }else{
+
+    root.setAttribute(
+      "data-theme",
+      "light"
+    );
+
+
+    $("themeButton").textContent =
+      "🌙";
+
+
+    localStorage.setItem(
+      "averiq_theme",
+      "light"
+    );
+
+  }
+
+};
+
+
+function loadTheme(){
+
+  const theme =
+    localStorage.getItem(
+      "averiq_theme"
+    );
+
+
+  if(theme){
+
+    document.documentElement
+      .setAttribute(
+        "data-theme",
+        theme
+      );
+
+
+    $("themeButton").textContent =
+      theme === "light"
+        ? "🌙"
+        : "☀️";
+
+  }
+
+}
+
+
+/* ==========================================================
+PHANTOM EVENTS
+========================================================== */
+
+function listenForWallet(){
+
+  const p =
+    getProvider();
+
+
+  if(!p || !p.on)
+    return;
+
+
+  provider =
+    p;
+
+
+  p.on(
+    "accountChanged",
+    async function(publicKey){
+
+      if(!publicKey){
+
+        wallet = null;
+
+        updateWalletUI();
+
+        $("balance").textContent =
+          "0";
+
+        $("balanceSub").textContent =
+          "Connect Phantom to read your real AVQ balance";
+
+        return;
+
+      }
+
+
+      wallet =
+        publicKey;
+
+
+      updateWalletUI();
+
+
+      try{
+
+        await afterWalletConnected();
+
+      }catch(error){
+
+        console.error(
+          error
+        );
+
+      }
+
+    }
+  );
+
+
+  p.on(
+    "disconnect",
+    function(){
+
+      wallet =
+        null;
+
+
+      updateWalletUI();
+
+    }
+  );
+
+}
+
+
+/* ==========================================================
+AUTO CONNECT
+========================================================== */
+
+async function autoConnect(){
+
+  const p =
+    getProvider();
+
+
+  if(!p)
+    return;
+
+
+  provider =
+    p;
+
+
+  try{
+
+    /*
+    onlyIfTrusted prevents the website
+    from repeatedly opening Phantom.
+    */
+
+    const result =
+      await p.connect({
+        onlyIfTrusted:true
+      });
+
+
+    if(
+      result &&
+      result.publicKey
+    ){
+
+      wallet =
+        result.publicKey;
+
+
+      updateWalletUI();
+
+
+      await afterWalletConnected();
+
+    }
+
+  }catch(error){
+
+    console.log(
+      "No trusted Phantom connection."
+    );
+
+  }
+
+}
+
+
+/* ==========================================================
+ESCAPE HTML
+========================================================== */
+
+function escapeHtml(value){
+
+  return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+/* ==========================================================
+PARTICLES
+========================================================== */
+
+const canvas =
+  $("particles");
+
+
+const ctx =
+  canvas.getContext(
+    "2d"
+  );
+
+
+let particles =
+  [];
+
+
+function resizeCanvas(){
+
+  canvas.width =
+    window.innerWidth;
+
+
+  canvas.height =
+    window.innerHeight;
+
+}
+
+
+function createParticles(){
+
+  particles =
+    [];
+
+
+  const count =
+    Math.min(
+      70,
+      Math.floor(
+        window.innerWidth *
+        window.innerHeight /
+        9000
+      )
+    );
+
+
+  for(
+    let i=0;
+    i<count;
+    i++
+  ){
+
+    particles.push({
+
+      x:
+        Math.random() *
+        canvas.width,
+
+      y:
+        Math.random() *
+        canvas.height,
+
+      r:
+        Math.random()*2+1,
+
+      vx:
+        (Math.random()-.5)*.4,
+
+      vy:
+        (Math.random()-.5)*.4
+
+    });
+
+  }
+
+}
+
+
+function animateParticles(){
+
+  ctx.clearRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+
+  for(
+    const p of particles
+  ){
+
+    p.x +=
+      p.vx;
+
+
+    p.y +=
+      p.vy;
+
+
+    if(
+      p.x < 0 ||
+      p.x > canvas.width
+    ){
+
+      p.vx *=
+        -1;
+
+    }
+
+
+    if(
+      p.y < 0 ||
+      p.y > canvas.height
+    ){
+
+      p.vy *=
+        -1;
+
+    }
+
+
+    ctx.beginPath();
+
+
+    ctx.arc(
+      p.x,
+      p.y,
+      p.r,
+      0,
+      Math.PI * 2
+    );
+
+
+    ctx.fillStyle =
+      "rgba(18,216,181,.25)";
+
+
+    ctx.fill();
+
+  }
+
+
+  requestAnimationFrame(
+    animateParticles
+  );
+
+}
+
+
+/* ==========================================================
+VISIBILITY REFRESH
+========================================================== */
+
+document.addEventListener(
+  "visibilitychange",
+  async function(){
+
+    if(
+      document.visibilityState !==
+      "visible"
+    ){
+
+      return;
+
+    }
+
+
+    /*
+    When the user returns from Phantom,
+    refresh the provider and blockchain state.
+    */
+
+    provider =
+      getProvider();
+
+
+    if(
+      provider &&
+      provider.publicKey
+    ){
+
+      wallet =
+        provider.publicKey;
+
+
+      updateWalletUI();
+
+
+      try{
+
+        await refreshBalance();
+
+        await restoreSession();
+
+      }catch(error){
+
+        console.warn(
+          "Resume refresh failed:",
+          error
+        );
+
+      }
+
+    }
+
+  }
+);
+
+
+/* ==========================================================
+WINDOW FOCUS REFRESH
+========================================================== */
+
+window.addEventListener(
+  "focus",
+  async function(){
+
+    provider =
+      getProvider();
+
+
+    if(
+      provider &&
+      provider.publicKey
+    ){
+
+      wallet =
+        provider.publicKey;
+
+
+      updateWalletUI();
+
+
+      try{
+
+        await refreshBalance();
+
+      }catch(error){
+
+        console.warn(
+          "Focus balance refresh failed:",
+          error
+        );
+
+      }
+
+    }
+
+  }
+);
+
+
+/* ==========================================================
+INITIALIZATION
+========================================================== */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async function(){
+
+    loadTheme();
+
+
+    resizeCanvas();
+
+    createParticles();
+
+    animateParticles();
+
+
+    window.addEventListener(
+      "resize",
+      function(){
+
+        resizeCanvas();
+
+        createParticles();
+
+      }
+    );
+
+
+    /*
+    Install Phantom listeners first.
+    */
+
+    listenForWallet();
+
+
+    /*
+    Then attempt silent reconnect.
+    */
+
+    await autoConnect();
+
+
+    /*
+    Start the UI timer even without a wallet.
+    */
+
+    startTimer();
+
+
+    console.log(
+      "Averiq AVQ frontend loaded."
+    );
+
+  }
+);
+
+</script>
+
+</body>
+</html>
