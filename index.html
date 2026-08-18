@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Averiq — ₳ Community Rewards</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: #06111c;
+            color: #eef7ff;
+            font-family: Arial, Helvetica, sans-serif;
+            min-height: 100%;
+        }
+        body {
+            min-height: 100vh;
+        }
+        button {
+            font: inherit;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        button:active {
+            transform: scale(.97);
+        }
+        .app {
+            width: 100%;
+            max-width: 760px;
+            margin: auto;
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+        header {
+            height: 82px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
+            background: #07131f;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 25px;
+            font-weight: 900;
+        }
+        .logo {
+            width: 55px;
+            height: 55px;
+            border-radius: 17px;
+            background: linear-gradient(145deg, #12d8b5, #0d8a72);
+            display: grid;
+            place-items: center;
+            color: #06111c;
+            font-size: 32px;
+            font-weight: 900;
+            box-shadow: 0 0 30px rgba(18, 216, 181, .2);
+        }
+        .online {
+            border: 1px solid rgba(18, 216, 181, .35);
+            padding: 9px 13px;
+            border-radius: 30px;
+            color: #12d8b5;
+            font-weight: 700;
+            font-size: 12px;
+        }
+        .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #37df6d;
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .4;
+            }
+        }
+        main {
+            padding: 20px;
+        }
+        .balance-card,
+        .clock-card,
+        .info-card {
+            background: linear-gradient(145deg, #101f2e, #0a1725);
+            border: 1px solid rgba(255, 255, 255, .09);
+            border-radius: 28px;
+            padding: 22px;
+            margin-bottom: 18px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, .18);
+        }
+        .balance-title {
+            color: #8295ad;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-align: center;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+        .balance {
+            text-align: center;
+            font-size: clamp(44px, 12vw, 62px);
+            font-weight: 900;
+            margin: 8px 0;
+            background: linear-gradient(135deg, #12d8b5, #f5b62e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .balance-sub {
+            text-align: center;
+            color: #8ca0b8;
+            font-size: 13px;
+        }
+        .clock-card {
+            text-align: center;
+        }
+        .clock {
+            width: min(88vw, 520px);
+            height: min(88vw, 520px);
+            max-width: 520px;
+            max-height: 520px;
+            margin: auto;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, rgba(8, 46, 69, .95) 0%, rgba(5, 28, 43, .96) 42%, rgba(3, 14, 24, 1) 72%);
+            border: 2px solid rgba(18, 216, 181, .25);
+            box-shadow: inset 0 0 50px rgba(0, 180, 255, .15), 0 0 45px rgba(0, 200, 180, .08);
+        }
+        .clock::before {
+            content: "";
+            position: absolute;
+            width: 82%;
+            height: 82%;
+            border: 1px solid rgba(18, 216, 181, .25);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .clock::after {
+            content: "";
+            position: absolute;
+            width: 68%;
+            height: 68%;
+            border: 1px dashed rgba(18, 216, 181, .18);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .earth {
+            position: absolute;
+            width: 125px;
+            height: 125px;
+            border-radius: 50%;
+            opacity: .28;
+            background: radial-gradient(circle at 35% 30%, #48d6ff 0 5%, transparent 6%),
+                radial-gradient(circle at 55% 50%, #0d74bb 0 35%, #053d71 60%, #021c35 100%);
+            animation: earthSpin 18s linear infinite;
+        }
+        @keyframes earthSpin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .clock-label,
+        .timer,
+        .status,
+        .avq-label {
+            position: relative;
+            z-index: 3;
+        }
+        .clock-label {
+            color: #91a8c0;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 18px;
+        }
+        .timer {
+            font-size: clamp(38px, 10vw, 78px);
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-shadow: 0 0 25px rgba(18, 216, 181, .18);
+        }
+        .timer.complete {
+            color: #f5b62e;
+            text-shadow: 0 0 30px rgba(245, 182, 46, .3);
+        }
+        .status {
+            margin-top: 16px;
+            padding: 9px 15px;
+            background: rgba(3, 18, 31, .85);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 25px;
+            color: #9aaec5;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .status.active {
+            color: #12d8b5;
+            border-color: rgba(18, 216, 181, .3);
+        }
+        .status.complete {
+            color: #f5b62e;
+            border-color: rgba(245, 182, 46, .3);
+        }
+        .avq-label {
+            margin-top: 55px;
+            font-size: 44px;
+            font-weight: 900;
+            letter-spacing: 8px;
+            background: linear-gradient(135deg, #12d8b5, #f5b62e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(18, 216, 181, .15);
+        }
+        .progress-wrap {
+            height: 12px;
+            border-radius: 20px;
+            background: #06101a;
+            overflow: hidden;
+            margin: 22px 15px 10px;
+        }
+        .progress {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #12d8b5, #f5b62e);
+            transition: width .5s linear;
+            border-radius: 20px;
+        }
+        .clock-help {
+            color: #879bb3;
+            line-height: 1.6;
+            margin: 15px;
+            font-size: 13px;
+        }
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 13px;
+            margin-bottom: 18px;
+        }
+        .action {
+            min-height: 112px;
+            border-radius: 23px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            background: #0d1d2c;
+            color: white;
+            padding: 16px;
+            font-weight: 800;
+            font-size: 16px;
+            transition: all .2s;
+        }
+        .action:active {
+            transform: scale(.96);
+        }
+        .action.primary {
+            border-color: rgba(18, 216, 181, .4);
+            background: linear-gradient(145deg, #0d1d2c, #0d2a1a);
+        }
+        .action.primary:hover {
+            border-color: #12d8b5;
+        }
+        .action small {
+            display: block;
+            margin-top: 8px;
+            color: #8498af;
+            font-weight: 500;
+            font-size: 12px;
+        }
+        .action .icon {
+            font-size: 22px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .wallet-button {
+            width: 100%;
+            border: 0;
+            border-radius: 18px;
+            padding: 16px;
+            background: linear-gradient(145deg, #12d8b5, #0d8a72);
+            color: #03151a;
+            font-weight: 900;
+            margin-top: 15px;
+            font-size: 16px;
+            transition: all .2s;
+            box-shadow: 0 4px 20px rgba(18, 216, 181, .15);
+        }
+        .wallet-button:active {
+            transform: scale(.97);
+        }
+        .wallet-button.connected {
+            background: rgba(18, 216, 181, .15);
+            color: #12d8b5;
+            border: 1px solid rgba(18, 216, 181, .3);
+        }
+        .wallet-address {
+            background: #06121e;
+            border-radius: 15px;
+            padding: 13px;
+            word-break: break-all;
+            color: #8fa4bb;
+            font-size: 12px;
+            margin-top: 12px;
+            font-family: monospace;
+        }
+        .message {
+            padding: 13px;
+            margin-top: 15px;
+            border-radius: 15px;
+            background: #091827;
+            color: #9fb1c6;
+            font-size: 13px;
+            line-height: 1.5;
+            word-break: break-word;
+            border-left: 3px solid rgba(18, 216, 181, .2);
+        }
+        .message.success {
+            border-left-color: #12d8b5;
+        }
+        .message.error {
+            border-left-color: #ff6675;
+        }
+        .message.info {
+            border-left-color: #f5b62e;
+        }
+        .mint-address {
+            color: #12d8b5;
+            word-break: break-all;
+            font-size: 12px;
+            margin-top: 6px;
+            font-family: monospace;
+            background: #06101a;
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+        .nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: min(760px, 100%);
+            height: 76px;
+            background: rgba(5, 17, 29, .98);
+            border-top: 1px solid rgba(255, 255, 255, .08);
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            z-index: 30;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .nav button {
+            border: 0;
+            background: transparent;
+            color: #71849b;
+            font-size: 11px;
+            font-weight: 700;
+            transition: color .2s;
+        }
+        .nav button.active {
+            color: #12d8b5;
+        }
+        .nav button .nav-icon {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: rgba(0, 0, 0, .85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(8px);
+        }
+        .modal-box {
+            width: 100%;
+            max-width: 390px;
+            background: linear-gradient(145deg, #0b1b2a, #06121e);
+            border: 1px solid rgba(18, 216, 181, .2);
+            border-radius: 24px;
+            padding: 25px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, .5);
+        }
+        .modal-box h2 {
+            font-size: 22px;
+            margin: 8px 0;
+        }
+        .modal-box .modal-icon {
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 15px;
+            border-radius: 18px;
+            background: linear-gradient(145deg, #12d8b5, #0d8a72);
+            display: grid;
+            place-items: center;
+            font-size: 30px;
+            font-weight: 900;
+            color: #06111c;
+        }
+        .phantom-button {
+            width: 100%;
+            border: 0;
+            border-radius: 16px;
+            padding: 16px;
+            background: linear-gradient(145deg, #ab9ff2, #8a7fe0);
+            color: #151129;
+            font-weight: 900;
+            font-size: 16px;
+        }
+        .cancel-button {
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 16px;
+            padding: 14px;
+            margin-top: 10px;
+            background: transparent;
+            color: white;
+            font-weight: 700;
+        }
+        @media(max-width:500px) {
+            main {
+                padding: 16px;
+            }
+            .balance-card,
+            .clock-card,
+            .info-card {
+                padding: 18px;
+            }
+            .clock {
+                width: 88vw;
+                height: 88vw;
+            }
+            .actions {
+                gap: 10px;
+            }
+            .action {
+                min-height: 105px;
+                padding: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app">
+
+        <header>
+            <div class="brand">
+                <div class="logo">₳</div>
+                <span>Averiq.</span>
+            </div>
+            <div class="online">
+                <span class="dot"></span> Devnet
+            </div>
+        </header>
+
+        <main>
+
+            <section class="balance-card">
+                <div class="balance-title">TOTAL ₳</div>
+                <div class="balance" id="avqBalance">0</div>
+                <div class="balance-sub">Your ₳ reward balance</div>
+            </section>
+
+            <section class="clock-card">
+                <div class="clock">
+                    <div class="earth"></div>
+                    <div class="clock-label">₳ EARNING SESSION</div>
+                    <div class="timer" id="timer">24:00:00</div>
+                    <div class="status" id="timerStatus">Ready to start</div>
+                    <div class="avq-label">₳</div>
+                </div>
+                <div class="progress-wrap">
+                    <div class="progress" id="progress"></div>
+                </div>
+                <div class="clock-help">
+                    Tap <b>Start Earning</b> to start a 24-hour session. When it reaches <b>00:00:00</b>, the session becomes eligible for the configured reward.
+                </div>
+            </section>
+
+            <section class="actions">
+                <button class="action primary" type="button" onclick="startEarning()">
+                    <span class="icon">⛏️</span>
+                    Start Earning
+                    <small>24-hour session</small>
+                </button>
+                <button class="action" type="button" onclick="checkIn()">
+                    <span class="icon">✅</span>
+                    Check-In
+                    <small>Once daily</small>
+                </button>
+                <button class="action" type="button" onclick="claimRewards()">
+                    <span class="icon">🎁</span>
+                    Claim Rewards
+                    <small>Claim 10 ₳</small>
+                </button>
+                <button class="action" type="button" onclick="inviteFriends()">
+                    <span class="icon">👥</span>
+                    Invite Friends
+                    <small>Share Averiq</small>
+                </button>
+            </section>
+
+            <section class="info-card">
+                <h2>🔗 ₳ Wallet</h2>
+                <div id="walletStatus">💡 Wallet connection not required for earning</div>
+                <div style="background: #0a1a2a; border-radius: 15px; padding: 13px; margin-top: 12px; color: #8ca0b8; font-size: 12px; text-align: center;">
+                    🔑 You can earn ₳ rewards without connecting a wallet.<br>
+                    Connect your wallet later to claim on-chain tokens.
+                </div>
+                <div class="message" id="appMessage">Tap <b>Start Earning</b> to begin your 24-hour session!</div>
+            </section>
+
+        </main>
+
+    </div>
+
+    <nav class="nav">
+        <button class="active" type="button">
+            <span class="nav-icon">⌂</span>Home
+        </button>
+        <button type="button" onclick="claimRewards()">
+            <span class="nav-icon">🎁</span>Rewards
+        </button>
+        <button type="button" onclick="showGrowth()">
+            <span class="nav-icon">🏆</span>Growth
+        </button>
+        <button type="button" onclick="showWallet()">
+            <span class="nav-icon">👛</span>Wallet
+        </button>
+        <button type="button" onclick="showProfile()">
+            <span class="nav-icon">●</span>Profile
+        </button>
+    </nav>
+
+    <script>
+        /* ============================================================
+           AVERIQ - OFFLINE MODE (No Wallet Required)
+           ============================================================ */
+
+        /* ============================================================
+           STATE
+           ============================================================ */
+        let balance = 0;
+        let claimable = 0;
+        let totalEarned = 0;
+        let totalClaimed = 0;
+        let sessions = 0;
+        let checks = 0;
+        let streak = 0;
+        let sessionEnd = null;
+        let sessionCompleted = false;
+        let timerInterval = null;
+        let lastCheckIn = null;
+
+        const SESSION_LENGTH = 24 * 60 * 60 * 1000;
+        const REWARD_AMOUNT = 10;
+        const CHECKIN_REWARD = 0.25;
+
+        /* ============================================================
+           LOAD / SAVE
+           ============================================================ */
+        function loadState() {
+            try {
+                const saved = localStorage.getItem('averiq_offline');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    balance = data.balance || 0;
+                    claimable = data.claimable || 0;
+                    totalEarned = data.totalEarned || 0;
+                    totalClaimed = data.totalClaimed || 0;
+                    sessions = data.sessions || 0;
+                    checks = data.checks || 0;
+                    streak = data.streak || 0;
+                    sessionCompleted = data.sessionCompleted || false;
+                    sessionEnd = data.sessionEnd || null;
+                    lastCheckIn = data.lastCheckIn || null;
+                    updateUI();
+                    if (sessionEnd && sessionEnd > Date.now()) {
+                        startTimer();
+                    } else if (sessionEnd && sessionEnd <= Date.now()) {
+                        sessionCompleted = true;
+                        sessionEnd = null;
+                        saveState();
+                        updateUI();
+                        showMessage("🎉 24-hour session complete! Claim your reward!", "success");
+                    }
+                }
+            } catch (e) {
+                console.log("No saved state");
+            }
+        }
+
+        function saveState() {
+            try {
+                const data = {
+                    balance: balance,
+                    claimable: claimable,
+                    totalEarned: totalEarned,
+                    totalClaimed: totalClaimed,
+                    sessions: sessions,
+                    checks: checks,
+                    streak: streak,
+                    sessionCompleted: sessionCompleted,
+                    sessionEnd: sessionEnd,
+                    lastCheckIn: lastCheckIn
+                };
+                localStorage.setItem('averiq_offline', JSON.stringify(data));
+            } catch (e) {
+                console.log("Save error");
+            }
+        }
+
+        /* ============================================================
+           UI UPDATE
+           ============================================================ */
+        function updateUI() {
+            document.getElementById("avqBalance").textContent = balance.toFixed(4);
+
+            if (sessionCompleted) {
+                document.getElementById("timer").textContent = "00:00:00";
+                document.getElementById("timer").className = "timer complete";
+                document.getElementById("timerStatus").textContent = "🎉 Session complete";
+                document.getElementById("timerStatus").className = "status complete";
+                document.getElementById("progress").style.width = "100%";
+            } else if (sessionEnd) {
+                const remaining = Math.max(0, sessionEnd - Date.now());
+                const hours = Math.floor(remaining / 3600000);
+                const minutes = Math.floor((remaining % 3600000) / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                document.getElementById("timer").textContent =
+                    String(hours).padStart(2, "0") + ":" +
+                    String(minutes).padStart(2, "0") + ":" +
+                    String(seconds).padStart(2, "0");
+                document.getElementById("timer").className = "timer";
+                document.getElementById("timerStatus").textContent = "⏳ Earning session running";
+                document.getElementById("timerStatus").className = "status active";
+                const elapsed = SESSION_LENGTH - remaining;
+                const percentage = Math.min(100, Math.max(0, elapsed / SESSION_LENGTH * 100));
+                document.getElementById("progress").style.width = percentage + "%";
+            } else {
+                document.getElementById("timer").textContent = "24:00:00";
+                document.getElementById("timer").className = "timer";
+                document.getElementById("timerStatus").textContent = "Ready to start";
+                document.getElementById("timerStatus").className = "status";
+                document.getElementById("progress").style.width = "0%";
+            }
+        }
+
+        /* ============================================================
+           TIMER
+           ============================================================ */
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateUI, 1000);
+        }
+
+        /* ============================================================
+           MESSAGE
+           ============================================================ */
+        function showMessage(text, type) {
+            const element = document.getElementById("appMessage");
+            if (element) {
+                element.textContent = text;
+                element.className = "message " + (type || "info");
+            }
+        }
+
+        /* ============================================================
+           START EARNING
+           ============================================================ */
+        window.startEarning = function() {
+            if (sessionEnd) {
+                if (sessionEnd > Date.now()) {
+                    showMessage("Your 24-hour earning session is already running.", "info");
+                    return;
+                }
+            }
+            if (sessionCompleted) {
+                showMessage("Session already complete! Claim your reward first.", "info");
+                return;
+            }
+
+            sessionEnd = Date.now() + SESSION_LENGTH;
+            sessionCompleted = false;
+            sessions += 1;
+            saveState();
+            startTimer();
+            updateUI();
+            showMessage("✅ Your 24-hour ₳ earning session has started!", "success");
+        };
+
+        /* ============================================================
+           CHECK-IN
+           ============================================================ */
+        window.checkIn = function() {
+            const today = new Date().toISOString().slice(0, 10);
+            if (lastCheckIn === today) {
+                showMessage("You already checked in today.", "info");
+                return;
+            }
+            lastCheckIn = today;
+            checks += 1;
+            streak += 1;
+            claimable += CHECKIN_REWARD;
+            totalEarned += CHECKIN_REWARD;
+            balance += CHECKIN_REWARD;
+            saveState();
+            updateUI();
+            showMessage("✅ Daily check-in completed! +" + CHECKIN_REWARD + " ₳", "success");
+        };
+
+        /* ============================================================
+           CLAIM REWARDS
+           ============================================================ */
+        window.claimRewards = function() {
+            if (!sessionCompleted) {
+                if (sessionEnd && sessionEnd > Date.now()) {
+                    showMessage("Your 24-hour session is still running. Wait until it reaches 00:00:00.", "info");
+                    return;
+                } else {
+                    showMessage("Start and complete a 24-hour earning session first.", "info");
+                    return;
+                }
+            }
+
+            if (claimable <= 0) {
+                showMessage("No rewards to claim. Complete a session first.", "info");
+                return;
+            }
+
+            const amount = claimable + REWARD_AMOUNT;
+            balance += REWARD_AMOUNT;
+            totalEarned += REWARD_AMOUNT;
+            totalClaimed += REWARD_AMOUNT;
+            claimable = 0;
+            sessionCompleted = false;
+            sessionEnd = null;
+            saveState();
+            updateUI();
+            showMessage("🎉 Success! " + amount.toFixed(4) + " ₳ claimed!", "success");
+        };
+
+        /* ============================================================
+           INVITE FRIENDS
+           ============================================================ */
+        window.inviteFriends = async function() {
+            const url = window.location.href;
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: "Join Averiq",
+                        text: "Join me on Averiq — the ₳ community rewards app.",
+                        url: url
+                    });
+                } catch (e) {}
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(url);
+                showMessage("✅ Averiq invitation link copied!", "success");
+            } catch (e) {
+                showMessage("Your Averiq link is: " + url, "info");
+            }
+        };
+
+        /* ============================================================
+           NAVIGATION
+           ============================================================ */
+        window.showGrowth = function() {
+            showMessage("🏆 Sessions: " + sessions + " | Check-ins: " + checks + " | Streak: " + streak + " days", "info");
+        };
+
+        window.showWallet = function() {
+            showMessage("👛 Wallet connection not required to earn rewards. Connect later for on-chain tokens.", "info");
+        };
+
+        window.showProfile = function() {
+            showMessage("👤 Balance: " + balance.toFixed(4) + " ₳ | Total Earned: " + totalEarned.toFixed(4) + " ₳ | Streak: " +
+                streak + " days", "info");
+        };
+
+        /* ============================================================
+           NAV BUTTONS
+           ============================================================ */
+        document.querySelectorAll('.nav button').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.nav button').forEach(function(b) {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+
+        /* ============================================================
+           INITIALIZE
+           ============================================================ */
+        loadState();
+        console.log("🌍 Averiq loaded! No wallet required.");
+        console.log("💾 Balance:", balance, "₳");
+
+        /* ============================================================
+           CHECK FOR COMPLETED SESSION ON LOAD
+           ============================================================ */
+        if (sessionEnd && sessionEnd <= Date.now()) {
+            sessionCompleted = true;
+            sessionEnd = null;
+            saveState();
+            updateUI();
+            showMessage("🎉 Your 24-hour session is complete! Claim your reward!", "success");
+        }
+    </script>
+
+</body>
+</html>
