@@ -1,0 +1,2231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <title>Averiq — AVQ Community Rewards</title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      background: #06111c;
+    }
+
+    body {
+      margin: 0;
+      background: #06111c;
+      color: #eef7ff;
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 760px;
+      margin: auto;
+      min-height: 100vh;
+      padding-bottom: 100px;
+    }
+
+    header {
+      height: 82px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: #07131f;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 25px;
+      font-weight: 900;
+    }
+
+    .logo {
+      width: 55px;
+      height: 55px;
+      border-radius: 17px;
+      background: #12d8b5;
+      display: grid;
+      place-items: center;
+      color: #06111c;
+      font-size: 30px;
+      font-weight: 900;
+    }
+
+    .online {
+      border: 1px solid rgba(18,216,181,.35);
+      padding: 9px 13px;
+      border-radius: 30px;
+      color: #12d8b5;
+      font-weight: 700;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #37df6d;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+
+    main {
+      padding: 20px;
+    }
+
+    .balance-card,
+    .clock-card,
+    .info-card {
+      background: linear-gradient(
+        145deg,
+        #101f2e,
+        #0a1725
+      );
+
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 28px;
+      padding: 22px;
+      margin-bottom: 18px;
+
+      box-shadow:
+        0 20px 50px rgba(0,0,0,.18);
+    }
+
+    .balance-title {
+      color: #8295ad;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .balance {
+      text-align: center;
+      font-size: clamp(40px, 12vw, 58px);
+      font-weight: 900;
+      margin: 8px 0;
+      color: #ffffff;
+      overflow-wrap: anywhere;
+    }
+
+    .balance-sub {
+      text-align: center;
+      color: #8ca0b8;
+      font-size: 13px;
+    }
+
+    .clock-card {
+      text-align: center;
+    }
+
+    .clock {
+      width: min(88vw, 520px);
+      height: min(88vw, 520px);
+      max-width: 520px;
+      max-height: 520px;
+      margin: auto;
+
+      border-radius: 50%;
+      position: relative;
+      overflow: hidden;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      background:
+        radial-gradient(
+          circle at center,
+          rgba(8,46,69,.95) 0%,
+          rgba(5,28,43,.96) 42%,
+          rgba(3,14,24,1) 72%
+        );
+
+      border: 2px solid rgba(18,216,181,.25);
+
+      box-shadow:
+        inset 0 0 50px rgba(0,180,255,.15),
+        0 0 45px rgba(0,200,180,.08);
+    }
+
+    .clock::before {
+      content: "";
+      position: absolute;
+      width: 82%;
+      height: 82%;
+      border: 1px solid rgba(18,216,181,.25);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .clock::after {
+      content: "";
+      position: absolute;
+      width: 68%;
+      height: 68%;
+      border: 1px dashed rgba(18,216,181,.18);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .earth {
+      position: absolute;
+      width: 125px;
+      height: 125px;
+      border-radius: 50%;
+      opacity: .28;
+
+      background:
+        radial-gradient(
+          circle at 35% 30%,
+          #48d6ff 0 5%,
+          transparent 6%
+        ),
+        radial-gradient(
+          circle at 55% 50%,
+          #0d74bb 0 35%,
+          #053d71 60%,
+          #021c35 100%
+        );
+
+      animation:
+        earthSpin 18s linear infinite;
+    }
+
+    @keyframes earthSpin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .clock-label,
+    .timer,
+    .status,
+    .avq-label {
+      position: relative;
+      z-index: 3;
+    }
+
+    .clock-label {
+      color: #91a8c0;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: 18px;
+    }
+
+    .timer {
+      font-size: clamp(38px, 10vw, 78px);
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-shadow: 0 0 25px rgba(18,216,181,.18);
+    }
+
+    .status {
+      margin-top: 16px;
+      padding: 9px 15px;
+      background: rgba(3,18,31,.85);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 25px;
+      color: #9aaec5;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .avq-label {
+      margin-top: 55px;
+      font-size: 38px;
+      font-weight: 900;
+      letter-spacing: 8px;
+      color: #13dfbc;
+    }
+
+    .progress-wrap {
+      height: 12px;
+      border-radius: 20px;
+      background: #06101a;
+      overflow: hidden;
+      margin: 22px 15px 10px;
+    }
+
+    .progress {
+      width: 0%;
+      height: 100%;
+      background: #12d8b5;
+      transition: width .5s linear;
+    }
+
+    .clock-help {
+      color: #879bb3;
+      line-height: 1.6;
+      margin: 15px 15px 0;
+      font-size: 13px;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 13px;
+      margin-bottom: 18px;
+    }
+
+    .action {
+      min-height: 112px;
+      border-radius: 23px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: #0d1d2c;
+      color: white;
+      padding: 16px;
+      font-weight: 800;
+      font-size: 16px;
+      transition:
+        transform .12s ease,
+        border-color .2s ease;
+    }
+
+    .action:active {
+      transform: scale(.97);
+    }
+
+    .action.primary {
+      border-color: rgba(18,216,181,.4);
+    }
+
+    .action small {
+      display: block;
+      margin-top: 8px;
+      color: #8498af;
+      font-weight: 500;
+      font-size: 12px;
+    }
+
+    .wallet-button {
+      width: 100%;
+      border: 0;
+      border-radius: 18px;
+      padding: 16px;
+      background: #12d8b5;
+      color: #03151a;
+      font-weight: 900;
+      margin-top: 15px;
+    }
+
+    .wallet-button:active {
+      transform: scale(.98);
+    }
+
+    .wallet-address {
+      background: #06121e;
+      border-radius: 15px;
+      padding: 13px;
+      word-break: break-all;
+      color: #8fa4bb;
+      font-size: 12px;
+      margin-top: 12px;
+      min-height: 42px;
+    }
+
+    .message {
+      padding: 13px;
+      margin-top: 15px;
+      border-radius: 15px;
+      background: #091827;
+      color: #9fb1c6;
+      font-size: 13px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .mint-address {
+      color: #12d8b5;
+      word-break: break-all;
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    .nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(760px,100%);
+      height: 76px;
+      background: rgba(5,17,29,.98);
+      border-top: 1px solid rgba(255,255,255,.08);
+      display: grid;
+      grid-template-columns: repeat(5,1fr);
+      z-index: 30;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .nav button {
+      border: 0;
+      background: transparent;
+      color: #71849b;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .nav button.active {
+      color: #12d8b5;
+    }
+
+    .network-info {
+      margin-top: 10px;
+      text-align: center;
+      color: #70859c;
+      font-size: 11px;
+    }
+
+    @media(max-width:500px) {
+
+      main {
+        padding: 16px;
+      }
+
+      .balance-card,
+      .clock-card,
+      .info-card {
+        padding: 18px;
+      }
+
+      .clock {
+        width: 88vw;
+        height: 88vw;
+      }
+
+      .actions {
+        gap: 10px;
+      }
+
+      .action {
+        min-height: 105px;
+        padding: 13px;
+      }
+
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <header>
+
+    <div class="brand">
+
+      <div class="logo">
+        A
+      </div>
+
+      <span>
+        Averiq.
+      </span>
+
+    </div>
+
+    <div class="online">
+
+      <span class="dot"></span>
+
+      <span id="networkText">
+        Devnet
+      </span>
+
+    </div>
+
+  </header>
+
+
+  <main>
+
+    <!-- BALANCE -->
+
+    <section class="balance-card">
+
+      <div class="balance-title">
+        TOTAL AVQ
+      </div>
+
+      <div
+        class="balance"
+        id="avqBalance"
+      >
+        0
+      </div>
+
+      <div class="balance-sub">
+        Real AVQ token balance on Solana Devnet
+      </div>
+
+    </section>
+
+
+    <!-- 24 HOUR CLOCK -->
+
+    <section class="clock-card">
+
+      <div class="clock">
+
+        <div class="earth"></div>
+
+        <div class="clock-label">
+          AVQ EARNING SESSION
+        </div>
+
+        <div
+          class="timer"
+          id="timer"
+        >
+          24:00:00
+        </div>
+
+        <div
+          class="status"
+          id="timerStatus"
+        >
+          Ready to start
+        </div>
+
+        <div class="avq-label">
+          AVQ
+        </div>
+
+      </div>
+
+
+      <div class="progress-wrap">
+
+        <div
+          class="progress"
+          id="progress"
+        ></div>
+
+      </div>
+
+
+      <div class="clock-help">
+
+        Click
+        <b>Start Earning</b>
+        to begin a 24-hour session.
+
+        When the timer reaches
+        <b>00:00:00</b>,
+        the session stops.
+
+        You can then claim the configured Devnet reward
+        using the authorized mint-authority wallet.
+
+      </div>
+
+    </section>
+
+
+    <!-- ACTION BUTTONS -->
+
+    <section class="actions">
+
+      <button
+        class="action primary"
+        onclick="startEarning()"
+      >
+
+        ⛏️
+        <br>
+
+        Start Earning
+
+        <small>
+          24-hour session
+        </small>
+
+      </button>
+
+
+      <button
+        class="action"
+        onclick="checkIn()"
+      >
+
+        ✅
+        <br>
+
+        Check-In
+
+        <small>
+          Once daily
+        </small>
+
+      </button>
+
+
+      <button
+        class="action"
+        onclick="claimRewards()"
+      >
+
+        🎁
+        <br>
+
+        Claim Rewards
+
+        <small>
+          Claim eligible AVQ
+        </small>
+
+      </button>
+
+
+      <button
+        class="action"
+        onclick="inviteFriends()"
+      >
+
+        👥
+        <br>
+
+        Invite Friends
+
+        <small>
+          Share Averiq
+        </small>
+
+      </button>
+
+    </section>
+
+
+    <!-- WALLET -->
+
+    <section class="info-card">
+
+      <h2>
+        🔗 AVQ Wallet
+      </h2>
+
+
+      <div id="walletStatus">
+        Wallet not connected
+      </div>
+
+
+      <button
+        class="wallet-button"
+        onclick="connectWallet()"
+      >
+        Connect Solana Wallet
+      </button>
+
+
+      <div
+        class="wallet-address"
+        id="walletAddress"
+      >
+        No wallet connected
+      </div>
+
+
+      <div class="message">
+
+        <b>
+          AVQ Devnet Mint
+        </b>
+
+        <div class="mint-address">
+          Hi6AH8T8GjvvDghrRPmqDMLEih6PMY7UVJgeLSt4S3NS
+        </div>
+
+      </div>
+
+
+      <div
+        class="message"
+        id="appMessage"
+      >
+        Start Earning, Check-In and Invite Friends are ready.
+        Connect your Solana wallet to read your real AVQ balance.
+      </div>
+
+
+      <div class="network-info">
+        Solana Devnet
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+
+<!-- BOTTOM NAV -->
+
+<nav class="nav">
+
+  <button class="active">
+    ⌂
+    <br>
+    Home
+  </button>
+
+
+  <button onclick="claimRewards()">
+    🎁
+    <br>
+    Rewards
+  </button>
+
+
+  <button onclick="showGrowth()">
+    🏆
+    <br>
+    Growth
+  </button>
+
+
+  <button onclick="connectWallet()">
+    👛
+    <br>
+    Wallet
+  </button>
+
+
+  <button onclick="showProfile()">
+    ●
+    <br>
+    Profile
+  </button>
+
+</nav>
+
+
+<script>
+
+/* ============================================================
+   AVERIQ CONFIGURATION
+   ============================================================ */
+
+const AVQ_MINT_ADDRESS =
+  "Hi6AH8T8GjvvDghrRPmqDMLEih6PMY7UVJgeLSt4S3NS";
+
+const DEVNET_RPC =
+  "https://api.devnet.solana.com";
+
+const SESSION_LENGTH =
+  24 * 60 * 60 * 1000;
+
+const SESSION_KEY =
+  "averiq_session_end_v5";
+
+const COMPLETED_KEY =
+  "averiq_session_completed_v5";
+
+const CHECKIN_KEY =
+  "averiq_checkin_v5";
+
+const REWARD_AVQ =
+  10;
+
+
+/* ============================================================
+   GLOBAL STATE
+   ============================================================ */
+
+let connectedWallet = null;
+
+let sessionEnd = null;
+
+let sessionCompleted = false;
+
+let timerInterval = null;
+
+let solanaWeb3 = null;
+
+let splToken = null;
+
+
+/* ============================================================
+   MESSAGE
+   ============================================================ */
+
+function showMessage(message) {
+
+  const element =
+    document.getElementById(
+      "appMessage"
+    );
+
+  if (element) {
+
+    element.textContent =
+      message;
+
+  }
+
+}
+
+
+/* ============================================================
+   ERROR MESSAGE
+   ============================================================ */
+
+function getErrorMessage(error) {
+
+  if (!error) {
+    return "Unknown error";
+  }
+
+  if (error.message) {
+    return error.message;
+  }
+
+  return String(error);
+
+}
+
+
+/* ============================================================
+   LOAD SOLANA LIBRARIES
+   ============================================================ */
+
+async function loadSolanaLibraries() {
+
+  if (
+    solanaWeb3 &&
+    splToken
+  ) {
+
+    return true;
+
+  }
+
+
+  try {
+
+    solanaWeb3 =
+      await import(
+        "https://esm.sh/@solana/web3.js@1.98.4"
+      );
+
+
+    splToken =
+      await import(
+        "https://esm.sh/@solana/spl-token@0.4.14"
+      );
+
+
+    console.log(
+      "Solana libraries loaded."
+    );
+
+
+    return true;
+
+  } catch (error) {
+
+    console.error(
+      "Solana library loading failed:",
+      error
+    );
+
+
+    showMessage(
+      "Solana library could not load. Check your internet connection and reload the page."
+    );
+
+
+    return false;
+
+  }
+
+}
+
+
+/* ============================================================
+   CONNECTION
+   ============================================================ */
+
+function getConnection() {
+
+  if (!solanaWeb3) {
+
+    return null;
+
+  }
+
+
+  return new solanaWeb3.Connection(
+    DEVNET_RPC,
+    "confirmed"
+  );
+
+}
+
+
+/* ============================================================
+   FIND SOLANA WALLET
+   ============================================================ */
+
+function getProvider() {
+
+  if (
+    window.phantom &&
+    window.phantom.solana
+  ) {
+
+    return window.phantom.solana;
+
+  }
+
+
+  if (
+    window.solana &&
+    window.solana.isPhantom
+  ) {
+
+    return window.solana;
+
+  }
+
+
+  if (window.solflare) {
+
+    return window.solflare;
+
+  }
+
+
+  return null;
+
+}
+
+
+/* ============================================================
+   START EARNING
+   ============================================================ */
+
+window.startEarning =
+  function() {
+
+    if (sessionEnd) {
+
+      showMessage(
+        "Your 24-hour earning session is already running."
+      );
+
+      return;
+
+    }
+
+
+    sessionCompleted =
+      false;
+
+
+    sessionEnd =
+      Date.now() +
+      SESSION_LENGTH;
+
+
+    localStorage.setItem(
+      SESSION_KEY,
+      String(sessionEnd)
+    );
+
+
+    localStorage.setItem(
+      COMPLETED_KEY,
+      "false"
+    );
+
+
+    startTimer();
+
+
+    showMessage(
+      "✅ AVQ earning session started. Keep the session running until 00:00:00."
+    );
+
+  };
+
+
+/* ============================================================
+   TIMER LOOP
+   ============================================================ */
+
+function startTimer() {
+
+  if (timerInterval) {
+
+    clearInterval(
+      timerInterval
+    );
+
+  }
+
+
+  updateTimer();
+
+
+  timerInterval =
+    setInterval(
+      updateTimer,
+      1000
+    );
+
+}
+
+
+/* ============================================================
+   UPDATE TIMER
+   ============================================================ */
+
+function updateTimer() {
+
+  const timer =
+    document.getElementById(
+      "timer"
+    );
+
+  const status =
+    document.getElementById(
+      "timerStatus"
+    );
+
+  const progress =
+    document.getElementById(
+      "progress"
+    );
+
+
+  if (
+    !timer ||
+    !status ||
+    !progress
+  ) {
+
+    return;
+
+  }
+
+
+  if (!sessionEnd) {
+
+    if (sessionCompleted) {
+
+      timer.textContent =
+        "00:00:00";
+
+      status.textContent =
+        "Session complete";
+
+      progress.style.width =
+        "100%";
+
+    } else {
+
+      timer.textContent =
+        "24:00:00";
+
+      status.textContent =
+        "Ready to start";
+
+      progress.style.width =
+        "0%";
+
+    }
+
+    return;
+
+  }
+
+
+  const remaining =
+    Math.max(
+      0,
+      sessionEnd -
+      Date.now()
+    );
+
+
+  if (remaining <= 0) {
+
+    sessionEnd =
+      null;
+
+
+    sessionCompleted =
+      true;
+
+
+    localStorage.removeItem(
+      SESSION_KEY
+    );
+
+
+    localStorage.setItem(
+      COMPLETED_KEY,
+      "true"
+    );
+
+
+    if (timerInterval) {
+
+      clearInterval(
+        timerInterval
+      );
+
+      timerInterval =
+        null;
+
+    }
+
+
+    timer.textContent =
+      "00:00:00";
+
+
+    status.textContent =
+      "Session complete";
+
+
+    progress.style.width =
+      "100%";
+
+
+    showMessage(
+      "🎉 Your 24-hour earning session is complete. You can now claim your Devnet AVQ reward."
+    );
+
+
+    return;
+
+  }
+
+
+  const hours =
+    Math.floor(
+      remaining /
+      3600000
+    );
+
+
+  const minutes =
+    Math.floor(
+      (
+        remaining %
+        3600000
+      ) /
+      60000
+    );
+
+
+  const seconds =
+    Math.floor(
+      (
+        remaining %
+        60000
+      ) /
+      1000
+    );
+
+
+  timer.textContent =
+    String(hours)
+      .padStart(2, "0") +
+    ":" +
+    String(minutes)
+      .padStart(2, "0") +
+    ":" +
+    String(seconds)
+      .padStart(2, "0");
+
+
+  status.textContent =
+    "Earning session running";
+
+
+  const elapsed =
+    SESSION_LENGTH -
+    remaining;
+
+
+  const percentage =
+    Math.min(
+      100,
+      Math.max(
+        0,
+        elapsed /
+        SESSION_LENGTH *
+        100
+      )
+    );
+
+
+  progress.style.width =
+    percentage +
+    "%";
+
+}
+
+
+/* ============================================================
+   LOAD TIMER AFTER REFRESH
+   ============================================================ */
+
+function loadTimer() {
+
+  const saved =
+    localStorage.getItem(
+      SESSION_KEY
+    );
+
+
+  sessionCompleted =
+    localStorage.getItem(
+      COMPLETED_KEY
+    ) === "true";
+
+
+  if (!saved) {
+
+    updateTimer();
+
+    return;
+
+  }
+
+
+  const end =
+    Number(saved);
+
+
+  if (
+    !Number.isFinite(end)
+  ) {
+
+    localStorage.removeItem(
+      SESSION_KEY
+    );
+
+    updateTimer();
+
+    return;
+
+  }
+
+
+  if (
+    end <= Date.now()
+  ) {
+
+    sessionEnd =
+      null;
+
+    sessionCompleted =
+      true;
+
+
+    localStorage.removeItem(
+      SESSION_KEY
+    );
+
+
+    localStorage.setItem(
+      COMPLETED_KEY,
+      "true"
+    );
+
+
+    updateTimer();
+
+    return;
+
+  }
+
+
+  sessionEnd =
+    end;
+
+
+  sessionCompleted =
+    false;
+
+
+  startTimer();
+
+}
+
+
+/* ============================================================
+   DAILY CHECK-IN
+   ============================================================ */
+
+window.checkIn =
+  function() {
+
+    const today =
+      new Date()
+        .toISOString()
+        .slice(
+          0,
+          10
+        );
+
+
+    const lastCheckIn =
+      localStorage.getItem(
+        CHECKIN_KEY
+      );
+
+
+    if (
+      lastCheckIn === today
+    ) {
+
+      showMessage(
+        "You have already checked in today."
+      );
+
+      return;
+
+    }
+
+
+    localStorage.setItem(
+      CHECKIN_KEY,
+      today
+    );
+
+
+    showMessage(
+      "✅ Daily check-in completed successfully."
+    );
+
+  };
+
+
+/* ============================================================
+   INVITE FRIENDS
+   ============================================================ */
+
+window.inviteFriends =
+  async function() {
+
+    const url =
+      window.location.href;
+
+
+    if (
+      navigator.share
+    ) {
+
+      try {
+
+        await navigator.share({
+
+          title:
+            "Join Averiq",
+
+          text:
+            "Join me on Averiq — the AVQ community rewards app.",
+
+          url
+
+        });
+
+      } catch (error) {
+
+        // User cancelled sharing.
+
+      }
+
+      return;
+
+    }
+
+
+    try {
+
+      await navigator.clipboard.writeText(
+        url
+      );
+
+
+      showMessage(
+        "✅ Averiq invitation link copied."
+      );
+
+    } catch (error) {
+
+      showMessage(
+        "Your Averiq invitation link is: " +
+        url
+      );
+
+    }
+
+  };
+
+
+/* ============================================================
+   CONNECT WALLET
+   ============================================================ */
+
+window.connectWallet =
+  async function() {
+
+    const provider =
+      getProvider();
+
+
+    if (!provider) {
+
+      showMessage(
+        "Phantom was not detected. Open this website inside the Phantom browser or use a browser with a Solana wallet."
+      );
+
+      return;
+
+    }
+
+
+    const librariesLoaded =
+      await loadSolanaLibraries();
+
+
+    if (!librariesLoaded) {
+
+      return;
+
+    }
+
+
+    try {
+
+      showMessage(
+        "Connecting wallet..."
+      );
+
+
+      const response =
+        await provider.connect();
+
+
+      if (
+        !response ||
+        !response.publicKey
+      ) {
+
+        throw new Error(
+          "The wallet did not return a public address."
+        );
+
+      }
+
+
+      connectedWallet =
+        response.publicKey;
+
+
+      updateWalletDisplay();
+
+
+      showMessage(
+        "Wallet connected. Reading your real AVQ Devnet balance..."
+      );
+
+
+      await refreshAVQBalance();
+
+    } catch (error) {
+
+      console.error(
+        "Wallet connection error:",
+        error
+      );
+
+
+      showMessage(
+        "Wallet connection failed: " +
+        getErrorMessage(error)
+      );
+
+    }
+
+  };
+
+
+/* ============================================================
+   DISPLAY WALLET
+   ============================================================ */
+
+function updateWalletDisplay() {
+
+  const status =
+    document.getElementById(
+      "walletStatus"
+    );
+
+  const address =
+    document.getElementById(
+      "walletAddress"
+    );
+
+
+  if (!connectedWallet) {
+
+    status.textContent =
+      "Wallet not connected";
+
+    address.textContent =
+      "No wallet connected";
+
+    return;
+
+  }
+
+
+  status.textContent =
+    "Wallet connected";
+
+
+  address.textContent =
+    connectedWallet.toBase58();
+
+}
+
+
+/* ============================================================
+   READ REAL AVQ BALANCE
+   ============================================================ */
+
+async function refreshAVQBalance() {
+
+  if (!connectedWallet) {
+
+    return;
+
+  }
+
+
+  if (
+    !solanaWeb3 ||
+    !splToken
+  ) {
+
+    const loaded =
+      await loadSolanaLibraries();
+
+
+    if (!loaded) {
+
+      return;
+
+    }
+
+  }
+
+
+  try {
+
+    const connection =
+      getConnection();
+
+
+    const mint =
+      new solanaWeb3.PublicKey(
+        AVQ_MINT_ADDRESS
+      );
+
+
+    const tokenAccount =
+      await splToken.getAssociatedTokenAddress(
+        mint,
+        connectedWallet
+      );
+
+
+    const mintInfo =
+      await splToken.getMint(
+        connection,
+        mint
+      );
+
+
+    let rawAmount =
+      0n;
+
+
+    try {
+
+      const account =
+        await splToken.getAccount(
+          connection,
+          tokenAccount
+        );
+
+
+      rawAmount =
+        BigInt(
+          account.amount
+        );
+
+    } catch {
+
+      rawAmount =
+        0n;
+
+    }
+
+
+    const formatted =
+      formatTokenAmount(
+        rawAmount,
+        mintInfo.decimals
+      );
+
+
+    document.getElementById(
+      "avqBalance"
+    ).textContent =
+      formatted;
+
+
+    showMessage(
+      "✅ Real AVQ balance loaded from Solana Devnet."
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Balance error:",
+      error
+    );
+
+
+    document.getElementById(
+      "avqBalance"
+    ).textContent =
+      "0";
+
+
+    showMessage(
+      "Could not read the AVQ Devnet balance: " +
+      getErrorMessage(error)
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   FORMAT TOKEN AMOUNT
+   ============================================================ */
+
+function formatTokenAmount(
+  amount,
+  decimals
+) {
+
+  const value =
+    BigInt(amount);
+
+
+  const divisor =
+    10n **
+    BigInt(decimals);
+
+
+  const whole =
+    value /
+    divisor;
+
+
+  const fraction =
+    value %
+    divisor;
+
+
+  if (
+    fraction === 0n
+  ) {
+
+    return whole.toString();
+
+  }
+
+
+  const fractionText =
+    fraction
+      .toString()
+      .padStart(
+        decimals,
+        "0"
+      )
+      .replace(
+        /0+$/,
+        ""
+      );
+
+
+  return (
+    whole.toString() +
+    "." +
+    fractionText
+  );
+
+}
+
+
+/* ============================================================
+   CLAIM AVQ
+   ============================================================ */
+
+window.claimRewards =
+  async function() {
+
+    if (!connectedWallet) {
+
+      showMessage(
+        "Connect your mint-authority Solana wallet first."
+      );
+
+      return;
+
+    }
+
+
+    if (!sessionCompleted) {
+
+      if (sessionEnd) {
+
+        showMessage(
+          "Your 24-hour session is still running. Wait until the timer reaches 00:00:00."
+        );
+
+      } else {
+
+        showMessage(
+          "Start a 24-hour earning session before claiming."
+        );
+
+      }
+
+      return;
+
+    }
+
+
+    const provider =
+      getProvider();
+
+
+    if (!provider) {
+
+      showMessage(
+        "Your Solana wallet is no longer available."
+      );
+
+      return;
+
+    }
+
+
+    const loaded =
+      await loadSolanaLibraries();
+
+
+    if (!loaded) {
+
+      return;
+
+    }
+
+
+    try {
+
+      const connection =
+        getConnection();
+
+
+      const mint =
+        new solanaWeb3.PublicKey(
+          AVQ_MINT_ADDRESS
+        );
+
+
+      showMessage(
+        "Checking AVQ mint authority..."
+      );
+
+
+      const mintInfo =
+        await splToken.getMint(
+          connection,
+          mint
+        );
+
+
+      /*
+       * IMPORTANT:
+       *
+       * The connected wallet MUST equal
+       * the actual on-chain mint authority.
+       */
+
+      if (
+        !mintInfo.mintAuthority
+      ) {
+
+        showMessage(
+          "This AVQ mint has no mint authority. New AVQ tokens cannot be created."
+        );
+
+        return;
+
+      }
+
+
+      console.log(
+        "AVQ Mint Authority:",
+        mintInfo.mintAuthority.toBase58()
+      );
+
+
+      console.log(
+        "Connected Wallet:",
+        connectedWallet.toBase58()
+      );
+
+
+      if (
+        !mintInfo.mintAuthority.equals(
+          connectedWallet
+        )
+      ) {
+
+        showMessage(
+          "Claim blocked: this wallet is NOT the AVQ mint authority. Connect the wallet that controls the AVQ mint."
+        );
+
+        return;
+
+      }
+
+
+      /*
+       * The authority check passed.
+       */
+
+      showMessage(
+        "Mint authority confirmed. Preparing your AVQ reward..."
+      );
+
+
+      const tokenAccount =
+        await splToken.getAssociatedTokenAddress(
+          mint,
+          connectedWallet
+        );
+
+
+      const transaction =
+        new solanaWeb3.Transaction();
+
+
+      /*
+       * Create the associated token account
+       * if the wallet does not have one yet.
+       */
+
+      const accountInfo =
+        await connection.getAccountInfo(
+          tokenAccount
+        );
+
+
+      if (!accountInfo) {
+
+        transaction.add(
+          splToken.createAssociatedTokenAccountInstruction(
+            connectedWallet,
+            tokenAccount,
+            connectedWallet,
+            mint
+          )
+        );
+
+      }
+
+
+      /*
+       * Calculate exact raw token amount.
+       */
+
+      const rawReward =
+        BigInt(
+          REWARD_AVQ
+        ) *
+        (
+          10n **
+          BigInt(
+            mintInfo.decimals
+          )
+        );
+
+
+      /*
+       * Mint 10 AVQ.
+       */
+
+      transaction.add(
+        splToken.createMintToInstruction(
+          mint,
+          tokenAccount,
+          connectedWallet,
+          rawReward
+        )
+      );
+
+
+      /*
+       * Prepare transaction.
+       */
+
+      const latestBlockhash =
+        await connection.getLatestBlockhash(
+          "confirmed"
+        );
+
+
+      transaction.feePayer =
+        connectedWallet;
+
+
+      transaction.recentBlockhash =
+        latestBlockhash.blockhash;
+
+
+      showMessage(
+        "Please approve the AVQ transaction in Phantom..."
+      );
+
+
+      /*
+       * Wallet signs transaction.
+       */
+
+      const signedTransaction =
+        await provider.signTransaction(
+          transaction
+        );
+
+
+      /*
+       * Send transaction.
+       */
+
+      const signature =
+        await connection.sendRawTransaction(
+          signedTransaction.serialize()
+        );
+
+
+      showMessage(
+        "Transaction sent. Waiting for Solana Devnet confirmation..."
+      );
+
+
+      /*
+       * Confirm transaction.
+       */
+
+      await connection.confirmTransaction(
+        {
+          signature:
+            signature,
+
+          blockhash:
+            latestBlockhash.blockhash,
+
+          lastValidBlockHeight:
+            latestBlockhash.lastValidBlockHeight
+
+        },
+        "confirmed"
+      );
+
+
+      /*
+       * Reset completed session.
+       */
+
+      sessionCompleted =
+        false;
+
+
+      localStorage.setItem(
+        COMPLETED_KEY,
+        "false"
+      );
+
+
+      updateTimer();
+
+
+      showMessage(
+        "🎉 Success! 10 AVQ was minted to your wallet. Transaction: " +
+        signature
+      );
+
+
+      /*
+       * Refresh actual blockchain balance.
+       */
+
+      await refreshAVQBalance();
+
+
+    } catch (error) {
+
+      console.error(
+        "CLAIM ERROR:",
+        error
+      );
+
+
+      showMessage(
+        "Claim failed: " +
+        getErrorMessage(error)
+      );
+
+    }
+
+  };
+
+
+/* ============================================================
+   GROWTH
+   ============================================================ */
+
+window.showGrowth =
+  function() {
+
+    showMessage(
+      "🏆 Growth section is ready for your achievement system."
+    );
+
+  };
+
+
+/* ============================================================
+   PROFILE
+   ============================================================ */
+
+window.showProfile =
+  function() {
+
+    if (connectedWallet) {
+
+      showMessage(
+        "Connected wallet: " +
+        connectedWallet.toBase58()
+      );
+
+    } else {
+
+      showMessage(
+        "Connect your Solana wallet to view your profile."
+      );
+
+    }
+
+  };
+
+
+/* ============================================================
+   AUTO CONNECT
+   ============================================================ */
+
+async function autoConnect() {
+
+  const provider =
+    getProvider();
+
+
+  if (!provider) {
+
+    return;
+
+  }
+
+
+  try {
+
+    const response =
+      await provider.connect({
+        onlyIfTrusted: true
+      });
+
+
+    if (
+      response &&
+      response.publicKey
+    ) {
+
+      connectedWallet =
+        response.publicKey;
+
+
+      updateWalletDisplay();
+
+
+      await loadSolanaLibraries();
+
+
+      await refreshAVQBalance();
+
+    }
+
+  } catch {
+
+    /*
+     * This is normal when the user
+     * has not previously authorized
+     * the website.
+     */
+
+  }
+
+}
+
+
+/* ============================================================
+   WALLET ACCOUNT CHANGE
+   ============================================================ */
+
+function listenForWalletChanges() {
+
+  const provider =
+    getProvider();
+
+
+  if (
+    !provider ||
+    !provider.on
+  ) {
+
+    return;
+
+  }
+
+
+  provider.on(
+    "accountChanged",
+    async function(publicKey) {
+
+      if (!publicKey) {
+
+        connectedWallet =
+          null;
+
+
+        updateWalletDisplay();
+
+
+        document.getElementById(
+          "avqBalance"
+        ).textContent =
+          "0";
+
+
+        showMessage(
+          "Wallet disconnected."
+        );
+
+
+        return;
+
+      }
+
+
+      connectedWallet =
+        publicKey;
+
+
+      updateWalletDisplay();
+
+
+      await refreshAVQBalance();
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   INITIALIZE
+   ============================================================ */
+
+loadTimer();
+
+listenForWalletChanges();
+
+autoConnect();
+
+
+/*
+ * Load Solana in background.
+ *
+ * IMPORTANT:
+ * The ordinary buttons do not depend on this.
+ */
+
+loadSolanaLibraries();
+
+</script>
+
+</body>
+</html>
