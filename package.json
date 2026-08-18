@@ -1,6 +1,7 @@
 {
   "name": "averiq-backend",
   "version": "1.0.0",
+  "type": "module",
   "description": "Averiq backend for Solana rewards",
   "main": "index.js",
   "scripts": {
