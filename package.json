@@ -1,0 +1,17 @@
+{
+  "name": "averiq-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "Averiq backend for Solana rewards",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.98.4",
+    "@solana/spl-token": "^0.4.14",
+    "@vercel/node": "^2.0.0",
+    "firebase-admin": "^13.4.0"
+  }
+}
