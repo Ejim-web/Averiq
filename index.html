@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Averiq — Tap to Mine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background: #0a0e17;
+            color: #e8edf5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        .container {
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        .logo {
+            font-size: 52px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #12d8b5, #f5b62e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle {
+            color: #8a9bb5;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+        .card {
+            background: rgba(17, 25, 39, 0.85);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 12px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .balance-label {
+            color: #5a6f8a;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .balance {
+            font-size: 44px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #12d8b5, #f5b62e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+        .cloud-btn {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: none;
+            background: radial-gradient(circle at 40% 35%, #1a3a4a, #0d1a2a);
+            cursor: pointer;
+            transition: transform 0.1s ease;
+            box-shadow: 0 0 60px rgba(18, 216, 181, 0.05);
+            margin: 8px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+        .cloud-btn:active {
+            transform: scale(0.92);
+        }
+        .cloud-btn .cloud-icon {
+            font-size: 72px;
+            line-height: 1;
+            animation: floatCloud 3s ease-in-out infinite;
+        }
+        @keyframes floatCloud {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        .cloud-btn .label {
+            font-size: 11px;
+            color: #8a9bb5;
+            font-weight: 700;
+            margin-top: 2px;
+            letter-spacing: 1px;
+        }
+        .cloud-btn .label .highlight {
+            color: #12d8b5;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+        .stat {
+            background: rgba(13, 21, 32, 0.8);
+            padding: 10px 6px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .stat .value {
+            font-size: 18px;
+            font-weight: 700;
+            display: block;
+        }
+        .stat .value.accent { color: #12d8b5; }
+        .stat .value.gold { color: #f5b62e; }
+        .stat .value.green { color: #37df6d; }
+        .stat .label {
+            font-size: 9px;
+            color: #5a6f8a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .energy-bar {
+            height: 4px;
+            background: rgba(13, 21, 32, 0.8);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .energy-bar .fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #12d8b5, #f5b62e);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .energy-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            color: #5a6f8a;
+            margin-top: 4px;
+        }
+        .wallet-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(145deg, #0098ea, #0088d4);
+            color: #fff;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .wallet-btn:active {
+            transform: scale(0.97);
+        }
+        .wallet-btn.connected {
+            background: rgba(0, 152, 234, 0.15);
+            color: #0098ea;
+            border: 1px solid rgba(0, 152, 234, 0.2);
+        }
+        .wallet-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .wallet-address {
+            font-family: monospace;
+            font-size: 11px;
+            color: #5a6f8a;
+            word-break: break-all;
+            padding: 8px;
+            background: rgba(13, 21, 32, 0.8);
+            border-radius: 8px;
+            margin-top: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .wallet-address .short {
+            color: #12d8b5;
+            font-weight: 600;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(13, 21, 32, 0.8);
+            color: #8a9bb5;
+            font-size: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .status.success { border-left: 3px solid #37df6d; }
+        .status.error { border-left: 3px solid #ff6675; }
+        .status.info { border-left: 3px solid #f5b62e; }
+        .button-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .button-grid .action-btn {
+            min-height: 44px;
+            padding: 8px 4px;
+            font-size: 9px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(13, 21, 32, 0.8);
+            color: #e8edf5;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .button-grid .action-btn:active { transform: scale(0.95); }
+        .button-grid .action-btn .icon { font-size: 16px; display: block; margin-bottom: 2px; }
+        .button-grid .action-btn.primary {
+            border-color: rgba(18, 216, 181, 0.2);
+            background: rgba(18, 216, 181, 0.05);
+        }
+        .button-grid .action-btn.success {
+            border-color: rgba(56, 229, 140, 0.2);
+            background: rgba(56, 229, 140, 0.05);
+        }
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            border-top-color: #0098ea;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .row:last-child { border-bottom: none; }
+        .row-title { font-size: 13px; font-weight: 600; }
+        .row-value { font-size: 13px; font-weight: 700; color: #12d8b5; }
+        @media (max-width: 400px) {
+            .cloud-btn { width: 160px; height: 160px; }
+            .cloud-btn .cloud-icon { font-size: 56px; }
+            .balance { font-size: 34px; }
+            .button-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 360px) {
+            .cloud-btn { width: 140px; height: 140px; }
+            .cloud-btn .cloud-icon { font-size: 44px; }
+            .balance { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <span class="logo">☁️</span>
+        <h1>Averiq</h1>
+        <div class="subtitle">Tap the cloud to mine ₳ tokens</div>
+
+        <div class="card">
+            <div class="balance-label">💰 YOUR BALANCE</div>
+            <div class="balance" id="balanceDisplay">0.0000</div>
+        </div>
+
+        <button class="cloud-btn" id="cloudBtn">
+            <span class="cloud-icon">☁️</span>
+            <span class="label"><span class="highlight">TAP</span> TO MINE</span>
+        </button>
+
+        <div class="card">
+            <div class="stats">
+                <div class="stat">
+                    <span class="value accent" id="tapCount">0</span>
+                    <span class="label">Taps</span>
+                </div>
+                <div class="stat">
+                    <span class="value gold" id="minedDisplay">0.0000</span>
+                    <span class="label">Mined</span>
+                </div>
+                <div class="stat">
+                    <span class="value green" id="energyDisplay">100%</span>
+                    <span class="label">Energy</span>
+                </div>
+            </div>
+            <div class="energy-bar">
+                <div class="fill" id="energyFill" style="width:100%"></div>
+            </div>
+            <div class="energy-text">
+                <span>0%</span>
+                <span id="energyStatus">Full Energy!</span>
+                <span>100%</span>
+            </div>
+        </div>
+
+        <div class="button-grid">
+            <button class="action-btn primary" id="autoTapBtn">
+                <span class="icon">⏱️</span>Auto-Tap
+            </button>
+            <button class="action-btn" id="checkinBtn">
+                <span class="icon">✅</span>Check-In
+            </button>
+            <button class="action-btn success" id="claimBtn">
+                <span class="icon">🎁</span>Claim
+            </button>
+            <button class="action-btn" id="sendBtn">
+                <span class="icon">📤</span>Send
+            </button>
+        </div>
+
+        <div class="card">
+            <button class="wallet-btn" id="walletBtn">
+                💎 Connect Telegram Wallet
+            </button>
+            <div class="wallet-address" id="walletAddress">
+                <span class="short">💡 No wallet connected</span>
+            </div>
+            <div class="status" id="statusMessage">🔗 Click connect to start mining!</div>
+        </div>
+
+        <div class="card">
+            <div class="row">
+                <span class="row-title">Mining Status</span>
+                <span class="row-value" id="miningStatus">⏸️ Inactive</span>
+            </div>
+            <div class="row">
+                <span class="row-title">Total Earned</span>
+                <span class="row-value" id="totalEarnedDisplay">0.0000 AVQ</span>
+            </div>
+            <div class="row">
+                <span class="row-title">Total Claimed</span>
+                <span class="row-value" id="totalClaimedDisplay">0.0000 AVQ</span>
+            </div>
+            <div class="row">
+                <span class="row-title">Sessions</span>
+                <span class="row-value" id="sessionsDisplay">0</span>
+            </div>
+            <div class="row">
+                <span class="row-title">Streak</span>
+                <span class="row-value" id="streakDisplay">0 days</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // AVERIQ — COMPLETE FEATURES
+        // ============================================================
+
+        let wallet = null;
+        let isConnecting = false;
+
+        let balance = 0;
+        let claimable = 0;
+        let totalEarned = 0;
+        let totalClaimed = 0;
+        let tapCount = 0;
+        let tapEnergy = 100;
+        let tapReward = 0.0005;
+        let tapMined = 0;
+        let streak = 0;
+        let sessions = 0;
+        let lastCheckIn = null;
+
+        let isAutoTapping = false;
+        let autoTapTimer = null;
+        let energyRegenTimer = null;
+
+        const CHECKIN_REWARD = 0.25;
+        const STORAGE_KEY = 'averiq_data';
+        const WALLET_KEY = 'averiq_wallet';
+
+        function connectTelegramWallet() {
+            const button = document.getElementById("walletBtn");
+            const status = document.getElementById("statusMessage");
+
+            if (isConnecting) {
+                status.textContent = "⏳ Connecting...";
+                status.className = "status info";
+                return;
+            }
+
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                
+                isConnecting = true;
+                button.disabled = true;
+                button.innerHTML = '<span class="spinner"></span> Connecting...';
+                status.textContent = "🔄 Opening Telegram Wallet...";
+                status.className = "status info";
+
+                try {
+                    const initData = tg.initDataUnsafe || {};
+                    
+                    if (initData.user) {
+                        const userId = initData.user.id;
+                        const username = initData.user.username || 'User';
+                        
+                        wallet = {
+                            address: `tg_${userId}`,
+                            username: username,
+                            connected: true
+                        };
+
+                        localStorage.setItem(WALLET_KEY, wallet.address);
+                        if (sessions === 0) sessions = 1;
+                        loadData();
+                        updateUI();
+                        
+                        button.innerHTML = '✅ Connected';
+                        button.className = 'wallet-btn connected';
+                        button.onclick = function() {
+                            if (confirm("Disconnect wallet?")) {
+                                disconnectWallet();
+                            }
+                        };
+                        
+                        status.textContent = `✅ Connected as ${username}!`;
+                        status.className = "status success";
+                        showMessage(`🎉 Welcome ${username}! Start mining!`, "success");
+                    } else {
+                        status.textContent = "⚠️ Please open this in Telegram";
+                        status.className = "status error";
+                        button.innerHTML = '💎 Connect Telegram Wallet';
+                        button.className = 'wallet-btn';
+                        button.onclick = connectTelegramWallet;
+                        button.disabled = false;
+                    }
+                } catch (error) {
+                    console.error("Telegram wallet error:", error);
+                    status.textContent = "❌ Could not connect. Try again.";
+                    status.className = "status error";
+                    button.innerHTML = '💎 Connect Telegram Wallet';
+                    button.className = 'wallet-btn';
+                    button.onclick = connectTelegramWallet;
+                    button.disabled = false;
+                } finally {
+                    isConnecting = false;
+                }
+            } else {
+                status.textContent = "⚠️ Open this in Telegram Mini App";
+                status.className = "status error";
+            }
+        }
+
+        function disconnectWallet() {
+            if (!wallet) return;
+            saveData();
+
+            wallet = null;
+            localStorage.removeItem(WALLET_KEY);
+
+            const button = document.getElementById("walletBtn");
+            button.innerHTML = '💎 Connect Telegram Wallet';
+            button.className = 'wallet-btn';
+            button.onclick = connectTelegramWallet;
+            button.disabled = false;
+
+            document.getElementById("walletAddress").innerHTML = `<span class="short">💡 No wallet connected</span>`;
+            showStatus("Wallet disconnected.", "error");
+
+            loadGuestData();
+        }
+
+        function autoConnect() {
+            const savedWallet = localStorage.getItem(WALLET_KEY);
+            if (!savedWallet) {
+                loadGuestData();
+                return;
+            }
+
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                const initData = tg.initDataUnsafe || {};
+                
+                if (initData.user) {
+                    const userId = initData.user.id;
+                    const username = initData.user.username || 'User';
+                    
+                    wallet = {
+                        address: `tg_${userId}`,
+                        username: username,
+                        connected: true
+                    };
+                    
+                    loadData();
+                    updateUI();
+                    
+                    const button = document.getElementById("walletBtn");
+                    button.innerHTML = '✅ Connected';
+                    button.className = 'wallet-btn connected';
+                    button.onclick = function() {
+                        if (confirm("Disconnect wallet?")) {
+                            disconnectWallet();
+                        }
+                    };
+                    
+                    showStatus(`✅ Connected as ${username}!`, "success");
+                    return;
+                }
+            }
+            
+            loadGuestData();
+        }
+
+        function getKey() {
+            if (wallet && wallet.address) {
+                return STORAGE_KEY + '_' + wallet.address;
+            }
+            return STORAGE_KEY + '_guest';
+        }
+
+        function saveData() {
+            try {
+                const data = {
+                    balance: balance,
+                    claimable: claimable,
+                    totalEarned: totalEarned,
+                    totalClaimed: totalClaimed,
+                    tapCount: tapCount,
+                    tapMined: tapMined,
+                    tapEnergy: tapEnergy,
+                    streak: streak,
+                    sessions: sessions,
+                    lastCheckIn: lastCheckIn,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem(getKey(), JSON.stringify(data));
+            } catch (e) {
+                console.error("Save error:", e);
+            }
+        }
+
+        function loadData() {
+            if (!wallet) return;
+            try {
+                const data = localStorage.getItem(STORAGE_KEY + '_' + wallet.address);
+                if (data) applyData(JSON.parse(data));
+            } catch (e) {
+                console.error("Load error:", e);
+            }
+        }
+
+        function loadGuestData() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY + '_guest');
+                if (data) applyData(JSON.parse(data));
+            } catch (e) {
+                console.error("Load guest error:", e);
+            }
+        }
+
+        function applyData(data) {
+            balance = data.balance || 0;
+            claimable = data.claimable || 0;
+            totalEarned = data.totalEarned || 0;
+            totalClaimed = data.totalClaimed || 0;
+            tapCount = data.tapCount || 0;
+            tapMined = data.tapMined || 0;
+            tapEnergy = data.tapEnergy || 100;
+            streak = data.streak || 0;
+            sessions = data.sessions || 0;
+            lastCheckIn = data.lastCheckIn || null;
+            updateUI();
+        }
+
+        function showStatus(message, type) {
+            const el = document.getElementById("statusMessage");
+            el.textContent = message;
+            el.className = "status " + (type || "");
+        }
+
+        function showMessage(message, type = "") {
+            const el = document.getElementById("statusMessage");
+            el.textContent = message;
+            el.className = "status " + type;
+            clearTimeout(showMessage.timer);
+            showMessage.timer = setTimeout(() => {
+                if (wallet && wallet.connected) {
+                    el.textContent = "✅ Mining... Keep tapping!";
+                    el.className = "status success";
+                } else {
+                    el.textContent = "🔗 Connect wallet to save progress!";
+                    el.className = "status";
+                }
+            }, 3000);
+        }
+
+        function tapCloud() {
+            if (tapEnergy < 3) {
+                showStatus("⏳ Energy low! Wait for recharge.", "info");
+                return;
+            }
+
+            const btn = document.getElementById("cloudBtn");
+            btn.style.transform = 'scale(0.92)';
+            setTimeout(() => { btn.style.transform = 'scale(1)'; }, 100);
+
+            const multiplier = 1 + (tapCount / 500) * 0.2;
+            const reward = tapReward * multiplier;
+
+            tapMined += reward;
+            balance += reward;
+            claimable += reward;
+            totalEarned += reward;
+            tapCount++;
+            tapEnergy = Math.max(0, tapEnergy - 0.8);
+
+            updateUI();
+            saveData();
+            updateEnergy();
+
+            if (!energyRegenTimer) startEnergyRegen();
+
+            showStatus(`+${reward.toFixed(4)} ₳`, "success");
+            setTimeout(() => {
+                if (wallet && wallet.connected) {
+                    showStatus("✅ Mining... Keep tapping!", "success");
+                } else {
+                    showStatus("☁️ Tap to mine! Connect wallet to save.", "");
+                }
+            }, 600);
+        }
+
+        function updateEnergy() {
+            const pct = Math.round(tapEnergy);
+            document.getElementById("energyDisplay").textContent = pct + '%';
+            document.getElementById("energyFill").style.width = pct + '%';
+
+            const txt = document.getElementById("energyStatus");
+            if (pct >= 100) txt.textContent = 'Full Energy!';
+            else if (pct > 50) txt.textContent = 'Energized';
+            else if (pct > 20) txt.textContent = 'Recharging...';
+            else txt.textContent = 'Low Energy!';
+        }
+
+        function startEnergyRegen() {
+            if (energyRegenTimer) clearInterval(energyRegenTimer);
+            energyRegenTimer = setInterval(() => {
+                if (tapEnergy < 100) {
+                    tapEnergy = Math.min(100, tapEnergy + 0.8);
+                    updateEnergy();
+                    if (tapEnergy >= 100) {
+                        clearInterval(energyRegenTimer);
+                        energyRegenTimer = null;
+                    }
+                } else {
+                    clearInterval(energyRegenTimer);
+                    energyRegenTimer = null;
+                }
+            }, 500);
+        }
+
+        function updateUI() {
+            document.getElementById("balanceDisplay").textContent = balance.toFixed(4);
+            document.getElementById("tapCount").textContent = tapCount;
+            document.getElementById("minedDisplay").textContent = tapMined.toFixed(4);
+            document.getElementById("totalEarnedDisplay").textContent = totalEarned.toFixed(4) + ' AVQ';
+            document.getElementById("totalClaimedDisplay").textContent = totalClaimed.toFixed(4) + ' AVQ';
+            document.getElementById("sessionsDisplay").textContent = sessions;
+            document.getElementById("streakDisplay").textContent = streak + ' days';
+            document.getElementById("miningStatus").textContent = wallet && wallet.connected ? '🟢 Active' : '⏸️ Inactive';
+            updateEnergy();
+
+            if (wallet && wallet.connected) {
+                const short = wallet.address.slice(0, 6) + "..." + wallet.address.slice(-6);
+                document.getElementById("walletAddress").innerHTML = 
+                    `<span class="short">🔗 ${short}</span><br><span style="font-size:9px;color:#5a6f8a;">${wallet.username || 'User'}</span>`;
+            } else {
+                document.getElementById("walletAddress").innerHTML = `<span class="short">💡 No wallet connected</span>`;
+            }
+        }
+
+        function toggleAutoTap() {
+            if (!wallet) {
+                showStatus("Connect your wallet first.", "error");
+                return;
+            }
+
+            isAutoTapping = !isAutoTapping;
+
+            if (isAutoTapping) {
+                if (autoTapTimer) clearInterval(autoTapTimer);
+                autoTapTimer = setInterval(() => {
+                    if (tapEnergy < 3) return;
+                    tapCloud();
+                }, 1500);
+                document.getElementById("autoTapBtn").innerHTML = '<span class="icon">⏹️</span>Stop Auto';
+                document.getElementById("autoTapBtn").className = 'action-btn success';
+                showStatus("⏱️ Auto-tap started!", "success");
+            } else {
+                if (autoTapTimer) {
+                    clearInterval(autoTapTimer);
+                    autoTapTimer = null;
+                }
+                document.getElementById("autoTapBtn").innerHTML = '<span class="icon">⏱️</span>Auto-Tap';
+                document.getElementById("autoTapBtn").className = 'action-btn primary';
+                showStatus("⏹️ Auto-tap stopped", "info");
+            }
+        }
+
+        function checkIn() {
+            if (!wallet) {
+                showStatus("Connect your wallet first.", "error");
+                return;
+            }
+
+            const today = new Date().toISOString().slice(0, 10);
+            if (lastCheckIn === today) {
+                showStatus("Already checked in today.", "info");
+                return;
+            }
+
+            const reward = CHECKIN_REWARD;
+            lastCheckIn = today;
+            streak += 1;
+            balance += reward;
+            claimable += reward;
+            totalEarned += reward;
+            updateUI();
+            saveData();
+            showStatus(`✅ Daily check-in! +${reward} ₳ (${streak} day streak)`, "success");
+        }
+
+        function claimRewards() {
+            if (!wallet) {
+                showStatus("Connect your wallet first.", "error");
+                return;
+            }
+
+            if (claimable <= 0) {
+                showStatus("No rewards to claim. Keep tapping!", "info");
+                return;
+            }
+
+            const amount = claimable;
+            totalClaimed += amount;
+            claimable = 0;
+            updateUI();
+            saveData();
+            showStatus(`🎉 Claimed ${amount.toFixed(4)} ₳!`, "success");
+        }
+
+        function sendTokens() {
+            if (!wallet) {
+                showStatus("Connect your wallet first.", "error");
+                return;
+            }
+
+            const amount = prompt("Enter amount to send:", "0.001");
+            if (amount === null) return;
+            
+            const numAmount = parseFloat(amount);
+            if (isNaN(numAmount) || numAmount <= 0) {
+                showStatus("Invalid amount.", "error");
+                return;
+            }
+
+            if (numAmount > balance) {
+                showStatus("Insufficient balance.", "error");
+                return;
+            }
+
+            const address = prompt("Enter recipient address:");
+            if (!address) return;
+
+            balance -= numAmount;
+            updateUI();
+            saveData();
+            showStatus(`📤 Sent ${numAmount.toFixed(4)} AVQ`, "success");
+        }
+
+        function initTelegramApp() {
+            try {
+                if (window.Telegram && window.Telegram.WebApp) {
+                    const tg = window.Telegram.WebApp;
+                    tg.ready();
+                    tg.expand();
+                    console.log('✅ Telegram WebApp initialized');
+                }
+            } catch (e) {
+                console.log('Not in Telegram WebApp mode');
+            }
+        }
+
+        // ============================================================
+        // EVENT LISTENERS
+        // ============================================================
+
+        document.addEventListener("DOMContentLoaded", function() {
+            initTelegramApp();
+            autoConnect();
+            if (!wallet) loadGuestData();
+            updateUI();
+
+            if (wallet && wallet.connected) {
+                showStatus("✅ Wallet connected! Start mining!", "success");
+            } else if (window.Telegram && window.Telegram.WebApp) {
+                showStatus("🔗 Click 'Connect Telegram Wallet' to start!", "");
+            } else {
+                showStatus("💡 Open this in Telegram Mini App to connect!", "info");
+            }
+
+            console.log("☁️ Averiq — Complete Features");
+            console.log("✅ Telegram Wallet, Auto-Tap, Check-In, Claim, Send");
+        });
+
+        document.getElementById("cloudBtn").addEventListener("click", tapCloud);
+        document.getElementById("walletBtn").addEventListener("click", connectTelegramWallet);
+        document.getElementById("autoTapBtn").addEventListener("click", toggleAutoTap);
+        document.getElementById("checkinBtn").addEventListener("click", checkIn);
+        document.getElementById("claimBtn").addEventListener("click", claimRewards);
+        document.getElementById("sendBtn").addEventListener("click", sendTokens);
+
+        window.tapCloud = tapCloud;
+        window.connectTelegramWallet = connectTelegramWallet;
+        window.disconnectWallet = disconnectWallet;
+        window.toggleAutoTap = toggleAutoTap;
+        window.checkIn = checkIn;
+        window.claimRewards = claimRewards;
+        window.sendTokens = sendTokens;
+        window.showStatus = showStatus;
+        window.showMessage = showMessage;
+    </script>
+</body>
+</html>
