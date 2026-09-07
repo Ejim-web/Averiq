@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Averiq — Tap to Mine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #0a0e17;
+            color: #e8edf5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 52px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #12d8b5, #f5b62e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #8a9bb5;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(17, 25, 39, 0.85);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 12px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        /* Balance */
+        .balance-label {
+            color: #5a6f8a;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .balance {
+            font-size: 44px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #12d8b5, #f5b62e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        /* Cloud Button */
+        .cloud-btn {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: none;
+            background: radial-gradient(circle at 40% 35%, #1a3a4a, #0d1a2a);
+            cursor: pointer;
+            font-size: 80px;
+            transition: transform 0.1s ease;
+            box-shadow: 0 0 60px rgba(18, 216, 181, 0.05), inset 0 0 60px rgba(18, 216, 181, 0.02);
+            margin: 8px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+            position: relative;
+        }
+
+        .cloud-btn:active {
+            transform: scale(0.92);
+        }
+
+        .cloud-btn .cloud-icon {
+            font-size: 72px;
+            line-height: 1;
+            animation: floatCloud 3s ease-in-out infinite;
+        }
+
+        @keyframes floatCloud {
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+
+        .cloud-btn .label {
+            font-size: 11px;
+            color: #8a9bb5;
+            font-weight: 700;
+            margin-top: 2px;
+            letter-spacing: 1px;
+        }
+
+        .cloud-btn .label .highlight {
+            color: #12d8b5;
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        .stat {
+            background: rgba(13, 21, 32, 0.8);
+            padding: 10px 6px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .stat .value {
+            font-size: 18px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat .value.accent {
+            color: #12d8b5;
+        }
+        .stat .value.gold {
+            color: #f5b62e;
+        }
+        .stat .value.green {
+            color: #37df6d;
+        }
+
+        .stat .label {
+            font-size: 9px;
+            color: #5a6f8a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Energy Bar */
+        .energy-bar {
+            height: 4px;
+            background: rgba(13, 21, 32, 0.8);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .energy-bar .fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #12d8b5, #f5b62e);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .energy-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            color: #5a6f8a;
+            margin-top: 4px;
+        }
+
+        /* Wallet Button */
+        .wallet-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(145deg, #12d8b5, #0d8a72);
+            color: #0a0e17;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .wallet-btn:active {
+            transform: scale(0.97);
+        }
+
+        .wallet-btn.connected {
+            background: rgba(18, 216, 181, 0.08);
+            color: #12d8b5;
+            border: 1px solid rgba(18, 216, 181, 0.15);
+        }
+
+        .wallet-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .wallet-address {
+            font-family: monospace;
+            font-size: 11px;
+            color: #5a6f8a;
+            word-break: break-all;
+            padding: 8px;
+            background: rgba(13, 21, 32, 0.8);
+            border-radius: 8px;
+            margin-top: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .wallet-address .short {
+            color: #12d8b5;
+            font-weight: 600;
+        }
+
+        /* Status Message */
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(13, 21, 32, 0.8);
+            color: #8a9bb5;
+            font-size: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.3s ease;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status.success {
+            border-left: 3px solid #37df6d;
+        }
+
+        .status.error {
+            border-left: 3px solid #ff6675;
+        }
+
+        .status.info {
+            border-left: 3px solid #f5b62e;
+        }
+
+        /* Action Buttons */
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .action-btn {
+            padding: 10px 6px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(13, 21, 32, 0.8);
+            color: #e8edf5;
+            font-weight: 600;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .action-btn .icon {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .action-btn.primary {
+            border-color: rgba(18, 216, 181, 0.2);
+            background: rgba(18, 216, 181, 0.05);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            border-top-color: #12d8b5;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Telegram Mini App */
+        .tg-app {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 400px) {
+            .cloud-btn {
+                width: 160px;
+                height: 160px;
+                font-size: 60px;
+            }
+            .cloud-btn .cloud-icon {
+                font-size: 56px;
+            }
+            .balance {
+                font-size: 34px;
+            }
+            .stats {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+            .actions {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .cloud-btn {
+                width: 140px;
+                height: 140px;
+                font-size: 48px;
+            }
+            .cloud-btn .cloud-icon {
+                font-size: 44px;
+            }
+            .balance {
+                font-size: 28px;
+            }
+        }
+
+        /* Telegram WebApp Styles */
+        body.tg-app-mode {
+            background: var(--tg-theme-bg-color, #0a0e17);
+            color: var(--tg-theme-text-color, #e8edf5);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="app">
+        <!-- Header -->
+        <div class="header">
+            <span class="logo">☁️</span>
+            <h1>Averiq</h1>
+            <div class="subtitle">Tap the cloud to mine ₳ tokens</div>
+        </div>
+
+        <!-- Balance -->
+        <div class="card">
+            <div class="balance-label">💰 Your Balance</div>
+            <div class="balance" id="balanceDisplay">0.0000</div>
+        </div>
+
+        <!-- Cloud Button -->
+        <button class="cloud-btn" id="cloudBtn">
+            <span class="cloud-icon">☁️</span>
+            <span class="label"><span class="highlight">TAP</span> TO MINE</span>
+        </button>
+
+        <!-- Stats -->
+        <div class="card">
+            <div class="stats">
+                <div class="stat">
+                    <span class="value accent" id="tapCount">0</span>
+                    <span class="label">Taps</span>
+                </div>
+                <div class="stat">
+                    <span class="value gold" id="minedDisplay">0.0000</span>
+                    <span class="label">Mined</span>
+                </div>
+                <div class="stat">
+                    <span class="value green" id="energyDisplay">100%</span>
+                    <span class="label">Energy</span>
+                </div>
+            </div>
+            <div class="energy-bar">
+                <div class="fill" id="energyFill" style="width:100%"></div>
+            </div>
+            <div class="energy-text">
+                <span>0%</span>
+                <span id="energyStatus">Full Energy!</span>
+                <span>100%</span>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+            <button class="action-btn primary" onclick="startAutoTap()">
+                <span class="icon">⏱️</span>
+                Auto-Tap
+            </button>
+            <button class="action-btn" onclick="checkIn()">
+                <span class="icon">✅</span>
+                Check-In
+            </button>
+            <button class="action-btn" onclick="claimRewards()">
+                <span class="icon">🎁</span>
+                Claim
+            </button>
+        </div>
+
+        <!-- Wallet -->
+        <div class="card">
+            <button class="wallet-btn" id="walletBtn">
+                Connect Phantom Wallet
+            </button>
+            <div class="wallet-address" id="walletAddress">
+                <span class="short">💡 No wallet connected</span>
+            </div>
+            <div class="status" id="statusMessage">🔗 Click connect to start mining!</div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // AVERIQ — FULL WORKING VERSION
+        // ============================================================
+
+        // ===== STATE =====
+        let wallet = null;
+        let isConnecting = false;
+
+        let balance = 0;
+        let claimable = 0;
+        let totalEarned = 0;
+        let totalClaimed = 0;
+        let tapCount = 0;
+        let tapEnergy = 100;
+        let tapReward = 0.0005;
+        let tapMined = 0;
+        let streak = 0;
+        let lastCheckIn = null;
+
+        let isAutoTapping = false;
+        let autoTapTimer = null;
+        let energyRegenTimer = null;
+
+        const CHECKIN_REWARD = 0.25;
+        const STORAGE_KEY = 'averiq_data';
+        const WALLET_KEY = 'averiq_wallet';
+
+        // ============================================================
+        // PHANTOM WALLET CONNECTION
+        // ============================================================
+
+        function getPhantom() {
+            if (window.phantom && window.phantom.solana) {
+                return window.phantom.solana;
+            }
+            if (window.solana && window.solana.isPhantom) {
+                return window.solana;
+            }
+            return null;
+        }
+
+        function isPhantomInstalled() {
+            return getPhantom() !== null;
+        }
+
+        function connectWallet() {
+            const button = document.getElementById("walletBtn");
+            const status = document.getElementById("statusMessage");
+
+            if (isConnecting) {
+                status.textContent = "⏳ Connection in progress...";
+                status.className = "status info";
+                return;
+            }
+
+            const phantom = getPhantom();
+
+            if (!phantom) {
+                status.textContent = "⚠️ Please open this in Phantom browser";
+                status.className = "status error";
+                return;
+            }
+
+            // Already connected
+            if (phantom.isConnected && phantom.isConnected()) {
+                const pubKey = phantom.publicKey;
+                if (pubKey) {
+                    handleConnection(pubKey);
+                    return;
+                }
+            }
+
+            // Start connection
+            isConnecting = true;
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner"></span> Connecting...';
+            status.textContent = "🔄 Opening Phantom... Please approve";
+            status.className = "status info";
+
+            phantom.connect({ onlyIfTrusted: false })
+                .then(res => {
+                    if (res && res.publicKey) {
+                        handleConnection(res.publicKey);
+                        button.textContent = "✅ Connected";
+                        button.className = "wallet-btn connected";
+                        button.onclick = function() {
+                            if (confirm("Disconnect wallet?")) {
+                                disconnectWallet();
+                            }
+                        };
+                        status.textContent = "✅ Wallet connected! Start mining!";
+                        status.className = "status success";
+                    } else {
+                        throw new Error("No public key");
+                    }
+                })
+                .catch(err => {
+                    console.error("Connection error:", err);
+                    if (err.code === 4001) {
+                        status.textContent = "❌ Connection rejected. Try again.";
+                    } else {
+                        status.textContent = "❌ Failed to connect. Try again.";
+                    }
+                    status.className = "status error";
+                    button.textContent = "Connect Phantom Wallet";
+                    button.className = "wallet-btn";
+                    button.onclick = connectWallet;
+                    button.disabled = false;
+                })
+                .finally(() => {
+                    isConnecting = false;
+                });
+        }
+
+        function handleConnection(publicKey) {
+            const address = publicKey.toBase58();
+
+            wallet = {
+                publicKey: publicKey,
+                address: address,
+                connected: true
+            };
+
+            localStorage.setItem(WALLET_KEY, address);
+
+            const short = address.slice(0, 6) + "..." + address.slice(-6);
+            document.getElementById("walletAddress").innerHTML =
+                `<span class="short">🔗 ${short}</span><br><span style="font-size:9px;color:#5a6f8a;">${address}</span>`;
+
+            loadData();
+            updateUI();
+
+            // Listen for account changes
+            const phantom = getPhantom();
+            if (phantom) {
+                phantom.on('accountChanged', (newPubKey) => {
+                    if (!newPubKey) {
+                        disconnectWallet();
+                        return;
+                    }
+                    const newAddress = newPubKey.toBase58();
+                    wallet = {
+                        publicKey: newPubKey,
+                        address: newAddress,
+                        connected: true
+                    };
+                    localStorage.setItem(WALLET_KEY, newAddress);
+                    loadData();
+                    updateUI();
+                    showStatus("🔄 Account changed", "info");
+                });
+
+                phantom.on('disconnect', () => {
+                    disconnectWallet();
+                });
+            }
+        }
+
+        function disconnectWallet() {
+            if (!wallet) return;
+            saveData();
+
+            const phantom = getPhantom();
+            if (phantom && phantom.disconnect) {
+                try { phantom.disconnect(); } catch (e) {}
+            }
+
+            wallet = null;
+            localStorage.removeItem(WALLET_KEY);
+
+            const button = document.getElementById("walletBtn");
+            button.textContent = "Connect Phantom Wallet";
+            button.className = "wallet-btn";
+            button.onclick = connectWallet;
+            button.disabled = false;
+
+            document.getElementById("walletAddress").innerHTML = `<span class="short">💡 No wallet connected</span>`;
+            showStatus("Wallet disconnected.", "error");
+
+            loadGuestData();
+        }
+
+        // ============================================================
+        // AUTO-CONNECT
+        // ============================================================
+
+        function autoConnect() {
+            const savedWallet = localStorage.getItem(WALLET_KEY);
+            if (!savedWallet) {
+                loadGuestData();
+                return;
+            }
+
+            const phantom = getPhantom();
+            if (!phantom) {
+                loadGuestData();
+                return;
+            }
+
+            if (phantom.isConnected && phantom.isConnected()) {
+                const pubKey = phantom.publicKey;
+                if (pubKey && pubKey.toBase58() === savedWallet) {
+                    handleConnection(pubKey);
+                    return;
+                }
+            }
+
+            phantom.connect({ onlyIfTrusted: true })
+                .then(res => {
+                    if (res && res.publicKey) {
+                        const address = res.publicKey.toBase58();
+                        if (address === savedWallet) {
+                            handleConnection(res.publicKey);
+                            showStatus("🔗 Wallet reconnected!", "success");
+                        }
+                    }
+                })
+                .catch(() => {
+                    loadDataByAddress(savedWallet);
+                });
+        }
+
+        // ============================================================
+        // DATA STORAGE
+        // ============================================================
+
+        function getKey() {
+            if (wallet && wallet.address) {
+                return STORAGE_KEY + '_' + wallet.address;
+            }
+            return STORAGE_KEY + '_guest';
+        }
+
+        function saveData() {
+            try {
+                const data = {
+                    balance: balance,
+                    claimable: claimable,
+                    totalEarned: totalEarned,
+                    totalClaimed: totalClaimed,
+                    tapCount: tapCount,
+                    tapMined: tapMined,
+                    tapEnergy: tapEnergy,
+                    streak: streak,
+                    lastCheckIn: lastCheckIn,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem(getKey(), JSON.stringify(data));
+            } catch (e) {
+                console.error("Save error:", e);
+            }
+        }
+
+        function loadData() {
+            if (!wallet) return;
+            try {
+                const data = localStorage.getItem(STORAGE_KEY + '_' + wallet.address);
+                if (data) applyData(JSON.parse(data));
+            } catch (e) {
+                console.error("Load error:", e);
+            }
+        }
+
+        function loadDataByAddress(address) {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY + '_' + address);
+                if (data) {
+                    applyData(JSON.parse(data));
+                    updateUI();
+                }
+            } catch (e) {
+                console.error("Load error:", e);
+            }
+        }
+
+        function loadGuestData() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY + '_guest');
+                if (data) applyData(JSON.parse(data));
+            } catch (e) {
+                console.error("Load guest error:", e);
+            }
+        }
+
+        function applyData(data) {
+            balance = data.balance || 0;
+            claimable = data.claimable || 0;
+            totalEarned = data.totalEarned || 0;
+            totalClaimed = data.totalClaimed || 0;
+            tapCount = data.tapCount || 0;
+            tapMined = data.tapMined || 0;
+            tapEnergy = data.tapEnergy || 100;
+            streak = data.streak || 0;
+            lastCheckIn = data.lastCheckIn || null;
+            updateUI();
+        }
+
+        // ============================================================
+        // UI HELPERS
+        // ============================================================
+
+        function showStatus(message, type) {
+            const el = document.getElementById("statusMessage");
+            el.textContent = message;
+            el.className = "status " + (type || "");
+        }
+
+        // ============================================================
+        // GAME MECHANICS
+        // ============================================================
+
+        function tapCloud() {
+            if (tapEnergy < 3) {
+                showStatus("⏳ Energy low! Wait for recharge.", "info");
+                return;
+            }
+
+            const btn = document.getElementById("cloudBtn");
+            btn.style.transform = 'scale(0.92)';
+            setTimeout(() => { btn.style.transform = 'scale(1)'; }, 100);
+
+            const multiplier = 1 + (tapCount / 500) * 0.2;
+            const reward = tapReward * multiplier;
+
+            tapMined += reward;
+            balance += reward;
+            claimable += reward;
+            totalEarned += reward;
+            tapCount++;
+            tapEnergy = Math.max(0, tapEnergy - 0.8);
+
+            updateUI();
+            saveData();
+            updateEnergy();
+
+            if (!energyRegenTimer) startEnergyRegen();
+
+            showStatus(`+${reward.toFixed(4)} ₳`, "success");
+            setTimeout(() => {
+                if (wallet && wallet.connected) {
+                    showStatus("✅ Mining... Keep tapping!", "success");
+                } else {
+                    showStatus("☁️ Tap to mine! Connect wallet to save.", "");
+                }
+            }, 600);
+        }
+
+        function updateEnergy() {
+            const pct = Math.round(tapEnergy);
+            document.getElementById("energyDisplay").textContent = pct + '%';
+            document.getElementById("energyFill").style.width = pct + '%';
+
+            const txt = document.getElementById("energyStatus");
+            if (pct >= 100) txt.textContent = 'Full Energy!';
+            else if (pct > 50) txt.textContent = 'Energized';
+            else if (pct > 20) txt.textContent = 'Recharging...';
+            else txt.textContent = 'Low Energy!';
+        }
+
+        function startEnergyRegen() {
+            if (energyRegenTimer) clearInterval(energyRegenTimer);
+            energyRegenTimer = setInterval(() => {
+                if (tapEnergy < 100) {
+                    tapEnergy = Math.min(100, tapEnergy + 0.8);
+                    updateEnergy();
+                    if (tapEnergy >= 100) {
+                        clearInterval(energyRegenTimer);
+                        energyRegenTimer = null;
+                    }
+                } else {
+                    clearInterval(energyRegenTimer);
+                    energyRegenTimer = null;
+                }
+            }, 500);
+        }
+
+        function updateUI() {
+            document.getElementById("balanceDisplay").textContent = balance.toFixed(4);
+            document.getElementById("tapCount").textContent = tapCount;
+            document.getElementById("minedDisplay").textContent = tapMined.toFixed(4);
+            updateEnergy();
+        }
+
+        // ============================================================
+        // GAME ACTIONS
+        // ============================================================
+
+        function startAutoTap() {
+            if (isAutoTapping) {
+                isAutoTapping = false;
+                if (autoTapTimer) {
+                    clearInterval(autoTapTimer);
+                    autoTapTimer = null;
+                }
+                document.querySelector('.action-btn.primary').innerHTML =
+                    '<span class="icon">⏱️</span>Auto-Tap';
+                showStatus("⏹️ Auto-tap stopped", "info");
+                return;
+            }
+
+            isAutoTapping = true;
+            document.querySelector('.action-btn.primary').innerHTML =
+                '<span class="icon">⏹️</span>Stop Auto';
+            showStatus("⏱️ Auto-tap started!", "success");
+
+            if (autoTapTimer) clearInterval(autoTapTimer);
+            autoTapTimer = setInterval(() => {
+                if (tapEnergy < 3) return;
+                tapCloud();
+            }, 300);
+        }
+
+        function checkIn() {
+            const today = new Date().toISOString().slice(0, 10);
+            if (lastCheckIn === today) {
+                showStatus("Already checked in today.", "info");
+                return;
+            }
+
+            const reward = CHECKIN_REWARD;
+            lastCheckIn = today;
+            streak += 1;
+            balance += reward;
+            claimable += reward;
+            totalEarned += reward;
+            updateUI();
+            saveData();
+            showStatus(`✅ Daily check-in! +${reward} ₳ (${streak} day streak)`, "success");
+        }
+
+        function claimRewards() {
+            if (claimable <= 0) {
+                showStatus("No rewards to claim. Keep tapping!", "info");
+                return;
+            }
+
+            const amount = claimable;
+            totalClaimed += amount;
+            claimable = 0;
+            updateUI();
+            saveData();
+            showStatus(`🎉 Claimed ${amount.toFixed(4)} ₳!`, "success");
+        }
+
+        // ============================================================
+        // TELEGRAM MINI APP INTEGRATION
+        // ============================================================
+
+        function initTelegramApp() {
+            try {
+                if (window.Telegram && window.Telegram.WebApp) {
+                    const tg = window.Telegram.WebApp;
+                    tg.ready();
+                    tg.expand();
+
+                    // Set theme colors
+                    if (tg.themeParams) {
+                        document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color || '#0a0e17');
+                        document.documentElement.style.setProperty('--tg-theme-text-color', tg.themeParams.text_color ||
+                            '#e8edf5');
+                    }
+
+                    document.body.classList.add('tg-app-mode');
+                    console.log('✅ Telegram WebApp initialized');
+                }
+            } catch (e) {
+                console.log('Not in Telegram WebApp mode');
+            }
+        }
+
+        // ============================================================
+        // INITIALIZE
+        // ============================================================
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Check if in Telegram
+            initTelegramApp();
+
+            // Auto-connect wallet
+            autoConnect();
+
+            // Load guest data if no wallet
+            if (!wallet) {
+                loadGuestData();
+            }
+
+            updateUI();
+
+            // Set initial status
+            if (wallet && wallet.connected) {
+                showStatus("✅ Wallet connected! Start mining!", "success");
+            } else if (isPhantomInstalled()) {
+                showStatus("🔗 Click 'Connect Phantom Wallet' to start!", "");
+            } else {
+                showStatus("💡 Open this in Phantom browser to connect!", "info");
+            }
+
+            console.log("☁️ Averiq — Tap to Mine");
+            console.log("✅ Full working version");
+        });
+
+        // Make functions globally accessible
+        window.tapCloud = tapCloud;
+        window.connectWallet = connectWallet;
+        window.disconnectWallet = disconnectWallet;
+        window.startAutoTap = startAutoTap;
+        window.checkIn = checkIn;
+        window.claimRewards = claimRewards;
+        window.showStatus = showStatus;
+
+        // Cloud button click
+        document.getElementById("cloudBtn").addEventListener("click", tapCloud);
+    </script>
+
+</body>
+</html>
