@@ -1,0 +1,1453 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1,viewport-fit=cover"
+>
+
+<title>Averiq</title>
+
+<style>
+
+:root {
+  --bg:#070914;
+  --card:#101525;
+  --card2:#151b2e;
+  --text:#f6f7fb;
+  --muted:#8e98b5;
+  --accent:#8b5cf6;
+  --accent2:#22d3ee;
+  --danger:#fb7185;
+  --ok:#34d399;
+}
+
+* {
+  box-sizing:border-box;
+}
+
+body {
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  background:
+    radial-gradient(
+      circle at top,
+      #171238 0,
+      #070914 50%
+    );
+
+  font-family:
+    Inter,
+    system-ui,
+    Arial,
+    sans-serif;
+}
+
+.app {
+  width:100%;
+  max-width:520px;
+  margin:auto;
+  padding:18px 16px 110px;
+}
+
+.top {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo {
+  font-size:25px;
+  font-weight:900;
+}
+
+.live {
+  color:var(--ok);
+  font-size:12px;
+  font-weight:800;
+}
+
+.balance {
+  margin-top:22px;
+  padding:22px;
+
+  border-radius:24px;
+
+  border:1px solid #242b43;
+
+  background:
+    linear-gradient(
+      145deg,
+      #12182a,
+      #0c1020
+    );
+
+  box-shadow:
+    0 18px 50px #0005;
+}
+
+.label {
+  color:var(--muted);
+  font-size:13px;
+}
+
+.amount {
+  margin:6px 0;
+
+  font-size:38px;
+  font-weight:900;
+}
+
+.wallet {
+  color:var(--muted);
+  font-size:12px;
+
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.btn {
+  border:0;
+
+  border-radius:14px;
+
+  padding:13px 16px;
+
+  color:white;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--accent),
+      #6d28d9
+    );
+
+  font-weight:800;
+
+  cursor:pointer;
+}
+
+.btn.secondary {
+  background:#20283e;
+}
+
+.btn:disabled {
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.connect {
+  width:100%;
+  margin-top:14px;
+}
+
+.cloudWrap {
+  margin:28px 0;
+  text-align:center;
+}
+
+.cloud {
+  width:190px;
+  height:190px;
+
+  border-radius:50%;
+
+  border:1px solid #534a9c;
+
+  background:
+    radial-gradient(
+      circle,
+      #4c3c93,
+      #17152e 65%,
+      #0c1020
+    );
+
+  box-shadow:
+    0 0 60px #7c3aed55;
+
+  font-size:70px;
+
+  cursor:pointer;
+}
+
+.cloud:active {
+  transform:scale(.96);
+}
+
+.energy {
+  height:9px;
+
+  margin:12px 0;
+
+  overflow:hidden;
+
+  border-radius:99px;
+
+  background:#1c2438;
+}
+
+.energy i {
+  display:block;
+
+  width:100%;
+  height:100%;
+
+  border-radius:99px;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--accent2),
+      var(--accent)
+    );
+}
+
+.stats {
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap:10px;
+}
+
+.stat {
+  padding:14px;
+
+  border-radius:17px;
+
+  border:1px solid #20283e;
+
+  background:var(--card);
+
+  text-align:center;
+}
+
+.stat b {
+  display:block;
+
+  margin-top:4px;
+
+  font-size:17px;
+}
+
+.actions {
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:10px;
+
+  margin-top:18px;
+}
+
+.section {
+  margin-top:22px;
+}
+
+.section h3 {
+  margin:0 0 10px;
+}
+
+.small {
+  color:var(--muted);
+
+  font-size:12px;
+
+  line-height:1.5;
+}
+
+.nav {
+  position:fixed;
+
+  left:50%;
+  bottom:0;
+
+  transform:
+    translateX(-50%);
+
+  width:min(520px,100%);
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(4,1fr);
+
+  padding:
+    10px
+    12px
+    calc(
+      10px +
+      env(safe-area-inset-bottom)
+    );
+
+  border-top:1px solid #20283e;
+
+  background:#080b15ee;
+
+  backdrop-filter:blur(15px);
+}
+
+.nav button {
+  border:0;
+
+  padding:8px;
+
+  color:var(--muted);
+
+  background:none;
+
+  font-weight:700;
+}
+
+.msg {
+  position:fixed;
+
+  top:16px;
+  left:50%;
+
+  transform:
+    translateX(-50%);
+
+  z-index:100;
+
+  display:none;
+
+  padding:12px 16px;
+
+  border-radius:12px;
+
+  border:1px solid #303951;
+
+  background:#171d30;
+}
+
+.msg.show {
+  display:block;
+}
+
+.modal {
+  position:fixed;
+
+  inset:0;
+
+  z-index:200;
+
+  display:none;
+
+  align-items:flex-end;
+
+  justify-content:center;
+
+  background:#0009;
+}
+
+.modal.show {
+  display:flex;
+}
+
+.sheet {
+  width:min(520px,100%);
+
+  padding:20px;
+
+  border-radius:
+    25px
+    25px
+    0
+    0;
+
+  border:1px solid #252e48;
+
+  background:#0e1425;
+}
+
+.input {
+  width:100%;
+
+  margin:
+    8px
+    0
+    12px;
+
+  padding:14px;
+
+  border-radius:13px;
+
+  border:1px solid #2a3450;
+
+  outline:none;
+
+  color:white;
+
+  background:#080c18;
+}
+
+.row {
+  display:flex;
+
+  gap:10px;
+}
+
+.row > * {
+  flex:1;
+}
+
+</style>
+</head>
+
+<body>
+
+<div
+  id="msg"
+  class="msg">
+</div>
+
+<main class="app">
+
+  <div class="top">
+
+    <div class="logo">
+      Averiq
+    </div>
+
+    <div class="live">
+      ● Secure
+    </div>
+
+  </div>
+
+  <section class="balance">
+
+    <div class="label">
+      Averiq balance
+    </div>
+
+    <div
+      class="amount"
+      id="balance">
+      0.0000 ₳
+    </div>
+
+    <div
+      class="wallet"
+      id="wallet">
+      Wallet not connected
+    </div>
+
+    <button
+      class="btn connect"
+      id="connectBtn">
+      Connect Phantom
+    </button>
+
+  </section>
+
+  <section class="cloudWrap">
+
+    <button
+      class="cloud"
+      id="tapCloud"
+      disabled>
+      ☁️
+    </button>
+
+    <div class="label">
+      Tap to earn
+    </div>
+
+    <div class="energy">
+      <i id="energyBar"></i>
+    </div>
+
+    <div class="small">
+      Energy:
+      <span id="energy">
+        100
+      </span>
+      /100
+    </div>
+
+  </section>
+
+  <div class="stats">
+
+    <div class="stat">
+      <span class="label">
+        Taps
+      </span>
+
+      <b id="taps">
+        0
+      </b>
+    </div>
+
+    <div class="stat">
+      <span class="label">
+        Claimable
+      </span>
+
+      <b id="claimable">
+        0.0000
+      </b>
+    </div>
+
+    <div class="stat">
+      <span class="label">
+        Streak
+      </span>
+
+      <b id="streak">
+        0
+      </b>
+    </div>
+
+  </div>
+
+  <div class="actions">
+
+    <button
+      class="btn"
+      id="checkin">
+      Daily Check-In
+    </button>
+
+    <button
+      class="btn secondary"
+      id="claim">
+      Claim
+    </button>
+
+    <button
+      class="btn secondary"
+      id="send">
+      Send
+    </button>
+
+    <button
+      class="btn secondary"
+      id="refresh">
+      Refresh
+    </button>
+
+  </div>
+
+  <section class="section">
+
+    <h3>
+      Averiq
+    </h3>
+
+    <div class="small">
+      Your wallet is authenticated
+      using a cryptographic signature.
+      Rewards and balances are stored
+      server-side.
+    </div>
+
+  </section>
+
+</main>
+
+<nav class="nav">
+
+  <button
+    onclick="scrollTo({top:0,behavior:'smooth'})">
+    Home
+  </button>
+
+  <button
+    onclick="openSend()">
+    Send
+  </button>
+
+  <button
+    onclick="claim()">
+    Claim
+  </button>
+
+  <button
+    onclick="refreshUser()">
+    Wallet
+  </button>
+
+</nav>
+
+<div
+  class="modal"
+  id="sendModal">
+
+  <div class="sheet">
+
+    <h3>
+      Send Averiq
+    </h3>
+
+    <input
+      class="input"
+      id="toWallet"
+      placeholder="Recipient Solana wallet"
+    >
+
+    <input
+      class="input"
+      id="sendAmount"
+      type="number"
+      min="0"
+      step="any"
+      placeholder="Amount"
+    >
+
+    <div class="row">
+
+      <button
+        class="btn secondary"
+        onclick="closeSend()">
+        Cancel
+      </button>
+
+      <button
+        class="btn"
+        onclick="sendTokens()">
+        Send
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script type="module">
+
+import {
+  initializeApp
+} from
+"https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+  getAuth,
+  signInWithCustomToken
+} from
+"https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+
+/*
+====================================================
+REPLACE THESE WITH YOUR FIREBASE WEB APP CONFIG
+====================================================
+*/
+
+const firebaseConfig = {
+
+  apiKey:
+    "YOUR_FIREBASE_WEB_API_KEY",
+
+  authDomain:
+    "YOUR_PROJECT.firebaseapp.com",
+
+  projectId:
+    "YOUR_PROJECT_ID",
+
+  storageBucket:
+    "YOUR_PROJECT.firebasestorage.app",
+
+  messagingSenderId:
+    "YOUR_SENDER_ID",
+
+  appId:
+    "YOUR_APP_ID"
+
+};
+
+
+const firebaseApp =
+  initializeApp(firebaseConfig);
+
+const firebaseAuth =
+  getAuth(firebaseApp);
+
+
+let wallet = null;
+
+let idToken = null;
+
+let busy = false;
+
+
+const $ =
+  id =>
+    document.getElementById(id);
+
+
+function phantom() {
+
+  return (
+    window.phantom?.solana ||
+    window.solana
+  );
+
+}
+
+
+function message(text) {
+
+  const element =
+    $("msg");
+
+  element.textContent =
+    text;
+
+  element.classList.add(
+    "show"
+  );
+
+  setTimeout(() => {
+
+    element.classList.remove(
+      "show"
+    );
+
+  }, 3000);
+
+}
+
+
+function shortWallet(value) {
+
+  if (!value) {
+    return "";
+  }
+
+  return (
+    value.slice(0,6) +
+    "..." +
+    value.slice(-5)
+  );
+
+}
+
+
+async function api(
+  endpoint,
+  options = {}
+) {
+
+  const headers = {
+
+    "Content-Type":
+      "application/json",
+
+    ...(options.headers || {})
+
+  };
+
+
+  if (idToken) {
+
+    headers.Authorization =
+      "Bearer " + idToken;
+
+  }
+
+
+  const response =
+    await fetch(
+      "/api/" + endpoint,
+      {
+        ...options,
+        headers
+      }
+    );
+
+
+  const data =
+    await response
+      .json()
+      .catch(
+        () => ({})
+      );
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      data.error ||
+      "Request failed"
+    );
+
+  }
+
+
+  return data;
+
+}
+
+
+async function connectWallet() {
+
+  if (busy) {
+    return;
+  }
+
+  busy = true;
+
+  try {
+
+    const p =
+      phantom();
+
+
+    if (!p?.isPhantom) {
+
+      message(
+        "Please install Phantom wallet."
+      );
+
+      return;
+
+    }
+
+
+    const result =
+      await p.connect();
+
+
+    wallet =
+      result.publicKey.toString();
+
+
+    const challenge =
+      await api(
+        "auth",
+        {
+          method:
+            "POST",
+
+          body:
+            JSON.stringify({
+              action:
+                "nonce",
+
+              wallet
+            })
+        }
+      );
+
+
+    const signedMessage = [
+
+      "Averiq wallet verification",
+
+      "",
+
+      `Wallet: ${wallet}`,
+
+      `Nonce: ${challenge.nonce}`,
+
+      "",
+
+      "Sign this message to securely connect your wallet."
+
+    ].join("\n");
+
+
+    const encoded =
+      new TextEncoder()
+        .encode(
+          signedMessage
+        );
+
+
+    const signed =
+      await p.signMessage(
+        encoded,
+        "utf8"
+      );
+
+
+    const signature =
+      base58Encode(
+        signed.signature
+      );
+
+
+    const verification =
+      await api(
+        "auth",
+        {
+          method:
+            "POST",
+
+          body:
+            JSON.stringify({
+
+              action:
+                "verify",
+
+              wallet,
+
+              nonce:
+                challenge.nonce,
+
+              signature
+
+            })
+        }
+      );
+
+
+    await signInWithCustomToken(
+      firebaseAuth,
+      verification.customToken
+    );
+
+
+    idToken =
+      await firebaseAuth
+        .currentUser
+        .getIdToken(true);
+
+
+    $("wallet").textContent =
+      shortWallet(wallet);
+
+
+    $("connectBtn").textContent =
+      "Connected";
+
+
+    $("tapCloud").disabled =
+      false;
+
+
+    await refreshUser();
+
+
+    message(
+      "Wallet securely connected."
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    message(
+      error.message ||
+      "Wallet connection failed"
+    );
+
+  } finally {
+
+    busy = false;
+
+  }
+
+}
+
+
+async function refreshUser() {
+
+  if (!idToken) {
+
+    return;
+
+  }
+
+
+  try {
+
+    const user =
+      await api("user");
+
+
+    $("balance")
+      .textContent =
+        Number(
+          user.balance
+        ).toFixed(4) +
+        " ₳";
+
+
+    $("claimable")
+      .textContent =
+        Number(
+          user.claimable
+        ).toFixed(4);
+
+
+    $("taps")
+      .textContent =
+        user.tapCount;
+
+
+    $("energy")
+      .textContent =
+        Number(
+          user.energy
+        ).toFixed(1);
+
+
+    $("energyBar")
+      .style.width =
+        Math.max(
+          0,
+          Math.min(
+            100,
+            user.energy
+          )
+        ) + "%";
+
+
+    $("streak")
+      .textContent =
+        user.streak;
+
+  } catch (error) {
+
+    message(
+      error.message
+    );
+
+  }
+
+}
+
+
+async function tap() {
+
+  if (!idToken) {
+
+    message(
+      "Connect your wallet first."
+    );
+
+    return;
+
+  }
+
+
+  if (busy) {
+    return;
+  }
+
+
+  busy = true;
+
+
+  try {
+
+    const requestId =
+      crypto
+        .randomUUID()
+        .replaceAll(
+          "-",
+          ""
+        );
+
+
+    const result =
+      await api(
+        "tap",
+        {
+          method:
+            "POST",
+
+          body:
+            JSON.stringify({
+              requestId
+            })
+        }
+      );
+
+
+    $("balance")
+      .textContent =
+        Number(
+          result.balance
+        ).toFixed(4) +
+        " ₳";
+
+
+    $("claimable")
+      .textContent =
+        Number(
+          result.claimable
+        ).toFixed(4);
+
+
+    $("taps")
+      .textContent =
+        result.tapCount;
+
+
+    $("energy")
+      .textContent =
+        Number(
+          result.energy
+        ).toFixed(1);
+
+
+    $("energyBar")
+      .style.width =
+        Math.max(
+          0,
+          Math.min(
+            100,
+            result.energy
+          )
+        ) + "%";
+
+  } catch (error) {
+
+    message(
+      error.message
+    );
+
+  } finally {
+
+    busy = false;
+
+  }
+
+}
+
+
+async function checkin() {
+
+  if (!idToken) {
+
+    message(
+      "Connect your wallet first."
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+    const result =
+      await api(
+        "checkin",
+        {
+          method:
+            "POST",
+
+          body:
+            "{}"
+        }
+      );
+
+
+    $("balance")
+      .textContent =
+        Number(
+          result.balance
+        ).toFixed(4) +
+        " ₳";
+
+
+    $("claimable")
+      .textContent =
+        Number(
+          result.claimable
+        ).toFixed(4);
+
+
+    $("streak")
+      .textContent =
+        result.streak;
+
+
+    message(
+      `Daily reward: ${result.reward} ₳`
+    );
+
+  } catch (error) {
+
+    message(
+      error.message
+    );
+
+  }
+
+}
+
+
+async function claim() {
+
+  if (!idToken) {
+
+    message(
+      "Connect your wallet first."
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+    const result =
+      await api(
+        "claim",
+        {
+          method:
+            "POST",
+
+          body:
+            "{}"
+        }
+      );
+
+
+    await refreshUser();
+
+
+    message(
+      `Claim ${result.status}: ${result.amount} ₳`
+    );
+
+  } catch (error) {
+
+    message(
+      error.message
+    );
+
+  }
+
+}
+
+
+window.claim =
+  claim;
+
+
+function openSend() {
+
+  $("sendModal")
+    .classList
+    .add("show");
+
+}
+
+
+function closeSend() {
+
+  $("sendModal")
+    .classList
+    .remove("show");
+
+}
+
+
+window.openSend =
+  openSend;
+
+window.closeSend =
+  closeSend;
+
+
+async function sendTokens() {
+
+  if (!idToken) {
+
+    message(
+      "Connect your wallet first."
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+    const toWallet =
+      $("toWallet")
+        .value
+        .trim();
+
+
+    const amount =
+      Number(
+        $("sendAmount")
+          .value
+      );
+
+
+    const result =
+      await api(
+        "send",
+        {
+          method:
+            "POST",
+
+          body:
+            JSON.stringify({
+              toWallet,
+              amount
+            })
+        }
+      );
+
+
+    closeSend();
+
+
+    await refreshUser();
+
+
+    message(
+      `Sent ${result.amount} ₳ successfully.`
+    );
+
+  } catch (error) {
+
+    message(
+      error.message
+    );
+
+  }
+
+}
+
+
+window.sendTokens =
+  sendTokens;
+
+window.refreshUser =
+  refreshUser;
+
+
+function base58Encode(bytes) {
+
+  const alphabet =
+    "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
+
+  let number = 0n;
+
+
+  for (const byte of bytes) {
+
+    number =
+      number * 256n +
+      BigInt(byte);
+
+  }
+
+
+  let output = "";
+
+
+  while (number > 0n) {
+
+    const remainder =
+      Number(
+        number % 58n
+      );
+
+
+    output =
+      alphabet[remainder] +
+      output;
+
+
+    number =
+      number / 58n;
+
+  }
+
+
+  for (
+    const byte of bytes
+  ) {
+
+    if (byte !== 0) {
+      break;
+    }
+
+    output =
+      "1" + output;
+
+  }
+
+
+  return output || "1";
+
+}
+
+
+$("connectBtn")
+  .onclick =
+    connectWallet;
+
+
+$("tapCloud")
+  .onclick =
+    tap;
+
+
+$("checkin")
+  .onclick =
+    checkin;
+
+
+$("claim")
+  .onclick =
+    claim;
+
+
+$("send")
+  .onclick =
+    openSend;
+
+
+$("refresh")
+  .onclick =
+    refreshUser;
+
+
+if (
+  window.phantom?.solana
+) {
+
+  window.phantom.solana.on(
+    "disconnect",
+    () => {
+
+      wallet = null;
+
+      idToken = null;
+
+      $("tapCloud")
+        .disabled =
+          true;
+
+      $("wallet")
+        .textContent =
+          "Wallet disconnected";
+
+      $("connectBtn")
+        .textContent =
+          "Connect Phantom";
+
+    }
+  );
+
+}
+
+</script>
+
+</body>
+</html>
