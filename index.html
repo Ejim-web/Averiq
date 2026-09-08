@@ -1,0 +1,2240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="theme-color" content="#0a0e17">
+    <title>Averiq — Mining Engine</title>
+
+    <!-- Monetag SDK -->
+    <script src="//libtl.com/sdk.js" data-zone="11747882" data-sdk="show_11747882"></script>
+
+    <!-- Ethers.js for Ethereum -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js">
+    </script>
+
+    <!-- TON Connect SDK 2.0 -->
+    <script src="https://unpkg.com/@tonconnect/sdk@2.0.8/dist/tonconnect-sdk.min.js">
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg: #0a0e17;
+            --card: #111927;
+            --card2: #1a2332;
+            --text: #ffffff;
+            --muted: #7a8ba3;
+            --line: rgba(255, 255, 255, .06);
+            --accent: #00d4ff;
+            --accent2: #7c5cff;
+            --success: #00ff88;
+            --danger: #ff5d73;
+            --warning: #ffc857;
+            --gold: #ffd700;
+            --orange: #f5a623;
+            --green: #00ff88;
+            --ton: #0088cc;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        body {
+            padding-bottom: 90px;
+        }
+
+        button {
+            border: 0;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 520px;
+            margin: auto;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            padding: 12px 15px;
+            background: rgba(10, 14, 23, .95);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .logo {
+            width: 36px;
+            height: 36px;
+            flex: 0 0 36px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            font-weight: 900;
+            font-size: 14px;
+            box-shadow: 0 0 25px rgba(0, 212, 255, .2);
+        }
+
+        .brand h1 {
+            font-size: 16px;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        .live {
+            font-size: 10px;
+            color: var(--success);
+            margin-top: 2px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 7px;
+            flex-shrink: 0;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--card);
+            color: var(--text);
+            border: 1px solid var(--line);
+            font-size: 14px;
+        }
+
+        .connect-btn {
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #0098ea, #0088d4);
+            color: #fff;
+            font-weight: 700;
+            max-width: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .connect-btn:disabled {
+            opacity: .6;
+            cursor: wait;
+        }
+
+        .connect-btn.connected {
+            background: rgba(0, 152, 234, 0.15);
+            color: #0098ea;
+            border: 1px solid rgba(0, 152, 234, 0.2);
+        }
+
+        .connect-btn.ton-connected {
+            background: rgba(0, 136, 204, 0.15);
+            color: #0088cc;
+            border: 1px solid rgba(0, 136, 204, 0.2);
+        }
+
+        .wallet-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .wallet-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            background: var(--card);
+            border: 2px solid var(--line);
+            color: var(--text);
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .wallet-btn.active {
+            border-color: var(--accent);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .wallet-btn.metamask.active {
+            border-color: #f6851b;
+            background: rgba(246, 133, 27, 0.05);
+        }
+
+        .wallet-btn.ton.active {
+            border-color: #0088cc;
+            background: rgba(0, 136, 204, 0.05);
+        }
+
+        main {
+            padding: 12px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .mining-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0 12px;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 14px;
+        }
+
+        .mining-header .title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .mining-header .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .status-badge .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .status-badge .dot.idle {
+            background: var(--warning);
+            animation: none;
+        }
+
+        .engine-visual {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 30px 20px;
+            margin-bottom: 14px;
+            border: 1px solid var(--line);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .engine-visual::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(0, 212, 255, .05), transparent 60%);
+            pointer-events: none;
+        }
+
+        .engine-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .engine-wrapper {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 400px) {
+            .engine-wrapper {
+                width: 240px;
+                height: 240px;
+            }
+        }
+
+        @media (min-width: 500px) {
+            .engine-wrapper {
+                width: 280px;
+                height: 280px;
+            }
+        }
+
+        .engine-icon {
+            font-size: 140px;
+            line-height: 1;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s linear;
+            text-shadow: 0 0 60px rgba(0, 212, 255, .3);
+        }
+
+        @media (min-width: 400px) {
+            .engine-icon {
+                font-size: 170px;
+            }
+        }
+
+        @media (min-width: 500px) {
+            .engine-icon {
+                font-size: 200px;
+            }
+        }
+
+        .engine-icon.spinning {
+            animation: spinEngine 1s linear infinite;
+        }
+
+        .engine-icon.spinning-fast {
+            animation: spinEngine 0.3s linear infinite;
+        }
+
+        @keyframes spinEngine {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg) scale(1);
+            }
+            to {
+                transform: translate(-50%, -50%) rotate(360deg) scale(1);
+            }
+        }
+
+        .engine-glow-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 212, 255, .1);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: all 0.5s;
+        }
+
+        .engine-glow-ring:nth-child(1) {
+            width: 100%;
+            height: 100%;
+            border-color: rgba(0, 212, 255, .05);
+        }
+
+        .engine-glow-ring:nth-child(2) {
+            width: 85%;
+            height: 85%;
+            border-color: rgba(0, 212, 255, .08);
+        }
+
+        .engine-glow-ring:nth-child(3) {
+            width: 70%;
+            height: 70%;
+            border-color: rgba(0, 212, 255, .12);
+        }
+
+        .engine-wrapper.active .engine-glow-ring {
+            animation: pulseRing 2s ease-in-out infinite;
+        }
+
+        .engine-wrapper.active .engine-glow-ring:nth-child(1) {
+            animation-delay: 0s;
+        }
+        .engine-wrapper.active .engine-glow-ring:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+        .engine-wrapper.active .engine-glow-ring:nth-child(3) {
+            animation-delay: 1s;
+        }
+
+        @keyframes pulseRing {
+            0%,
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.05);
+                opacity: 1;
+            }
+        }
+
+        .engine-stats-below {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .engine-stats-below .stat-item {
+            text-align: center;
+        }
+
+        .engine-stats-below .stat-item .label {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .engine-stats-below .stat-item .value {
+            font-size: 24px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .engine-stats-below .stat-item .value.green {
+            background: linear-gradient(135deg, var(--success), #00cc66);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .engine-stats-below .stat-item .sub {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .stat-box {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid var(--line);
+        }
+
+        .stat-box .label {
+            font-size: 9px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-box .value {
+            font-size: 16px;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+
+        .stat-box .value.green {
+            color: var(--success);
+        }
+
+        .stat-box .value.gold {
+            color: var(--gold);
+        }
+
+        .stat-box .value.orange {
+            color: var(--orange);
+        }
+
+        .stat-box .value.red {
+            color: var(--danger);
+        }
+
+        .stat-box .value.cyan {
+            color: var(--accent);
+        }
+
+        .chart-container {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 14px;
+            border: 1px solid var(--line);
+        }
+
+        .chart-container .chart-title {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 80px;
+            gap: 4px;
+        }
+
+        .chart-bar-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .chart-bar {
+            width: 100%;
+            max-width: 20px;
+            border-radius: 4px 4px 0 0;
+            background: linear-gradient(180deg, var(--accent), var(--accent2));
+            transition: height 0.5s ease;
+            min-height: 4px;
+        }
+
+        .chart-bar.active {
+            background: linear-gradient(180deg, var(--success), #00cc66);
+        }
+
+        .chart-bar-label {
+            font-size: 7px;
+            color: var(--muted);
+        }
+
+        .temp-fan {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .temp-fan .item {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid var(--line);
+        }
+
+        .temp-fan .item .label {
+            font-size: 9px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .temp-fan .item .value {
+            font-size: 16px;
+            font-weight: 800;
+            margin-top: 3px;
+        }
+
+        .temp-fan .item .value.hot {
+            color: var(--orange);
+        }
+
+        .temp-fan .item .value.critical {
+            color: var(--danger);
+        }
+
+        .temp-fan .item .value.green {
+            color: var(--success);
+        }
+
+        .balance-card {
+            background:
+                radial-gradient(circle at 20% 10%, rgba(0, 212, 255, .08), transparent 30%),
+                radial-gradient(circle at 90% 90%, rgba(124, 92, 255, .1), transparent 35%),
+                var(--card);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 14px;
+        }
+
+        .balance-card .small {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .balance-card .balance {
+            font-size: 32px;
+            font-weight: 900;
+            margin: 4px 0;
+            background: linear-gradient(135deg, #ffd700, #f5a623);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .balance-card .unit {
+            font-size: 13px;
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .balance-card .wallet-status {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 8px;
+        }
+
+        .balance-card .wallet-status .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--danger);
+        }
+
+        .balance-card .wallet-status .dot.connected {
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .action-btn {
+            min-height: 48px;
+            padding: 12px;
+            border-radius: 12px;
+            color: var(--text);
+            background: var(--card);
+            border: 1px solid var(--line);
+            font-weight: 700;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+
+        .action-btn .icon {
+            font-size: 16px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .action-btn.primary {
+            color: #fff;
+            background: linear-gradient(135deg, var(--accent2), #4f8cff);
+            border-color: transparent;
+        }
+
+        .action-btn.success {
+            color: #04150d;
+            background: var(--success);
+            border-color: transparent;
+        }
+
+        .action-btn.danger {
+            color: var(--danger);
+            border-color: rgba(255, 93, 115, 0.3);
+        }
+
+        .action-btn.task-btn {
+            color: #fff;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            border-color: transparent;
+        }
+
+        .action-btn:active {
+            transform: scale(0.96);
+        }
+
+        .action-btn:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        .wallet-address {
+            background: var(--card2);
+            border-radius: 12px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 11px;
+            word-break: break-all;
+            margin: 10px 0;
+            border: 1px solid var(--line);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 520px;
+            z-index: 30;
+            padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+            background: rgba(10, 14, 23, .95);
+            backdrop-filter: blur(18px);
+            border-top: 1px solid var(--line);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .nav-btn {
+            background: transparent;
+            color: var(--muted);
+            padding: 7px 2px;
+            font-size: 10px;
+            font-weight: 700;
+            transition: color 0.2s;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .nav-btn.active {
+            color: var(--accent);
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 90px;
+            transform: translateX(-50%) translateY(20px);
+            width: calc(100% - 30px);
+            max-width: 480px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: #13243a;
+            color: #fff;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            opacity: 0;
+            pointer-events: none;
+            transition: .25s;
+            z-index: 200;
+            border: 1px solid rgba(255, 255, 255, .1);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success {
+            border-color: rgba(56, 229, 140, .4);
+        }
+
+        .toast.error {
+            border-color: rgba(255, 93, 115, .5);
+        }
+
+        .toast.info {
+            border-color: rgba(0, 212, 255, .4);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            border-top-color: #0098ea;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, .8);
+            padding: 20px;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+        }
+
+        .modal {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 24px 24px 15px 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .modal h2 {
+            margin-top: 0;
+        }
+
+        .modal .modal-icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .engine-status-overlay {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+            z-index: 2;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .engine-status-overlay .status-text {
+            color: var(--warning);
+        }
+
+        .engine-status-overlay .status-text.running {
+            color: var(--success);
+        }
+
+        @media (max-width: 390px) {
+            .brand h1 {
+                font-size: 14px;
+            }
+            .connect-btn {
+                padding: 8px 12px;
+                max-width: 120px;
+                font-size: 11px;
+            }
+            .engine-wrapper {
+                width: 160px;
+                height: 160px;
+            }
+            .engine-icon {
+                font-size: 110px;
+            }
+            .engine-stats-below .stat-item .value {
+                font-size: 18px;
+            }
+            .balance-card .balance {
+                font-size: 26px;
+            }
+            .engine-visual {
+                min-height: 240px;
+                padding: 20px 15px;
+            }
+        }
+
+        @media (min-width: 600px) {
+            body {
+                background: #060a12;
+            }
+            .app {
+                background: var(--bg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <header>
+            <div class="top">
+                <div class="brand">
+                    <div class="logo">A</div>
+                    <div>
+                        <h1>AVERIQ</h1>
+                        <div class="live">● Engine Online</div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="icon-btn" id="themeBtn" type="button">☀️</button>
+                    <button class="connect-btn" id="connectBtn" type="button">
+                        <span id="connectText">Connect Wallet</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+
+            <section class="page active" id="homePage">
+
+                <div class="mining-header">
+                    <div class="title">⚡ Mining Engine</div>
+                    <div class="status-badge">
+                        <span class="dot" id="statusDot"></span>
+                        <span id="statusText">Idle</span>
+                    </div>
+                </div>
+
+                <!-- Wallet Selector -->
+                <div class="wallet-selector">
+                    <button class="wallet-btn metamask active" id="walletMetaMask" onclick="selectWallet('metamask')">
+                        🦊 MetaMask
+                    </button>
+                    <button class="wallet-btn ton" id="walletTON" onclick="selectWallet('ton')">
+                        💎 TON
+                    </button>
+                </div>
+
+                <div class="engine-visual">
+                    <div class="engine-display">
+                        <div class="engine-wrapper" id="engineWrapper">
+                            <div class="engine-glow-ring"></div>
+                            <div class="engine-glow-ring"></div>
+                            <div class="engine-glow-ring"></div>
+                            <div class="engine-icon" id="engineIcon">⚙️</div>
+                        </div>
+                        <div class="engine-status-overlay">
+                            Status: <span class="status-text idle" id="engineStatusText">⏸️ Idle</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="engine-stats-below">
+                    <div class="stat-item">
+                        <div class="label">Hashrate</div>
+                        <div class="value green" id="hashrate">125.67</div>
+                        <div class="sub">TH/s</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="label">Efficiency</div>
+                        <div class="value gold" id="efficiency">99.85%</div>
+                        <div class="sub">Accepted / Rejected</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="label">Time Remaining</div>
+                        <div class="value cyan" id="timeRemaining">24:00:00</div>
+                        <div class="sub">Hours</div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="label">Accepted</div>
+                        <div class="value green" id="accepted">842,391</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">Rejected</div>
+                        <div class="value red" id="rejected">1,234</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">Sessions</div>
+                        <div class="value cyan" id="sessionsCount">0</div>
+                    </div>
+                </div>
+
+                <div class="balance-card">
+                    <div class="small" id="balanceLabel">Your AVQ Balance</div>
+                    <div class="balance" id="balance">0.0000</div>
+                    <div class="unit" id="balanceUnit">AVQ</div>
+                    <div class="wallet-status">
+                        <span class="dot" id="walletDot"></span>
+                        <span id="walletStatus">Wallet not connected</span>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">📊 Mining Performance</div>
+                    <div class="chart-bars" id="chartBars">
+                        <div class="chart-bar-wrap"><div class="chart-bar" style="height:30%"></div><span class="chart-bar-label">12:00</span></div>
+                        <div class="chart-bar-wrap"><div class="chart-bar" style="height:50%"></div><span class="chart-bar-label">14:00</span></div>
+                        <div class="chart-bar-wrap"><div class="chart-bar" style="height:70%"></div><span class="chart-bar-label">16:00</span></div>
+                        <div class="chart-bar-wrap"><div class="chart-bar active" style="height:90%"></div><span class="chart-bar-label">18:00</span></div>
+                        <div class="chart-bar-wrap"><div class="chart-bar" style="height:60%"></div><span class="chart-bar-label">20:00</span></div>
+                    </div>
+                </div>
+
+                <div class="temp-fan">
+                    <div class="item">
+                        <div class="label">🌡️ Temperature</div>
+                        <div class="value hot" id="temperature">62°C</div>
+                    </div>
+                    <div class="item">
+                        <div class="label">🌀 Fan Speed</div>
+                        <div class="value green" id="fanSpeed">4,200 RPM</div>
+                    </div>
+                    <div class="item">
+                        <div class="label">⚡ Power</div>
+                        <div class="value cyan" id="power">2,000W</div>
+                    </div>
+                </div>
+
+                <div class="button-grid">
+                    <button class="action-btn primary" id="startBtn" type="button">
+                        <span class="icon">⚙️</span>Start Engine
+                    </button>
+                    <button class="action-btn success" id="claimBtn" type="button">
+                        <span class="icon">🎁</span>Claim
+                    </button>
+                    <button class="action-btn" id="checkinBtn" type="button">
+                        <span class="icon">✅</span>Check-In
+                    </button>
+                    <button class="action-btn task-btn" id="tasksBtn" type="button">
+                        <span class="icon">📋</span>Tasks
+                    </button>
+                </div>
+
+            </section>
+
+            <section class="page" id="tasksPage">
+                <div class="balance-card">
+                    <div class="small">📋 Tasks & Rewards</div>
+                    <div class="balance" style="font-size:28px;" id="tasksBalance">0.0000</div>
+                    <div class="unit">AVQ</div>
+                </div>
+                <div class="stats-grid" style="grid-template-columns:1fr;">
+                    <div class="stat-box" style="padding:16px;text-align:left;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                            <span class="label">📺 Watch 2 Videos</span>
+                            <span style="color:var(--gold);font-weight:700;">+0.15 AVQ</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span class="label" style="font-size:11px;">Progress: 0/2</span>
+                            <button class="action-btn primary" style="min-height:28px;padding:4px 12px;font-size:10px;" onclick="startTask('task1')">Go</button>
+                        </div>
+                    </div>
+                    <div class="stat-box" style="padding:16px;text-align:left;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                            <span class="label">✅ Complete Check-In</span>
+                            <span style="color:var(--gold);font-weight:700;">+0.10 AVQ</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span class="label" style="font-size:11px;">Progress: 0/1</span>
+                            <button class="action-btn primary" style="min-height:28px;padding:4px 12px;font-size:10px;" onclick="startTask('task2')">Go</button>
+                        </div>
+                    </div>
+                    <div class="stat-box" style="padding:16px;text-align:left;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                            <span class="label">⛏️ Mine 0.1 AVQ</span>
+                            <span style="color:var(--gold);font-weight:700;">+0.20 AVQ</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span class="label" style="font-size:11px;">Progress: 0/1</span>
+                            <button class="action-btn primary" style="min-height:28px;padding:4px 12px;font-size:10px;" onclick="startTask('task3')">Go</button>
+                        </div>
+                    </div>
+                </div>
+                <div style="background:var(--card);border-radius:16px;padding:16px;border:1px solid var(--line);">
+                    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">📋 How It Works</div>
+                    <div style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6;">
+                        <strong>1.</strong> Click "Go" on any task<br>
+                        <strong>2.</strong> Watch the video<br>
+                        <strong>3.</strong> Earn rewards instantly!
+                    </div>
+                </div>
+            </section>
+
+            <section class="page" id="claimPage">
+                <div class="balance-card">
+                    <div class="small">Claimable Rewards</div>
+                    <div class="balance" id="claimPageBalance">0.0000</div>
+                    <div class="unit">AVQ</div>
+                </div>
+                <div style="background:var(--card);border-radius:16px;padding:16px;border:1px solid var(--line);text-align:center;">
+                    <div style="font-size:12px;color:var(--muted);">Your rewards are auto-claimed every 10 minutes while the engine runs.</div>
+                    <br>
+                    <button class="action-btn success" style="width:100%;" id="claimPageBtn" type="button">
+                        📺 Watch Video & Claim Extra
+                    </button>
+                </div>
+            </section>
+
+            <section class="page" id="walletPage">
+                <div style="background:var(--card);border-radius:16px;padding:16px;border:1px solid var(--line);">
+                    <div style="font-size:14px;font-weight:700;margin-bottom:8px;">👛 Wallet</div>
+                    <div style="font-size:11px;color:var(--muted);">Connection status</div>
+                    <div style="margin-top:8px;font-weight:900;" id="walletPageStatus">Not connected</div>
+                    <div class="wallet-address" id="walletAddress">No wallet connected</div>
+                    <div style="margin:10px 0;display:flex;gap:8px;">
+                        <button class="action-btn primary" style="flex:1;min-height:40px;padding:8px;font-size:10px;" id="walletConnectPageBtn">
+                            <span id="walletPageConnectText">Connect Wallet</span>
+                        </button>
+                        <button class="action-btn danger" style="flex:1;min-height:40px;padding:8px;font-size:10px;" id="disconnectBtn">Disconnect</button>
+                    </div>
+                </div>
+                <div style="background:var(--card);border-radius:16px;padding:16px;border:1px solid var(--line);margin-top:12px;">
+                    <div style="font-size:14px;font-weight:700;margin-bottom:8px;">🔒 Security</div>
+                    <div style="font-size:11px;color:var(--muted);">Never enter your Secret Recovery Phrase or private key into Averiq.</div>
+                </div>
+            </section>
+
+        </main>
+
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-page="homePage" type="button">
+                <span class="nav-icon">🏠</span>Home
+            </button>
+            <button class="nav-btn" data-page="tasksPage" type="button">
+                <span class="nav-icon">📋</span>Tasks
+            </button>
+            <button class="nav-btn" data-page="claimPage" type="button">
+                <span class="nav-icon">💰</span>Claim
+            </button>
+            <button class="nav-btn" data-page="walletPage" type="button">
+                <span class="nav-icon">👛</span>Wallet
+            </button>
+        </nav>
+
+    </div>
+
+    <div class="modal-backdrop" id="adOverlay" style="display:none;">
+        <div class="modal">
+            <div class="modal-icon">📺</div>
+            <h2>Loading Video...</h2>
+            <p style="color:var(--muted);margin:10px 0;">Please wait</p>
+            <div class="spinner" style="margin:20px auto;"></div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        "use strict";
+
+        // ============================================================
+        // AVERIQ — DUAL WALLET: METAMASK + TON (FULLY CORRECTED)
+        // ============================================================
+
+        // ===== CONFIGURATION =====
+        const ENGINE_RUNTIME_HOURS = 24;
+        const ENGINE_RUNTIME_MS = ENGINE_RUNTIME_HOURS * 60 * 60 * 1000;
+        const DAILY_LIMIT = 1;
+        const REWARD_PER_SECOND = DAILY_LIMIT / (ENGINE_RUNTIME_HOURS * 60 * 60);
+        const CLAIM_INTERVAL_MS = 10 * 60 * 1000;
+
+        // ===== STORAGE =====
+        const STORAGE_KEY = "averiq_engine_data";
+        const WALLET_KEY = "averiq_wallet";
+        const WALLET_CONNECTED_KEY = "averiq_wallet_connected";
+        const WALLET_TYPE_KEY = "averiq_wallet_type";
+        const THEME_KEY = "averiq_theme";
+
+        const DEFAULT_DATA = {
+            balance: 0,
+            claimable: 0,
+            totalEarned: 0,
+            totalClaimed: 0,
+            sessions: 0,
+            checks: 0,
+            streak: 0,
+            lastCheckIn: null,
+            todayMined: 0,
+            todayDate: new Date().toISOString().slice(0, 10),
+            engineRunning: false,
+            engineStartTime: 0,
+            engineElapsed: 0,
+            lastClaimTime: 0,
+            lastEngineUpdate: 0,
+            accepted: 842391,
+            rejected: 1234,
+            efficiency: 99.85,
+            hashrate: 125.67,
+            temperature: 62,
+            fanSpeed: 4200,
+            power: 2000,
+            tasks: { task1: 0, task2: 0, task3: 0 }
+        };
+
+        let data = loadData();
+        let walletConnected = false;
+        let walletAddress = null;
+        let walletType = 'metamask';
+        let isConnecting = false;
+        let isAdPlaying = false;
+        let engineInterval = null;
+        let statsInterval = null;
+        let tonConnector = null;
+
+        // ===== DOM HELPERS =====
+        function $(id) { return document.getElementById(id); }
+
+        // ===== STORAGE =====
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            } catch (error) {
+                console.error("Unable to save data:", error);
+            }
+        }
+
+        function loadData() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+                if (!saved || typeof saved !== "object") return { ...DEFAULT_DATA };
+                const today = new Date().toISOString().slice(0, 10);
+                if (saved.todayDate !== today) {
+                    saved.todayMined = 0;
+                    saved.todayDate = today;
+                }
+                if (!saved.tasks) saved.tasks = { task1: 0, task2: 0, task3: 0 };
+                return { ...DEFAULT_DATA, ...saved };
+            } catch (error) {
+                return { ...DEFAULT_DATA };
+            }
+        }
+
+        // ===== NUMBER HELPERS =====
+        function formatNumber(number) {
+            const value = Number(number);
+            if (!Number.isFinite(value)) return "0.0000";
+            return value.toFixed(4);
+        }
+
+        function cleanNumber(number) {
+            const value = Number(number);
+            if (!Number.isFinite(value)) return 0;
+            return Math.max(0, value);
+        }
+
+        function shortAddress(address) {
+            if (!address) return "Not connected";
+            if (address.length < 12) return address;
+            return address.slice(0, 6) + "..." + address.slice(-4);
+        }
+
+        function formatTime(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function randomBetween(min, max) {
+            return Math.round((Math.random() * (max - min) + min) * 100) / 100;
+        }
+
+        // ===== TOAST =====
+        function showMessage(message, type = "") {
+            const toast = $("toast");
+            toast.textContent = message;
+            toast.className = "toast show " + type;
+            clearTimeout(showMessage.timer);
+            showMessage.timer = setTimeout(() => {
+                toast.className = "toast";
+            }, 3000);
+        }
+
+        // ===== DAILY LIMIT =====
+        function canMineToday() {
+            const today = new Date().toISOString().slice(0, 10);
+            if (data.todayDate !== today) {
+                data.todayMined = 0;
+                data.todayDate = today;
+                saveData();
+                return true;
+            }
+            return data.todayMined < DAILY_LIMIT;
+        }
+
+        // ============================================================
+        // WALLET SELECTOR
+        // ============================================================
+
+        function selectWallet(type) {
+            walletType = type;
+
+            document.querySelectorAll('.wallet-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            if (type === 'metamask') {
+                document.getElementById('walletMetaMask').classList.add('active');
+                $("connectBtn").style.background = 'linear-gradient(135deg, #0098ea, #0088d4)';
+            } else {
+                document.getElementById('walletTON').classList.add('active');
+                $("connectBtn").style.background = 'linear-gradient(135deg, #0088cc, #0066aa)';
+            }
+
+            const connectText = $("connectText");
+            if (walletConnected) {
+                connectText.textContent = '✅ ' + shortAddress(walletAddress);
+            } else {
+                connectText.textContent = 'Connect ' + (type === 'metamask' ? 'MetaMask' : 'TON');
+            }
+        }
+
+        // ============================================================
+        // METAMASK CONNECTION
+        // ============================================================
+
+        function isMetaMaskInstalled() {
+            return typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask === true;
+        }
+
+        function getMetaMaskProvider() {
+            if (typeof window.ethereum === 'undefined') return null;
+            return window.ethereum;
+        }
+
+        async function connectMetaMask() {
+            if (isConnecting) return;
+            if (walletConnected && walletType === 'metamask') {
+                if (confirm("Disconnect wallet?")) {
+                    disconnectWallet();
+                }
+                return;
+            }
+
+            const button = $("connectBtn");
+            const connectText = $("connectText");
+
+            if (!isMetaMaskInstalled()) {
+                showMessage("🦊 Please install MetaMask!", "error");
+                window.open("https://metamask.io/download/", "_blank");
+                return;
+            }
+
+            const provider = getMetaMaskProvider();
+            if (!provider) {
+                showMessage("⚠️ Could not detect MetaMask", "error");
+                return;
+            }
+
+            isConnecting = true;
+            button.disabled = true;
+            connectText.innerHTML = '<span class="spinner"></span>';
+
+            try {
+                const accounts = await provider.request({
+                    method: "eth_requestAccounts"
+                });
+
+                if (!accounts || accounts.length === 0) {
+                    throw new Error("No accounts found");
+                }
+
+                walletAddress = accounts[0];
+                walletConnected = true;
+                walletType = 'metamask';
+
+                localStorage.setItem(WALLET_KEY, walletAddress);
+                localStorage.setItem(WALLET_CONNECTED_KEY, "true");
+                localStorage.setItem(WALLET_TYPE_KEY, "metamask");
+
+                updateWalletUI(walletAddress);
+                showMessage("✅ MetaMask connected!", "success");
+
+                // Get AVQ balance
+                try {
+                    const balance = await getAVQBalance(walletAddress);
+                    if (balance && balance.formatted) {
+                        $("balance").textContent = balance.formatted;
+                        $("tasksBalance").textContent = balance.formatted;
+                        $("claimPageBalance").textContent = balance.formatted;
+                    }
+                } catch (e) {
+                    console.log("Balance error:", e);
+                }
+
+                updateUI();
+
+                // Setup listeners
+                provider.on('accountsChanged', async (accounts) => {
+                    if (accounts.length === 0) {
+                        disconnectWallet();
+                    } else if (accounts[0] !== walletAddress) {
+                        walletAddress = accounts[0];
+                        walletConnected = true;
+                        localStorage.setItem(WALLET_KEY, walletAddress);
+                        updateWalletUI(walletAddress);
+                        showMessage("🔄 Account changed!", "info");
+                        try {
+                            const balance = await getAVQBalance(walletAddress);
+                            if (balance && balance.formatted) {
+                                $("balance").textContent = balance.formatted;
+                                $("tasksBalance").textContent = balance.formatted;
+                                $("claimPageBalance").textContent = balance.formatted;
+                            }
+                        } catch (e) {}
+                        updateUI();
+                    }
+                });
+
+                provider.on('chainChanged', () => {
+                    window.location.reload();
+                });
+
+            } catch (error) {
+                console.error("Connection error:", error);
+                if (error.code === 4001) {
+                    showMessage("❌ Connection rejected", "error");
+                } else {
+                    showMessage("❌ Could not connect. Try again.", "error");
+                }
+                connectText.textContent = 'Connect MetaMask';
+                button.disabled = false;
+            } finally {
+                isConnecting = false;
+            }
+        }
+
+        // ============================================================
+        // TON CONNECTION - CORRECTED
+        // ============================================================
+
+        function initTONConnect() {
+            if (tonConnector) return;
+
+            try {
+                // ✅ CORRECT: Use 'TonConnect' (not 'TonConnectSDK')
+                tonConnector = new TonConnect({
+                    manifestUrl: window.location.origin + '/ton-manifest.json'
+                });
+                console.log("✅ TON Connect initialized");
+
+                // Listen for connection status changes
+                tonConnector.onStatusChange((wallet) => {
+                    if (wallet) {
+                        console.log("TON wallet connected:", wallet);
+                    } else {
+                        console.log("TON wallet disconnected");
+                    }
+                });
+
+            } catch (error) {
+                console.error("TON Connect init error:", error);
+            }
+        }
+
+        async function connectTON() {
+            if (isConnecting) return;
+            if (walletConnected && walletType === 'ton') {
+                if (confirm("Disconnect wallet?")) {
+                    disconnectWallet();
+                }
+                return;
+            }
+
+            const button = $("connectBtn");
+            const connectText = $("connectText");
+
+            initTONConnect();
+
+            isConnecting = true;
+            button.disabled = true;
+            connectText.innerHTML = '<span class="spinner"></span>';
+
+            try {
+                // ✅ CORRECT: Open connection modal
+                const wallet = await tonConnector.connect();
+
+                if (wallet && wallet.account) {
+                    const address = wallet.account.address;
+                    walletAddress = address;
+                    walletConnected = true;
+                    walletType = 'ton';
+
+                    localStorage.setItem(WALLET_KEY, address);
+                    localStorage.setItem(WALLET_CONNECTED_KEY, "true");
+                    localStorage.setItem(WALLET_TYPE_KEY, "ton");
+
+                    updateWalletUI(address);
+                    showMessage("✅ TON wallet connected!", "success");
+
+                    // Show TON balance
+                    $("balance").textContent = "0.0000";
+                    $("tasksBalance").textContent = "0.0000";
+                    $("claimPageBalance").textContent = "0.0000";
+                    $("balanceLabel").textContent = "Your TON Balance";
+                    $("balanceUnit").textContent = "TON";
+
+                    updateUI();
+                } else {
+                    throw new Error("No wallet connected");
+                }
+
+            } catch (error) {
+                console.error("TON connection error:", error);
+                if (error.message && error.message.includes("cancelled")) {
+                    showMessage("❌ Connection cancelled", "error");
+                } else {
+                    showMessage("❌ Could not connect TON wallet. Try again.", "error");
+                }
+                connectText.textContent = 'Connect TON';
+                button.disabled = false;
+            } finally {
+                isConnecting = false;
+            }
+        }
+
+        // ============================================================
+        // MAIN CONNECT FUNCTION
+        // ============================================================
+
+        async function connectWallet() {
+            if (walletType === 'metamask') {
+                await connectMetaMask();
+            } else {
+                await connectTON();
+            }
+        }
+
+        // ============================================================
+        // DISCONNECT WALLET
+        // ============================================================
+
+        function disconnectWallet() {
+            // Disconnect TON if connected
+            if (tonConnector && walletType === 'ton') {
+                try {
+                    tonConnector.disconnect();
+                } catch (e) {}
+            }
+
+            walletConnected = false;
+            walletAddress = null;
+            localStorage.removeItem(WALLET_KEY);
+            localStorage.removeItem(WALLET_CONNECTED_KEY);
+            localStorage.removeItem(WALLET_TYPE_KEY);
+
+            const button = $("connectBtn");
+            const connectText = $("connectText");
+
+            if (button) {
+                button.className = 'connect-btn';
+                const label = walletType === 'metamask' ? 'MetaMask' : 'TON';
+                connectText.textContent = 'Connect ' + label;
+                button.disabled = false;
+            }
+
+            $("walletStatus").textContent = "Wallet not connected";
+            $("walletDot").className = "dot";
+            $("walletPageStatus").textContent = "Not connected";
+            $("walletAddress").innerHTML = "No wallet connected";
+
+            $("balance").textContent = "0.0000";
+            $("tasksBalance").textContent = "0.0000";
+            $("claimPageBalance").textContent = "0.0000";
+            $("balanceLabel").textContent = "Your AVQ Balance";
+            $("balanceUnit").textContent = "AVQ";
+
+            showMessage("Wallet disconnected.", "info");
+            updateUI();
+        }
+
+        // ============================================================
+        // UPDATE WALLET UI
+        // ============================================================
+
+        function updateWalletUI(address) {
+            const button = $("connectBtn");
+            const connectText = $("connectText");
+            const pageButton = $("walletConnectPageBtn");
+            const pageConnectText = $("walletPageConnectText");
+
+            if (button) {
+                if (walletType === 'metamask') {
+                    button.className = 'connect-btn connected';
+                } else {
+                    button.className = 'connect-btn ton-connected';
+                }
+                connectText.textContent = '✅ ' + shortAddress(address);
+                button.disabled = false;
+            }
+
+            if (pageButton) {
+                pageButton.className = 'action-btn success';
+                pageConnectText.textContent = '✅ Connected';
+                pageButton.disabled = false;
+            }
+
+            $("walletStatus").textContent = "✅ Connected";
+            $("walletDot").className = "dot connected";
+            $("walletPageStatus").textContent = "Connected";
+            $("walletAddress").innerHTML = `<strong>${address}</strong>`;
+        }
+
+        // ============================================================
+        // AUTO-CONNECT
+        // ============================================================
+
+        async function autoConnectWallet() {
+            const isConnected = localStorage.getItem(WALLET_CONNECTED_KEY) === "true";
+            const savedWallet = localStorage.getItem(WALLET_KEY);
+            const savedType = localStorage.getItem(WALLET_TYPE_KEY) || 'metamask';
+
+            if (!isConnected || !savedWallet) {
+                return false;
+            }
+
+            walletType = savedType;
+            selectWallet(walletType);
+
+            if (walletType === 'metamask') {
+                if (!isMetaMaskInstalled()) return false;
+                const provider = getMetaMaskProvider();
+                if (!provider) return false;
+
+                try {
+                    const accounts = await provider.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0 && accounts[0].toLowerCase() === savedWallet.toLowerCase()) {
+                        walletAddress = accounts[0];
+                        walletConnected = true;
+                        updateWalletUI(walletAddress);
+                        try {
+                            const balance = await getAVQBalance(walletAddress);
+                            if (balance && balance.formatted) {
+                                $("balance").textContent = balance.formatted;
+                                $("tasksBalance").textContent = balance.formatted;
+                                $("claimPageBalance").textContent = balance.formatted;
+                            }
+                        } catch (e) {}
+                        updateUI();
+                        showMessage("✅ Wallet reconnected!", "success");
+                        return true;
+                    }
+                } catch (error) {
+                    console.error("Auto-connect error:", error);
+                }
+            } else if (walletType === 'ton') {
+                initTONConnect();
+                try {
+                    // Check if TON wallet is still connected
+                    const wallet = await tonConnector.restoreConnection();
+                    if (wallet && wallet.account && wallet.account.address === savedWallet) {
+                        walletAddress = wallet.account.address;
+                        walletConnected = true;
+                        updateWalletUI(walletAddress);
+                        updateUI();
+                        showMessage("✅ TON wallet reconnected!", "success");
+                        return true;
+                    }
+                } catch (error) {
+                    console.error("TON auto-connect error:", error);
+                }
+            }
+
+            return false;
+        }
+
+        // ============================================================
+        // AVQ BALANCE (MetaMask)
+        // ============================================================
+
+        const AVQ_TOKEN_ADDRESS = "0x586e4A56b8fCA07fa5172D55e8Cdc050A983b6C9";
+        const AVQ_ABI = [
+            { "constant": true, "inputs": [{ "name": "owner", "type": "address" }], "name": "balanceOf",
+                "outputs": [{ "name": "", "type": "uint256" }], "type": "function" }
+        ];
+        const AVQ_DECIMALS = 18;
+
+        const RPC_PROVIDERS = [
+            "https://eth-sepolia.g.alchemy.com/v2/demo",
+            "https://sepolia.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+            "https://rpc2.sepolia.org",
+            "https://sepolia.gateway.tenderly.co"
+        ];
+
+        async function getAVQBalance(address) {
+            for (const rpcUrl of RPC_PROVIDERS) {
+                try {
+                    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+                    const contract = new ethers.Contract(AVQ_TOKEN_ADDRESS, AVQ_ABI, provider);
+                    const balance = await contract.balanceOf(address);
+                    const formatted = ethers.utils.formatUnits(balance, AVQ_DECIMALS);
+                    return { raw: balance, formatted: formatted };
+                } catch (error) {
+                    continue;
+                }
+            }
+            return { raw: null, formatted: "0.0" };
+        }
+
+        // ============================================================
+        // SHOW AD
+        // ============================================================
+
+        function showAdAndThen(callback, rewardAmount = 0) {
+            return new Promise((resolve) => {
+                if (isAdPlaying) {
+                    showMessage("⏳ Video in progress...", "info");
+                    resolve(false);
+                    return;
+                }
+
+                if (typeof show_11747882 !== 'function') {
+                    setTimeout(() => {
+                        if (rewardAmount > 0) {
+                            data.balance += rewardAmount;
+                            data.claimable += rewardAmount;
+                            data.totalEarned += rewardAmount;
+                            saveData();
+                            updateUI();
+                            showMessage(`🎉 +${rewardAmount.toFixed(4)} AVQ!`, "success");
+                        }
+                        if (callback) callback();
+                        resolve(true);
+                    }, 1500);
+                    return;
+                }
+
+                isAdPlaying = true;
+                $("adOverlay").style.display = "flex";
+
+                Promise.resolve(show_11747882({
+                    type: "end",
+                    ymid: walletAddress || undefined,
+                    requestVar: "averiq_engine"
+                }))
+                    .then(() => {
+                        if (rewardAmount > 0) {
+                            data.balance += rewardAmount;
+                            data.claimable += rewardAmount;
+                            data.totalEarned += rewardAmount;
+                            saveData();
+                            updateUI();
+                            showMessage(`🎉 +${rewardAmount.toFixed(4)} AVQ!`, "success");
+                        }
+                        if (callback) callback();
+                        resolve(true);
+                    })
+                    .catch((error) => {
+                        console.error("Video error:", error);
+                        if (callback) callback();
+                        resolve(true);
+                    })
+                    .finally(() => {
+                        isAdPlaying = false;
+                        $("adOverlay").style.display = "none";
+                    });
+            });
+        }
+
+        // ============================================================
+        // ENGINE SYSTEM (FULL - same as before)
+        // ============================================================
+
+        function startEngine() {
+            if (!canMineToday()) {
+                showMessage("⚠️ Daily limit reached! 1 AVQ per day max.", "error");
+                return;
+            }
+
+            if (data.engineRunning) {
+                showMessage("⚙️ Engine is already running!", "info");
+                return;
+            }
+
+            if (data.engineElapsed >= ENGINE_RUNTIME_MS) {
+                showMessage("⏰ 24-hour cycle complete! Click again to restart.", "info");
+                return;
+            }
+
+            showAdAndThen(() => {
+                data.engineRunning = true;
+                data.engineStartTime = Date.now();
+                data.engineElapsed = 0;
+                data.lastClaimTime = Date.now();
+                data.lastEngineUpdate = Date.now();
+                data.sessions += 1;
+
+                const engineWrapper = $("engineWrapper");
+                const engineIcon = $("engineIcon");
+                const statusDot = $("statusDot");
+                const statusText = $("statusText");
+                const engineStatusText = $("engineStatusText");
+
+                engineWrapper.classList.add("active");
+                engineIcon.className = "engine-icon spinning";
+                statusDot.className = "dot";
+                statusText.textContent = "Running";
+                engineStatusText.textContent = "🟢 Running";
+                engineStatusText.className = "status-text running";
+
+                $("startBtn").innerHTML = '<span class="icon">⏹️</span>Stop Engine';
+                $("startBtn").className = "action-btn danger";
+
+                if (engineInterval) clearInterval(engineInterval);
+                engineInterval = setInterval(updateEngine, 1000);
+
+                if (statsInterval) clearInterval(statsInterval);
+                statsInterval = setInterval(updateStats, 2000);
+
+                $("sessionsCount").textContent = data.sessions;
+
+                saveData();
+                updateUI();
+                showMessage("⚙️ Engine started! Mining for 24 hours!", "success");
+            }, 0);
+        }
+
+        function stopEngine() {
+            data.engineRunning = false;
+            if (engineInterval) {
+                clearInterval(engineInterval);
+                engineInterval = null;
+            }
+            if (statsInterval) {
+                clearInterval(statsInterval);
+                statsInterval = null;
+            }
+
+            const engineWrapper = $("engineWrapper");
+            const engineIcon = $("engineIcon");
+            const statusDot = $("statusDot");
+            const statusText = $("statusText");
+            const engineStatusText = $("engineStatusText");
+
+            engineWrapper.classList.remove("active");
+            engineIcon.className = "engine-icon";
+            statusDot.className = "dot idle";
+            statusText.textContent = "Idle";
+            engineStatusText.textContent = "⏸️ Idle";
+            engineStatusText.className = "status-text idle";
+
+            $("startBtn").innerHTML = '<span class="icon">⚙️</span>Start Engine';
+            $("startBtn").className = "action-btn primary";
+
+            saveData();
+            updateUI();
+        }
+
+        function updateEngine() {
+            if (!data.engineRunning) {
+                stopEngine();
+                return;
+            }
+
+            const now = Date.now();
+            const elapsed = now - data.engineStartTime;
+
+            if (elapsed >= ENGINE_RUNTIME_MS) {
+                data.engineRunning = false;
+                data.engineElapsed = ENGINE_RUNTIME_MS;
+                saveData();
+                stopEngine();
+                showMessage("⏰ 24-hour mining cycle complete! Click 'Start Engine' again.", "info");
+                return;
+            }
+
+            data.engineElapsed = elapsed;
+
+            const timeSinceUpdate = (now - data.lastEngineUpdate) / 1000;
+            if (timeSinceUpdate > 0) {
+                const reward = timeSinceUpdate * REWARD_PER_SECOND;
+                const maxReward = Math.max(0, DAILY_LIMIT - cleanNumber(data.todayMined));
+                const actualReward = Math.min(reward, maxReward);
+
+                if (actualReward > 0) {
+                    data.balance += actualReward;
+                    data.claimable += actualReward;
+                    data.totalEarned += actualReward;
+                    data.todayMined += actualReward;
+                }
+
+                data.lastEngineUpdate = now;
+                saveData();
+            }
+
+            // Update stats
+            data.hashrate = 125 + randomBetween(-5, 5);
+            $("hashrate").textContent = data.hashrate.toFixed(2);
+
+            data.accepted += Math.floor(randomBetween(10, 30));
+            $("accepted").textContent = data.accepted.toLocaleString();
+
+            data.rejected += Math.floor(randomBetween(0, 3));
+            $("rejected").textContent = data.rejected.toLocaleString();
+
+            const total = data.accepted + data.rejected;
+            data.efficiency = total > 0 ? (data.accepted / total) * 100 : 99.85;
+            $("efficiency").textContent = data.efficiency.toFixed(2) + "%";
+
+            data.temperature = 58 + randomBetween(-3, 8);
+            const tempEl = $("temperature");
+            tempEl.textContent = data.temperature.toFixed(0) + "°C";
+            tempEl.className = "value" + (data.temperature > 68 ? " critical" : data.temperature > 63 ? " hot" : " green");
+
+            data.fanSpeed = 3800 + (data.temperature - 58) * 40 + randomBetween(-100, 100);
+            const fanEl = $("fanSpeed");
+            fanEl.textContent = Math.round(data.fanSpeed).toLocaleString() + " RPM";
+            fanEl.className = "value" + (data.fanSpeed > 5000 ? " hot" : " green");
+
+            data.power = 1800 + (data.temperature - 58) * 20 + randomBetween(-50, 50);
+            $("power").textContent = Math.round(data.power) + "W";
+
+            const remaining = Math.max(0, ENGINE_RUNTIME_MS - elapsed);
+            $("timeRemaining").textContent = formatTime(remaining);
+
+            const engineIcon = $("engineIcon");
+            if (data.temperature > 66) {
+                engineIcon.className = "engine-icon spinning-fast";
+            } else {
+                engineIcon.className = "engine-icon spinning";
+            }
+
+            if (data.todayMined >= DAILY_LIMIT) {
+                data.engineRunning = false;
+                saveData();
+                stopEngine();
+                showMessage("✅ Daily limit reached! 1 AVQ earned today.", "success");
+            }
+
+            updateUI();
+            updateChart();
+        }
+
+        function updateStats() {
+            if (!data.engineRunning) return;
+            updateChart();
+        }
+
+        function updateChart() {
+            const bars = document.querySelectorAll('.chart-bar');
+            const heights = [30, 50, 70, 90, 60];
+            const currentIndex = Math.floor((Date.now() / 2000) % 5);
+
+            bars.forEach((bar, index) => {
+                const targetHeight = index === currentIndex ?
+                    70 + randomBetween(10, 25) :
+                    heights[index] + randomBetween(-5, 5);
+                bar.style.height = Math.min(100, Math.max(10, targetHeight)) + "%";
+                bar.className = "chart-bar" + (index === currentIndex ? " active" : "");
+            });
+        }
+
+        // ============================================================
+        // CLAIM, CHECK-IN & TASKS
+        // ============================================================
+
+        function manualClaim() {
+            const amount = cleanNumber(data.claimable);
+            if (amount <= 0) {
+                showMessage("You have no claimable rewards.", "error");
+                return;
+            }
+
+            const claimAmount = amount;
+            data.claimable = 0;
+            saveData();
+
+            showAdAndThen(() => {
+                data.totalClaimed += claimAmount;
+                data.balance += claimAmount;
+                data.totalEarned += claimAmount;
+                saveData();
+                updateUI();
+                showMessage(`🎉 Claimed ${claimAmount.toFixed(4)} AVQ!`, "success");
+            }, 0);
+        }
+
+        function checkIn() {
+            const today = new Date().toISOString().slice(0, 10);
+            if (data.lastCheckIn === today) {
+                showMessage("You already checked in today.", "error");
+                return;
+            }
+
+            const reward = 0.25;
+            showAdAndThen(() => {
+                data.balance += reward;
+                data.claimable += reward;
+                data.totalEarned += reward;
+                data.checks += 1;
+                data.streak += 1;
+                data.lastCheckIn = today;
+                saveData();
+                updateUI();
+                showMessage(`🎁 Daily check-in +${reward.toFixed(4)} AVQ`, "success");
+            }, 0);
+        }
+
+        function startTask(taskId) {
+            if (!data.tasks) data.tasks = { task1: 0, task2: 0, task3: 0 };
+            const maxProgress = 1;
+            const current = data.tasks[taskId] || 0;
+
+            if (current >= maxProgress) {
+                showMessage("✅ Task already completed!", "info");
+                return;
+            }
+
+            const rewards = { task1: 0.15, task2: 0.10, task3: 0.20 };
+            const reward = rewards[taskId] || 0.10;
+
+            showAdAndThen(() => {
+                data.tasks[taskId] = (data.tasks[taskId] || 0) + 1;
+                data.balance += reward;
+                data.claimable += reward;
+                data.totalEarned += reward;
+                saveData();
+                updateUI();
+                showMessage(`🎉 Task completed! +${reward.toFixed(2)} AVQ`, "success");
+                updateTaskUI();
+            }, 0);
+        }
+
+        function updateTaskUI() {
+            const taskButtons = document.querySelectorAll('.stat-box .action-btn');
+            const taskLabels = document.querySelectorAll('.stat-box .label');
+            const tasks = ['task1', 'task2', 'task3'];
+            tasks.forEach((taskId, index) => {
+                const progress = data.tasks[taskId] || 0;
+                const maxProgress = 1;
+                if (taskLabels[index]) {
+                    const label = taskLabels[index];
+                    const text = label.textContent.split('(')[0].trim();
+                    label.textContent = `${text} (${progress}/${maxProgress})`;
+                }
+                if (taskButtons[index]) {
+                    if (progress >= maxProgress) {
+                        taskButtons[index].textContent = '✅ Done';
+                        taskButtons[index].className = 'action-btn success';
+                        taskButtons[index].style.minHeight = '28px';
+                        taskButtons[index].style.padding = '4px 12px';
+                        taskButtons[index].style.fontSize = '10px';
+                        taskButtons[index].disabled = true;
+                    }
+                }
+            });
+        }
+
+        // ============================================================
+        // UI UPDATE
+        // ============================================================
+
+        function updateUI() {
+            $("balance").textContent = formatNumber(data.balance);
+            $("tasksBalance").textContent = formatNumber(data.balance);
+            $("claimPageBalance").textContent = formatNumber(data.claimable);
+            $("sessionsCount").textContent = data.sessions;
+        }
+
+        // ============================================================
+        // NAVIGATION
+        // ============================================================
+
+        function showPage(pageId) {
+            document.querySelectorAll(".page").forEach(page => {
+                page.classList.remove("active");
+            });
+            const page = document.getElementById(pageId);
+            if (page) page.classList.add("active");
+
+            document.querySelectorAll(".nav-btn").forEach(button => {
+                button.classList.toggle("active", button.dataset.page === pageId);
+            });
+
+            if (pageId === "tasksPage") {
+                updateTaskUI();
+            }
+        }
+
+        // ============================================================
+        // THEME
+        // ============================================================
+
+        function loadTheme() {
+            const theme = localStorage.getItem(THEME_KEY) || "dark";
+            $("themeBtn").textContent = "☀️";
+        }
+
+        function toggleTheme() {
+            $("themeBtn").textContent = "🌙";
+        }
+
+        // ============================================================
+        // EVENT LISTENERS
+        // ============================================================
+
+        $("connectBtn").addEventListener("click", connectWallet);
+        $("walletConnectPageBtn").addEventListener("click", connectWallet);
+        $("disconnectBtn").addEventListener("click", () => {
+            if (confirm("Disconnect wallet?")) {
+                disconnectWallet();
+            }
+        });
+
+        $("startBtn").addEventListener("click", startEngine);
+        $("claimBtn").addEventListener("click", manualClaim);
+        $("claimPageBtn").addEventListener("click", manualClaim);
+        $("checkinBtn").addEventListener("click", checkIn);
+        $("tasksBtn").addEventListener("click", () => showPage("tasksPage"));
+        $("themeBtn").addEventListener("click", toggleTheme);
+
+        document.querySelectorAll(".nav-btn").forEach(button => {
+            button.addEventListener("click", () => {
+                showPage(button.dataset.page);
+            });
+        });
+
+        // ============================================================
+        // LIFECYCLE
+        // ============================================================
+
+        function handleResume() {
+            if (data.engineRunning) {
+                const now = Date.now();
+                const elapsed = now - data.engineStartTime;
+                if (elapsed >= ENGINE_RUNTIME_MS) {
+                    data.engineRunning = false;
+                    data.engineElapsed = ENGINE_RUNTIME_MS;
+                    saveData();
+                    stopEngine();
+                    showMessage("⏰ 24-hour cycle complete!", "info");
+                } else {
+                    data.engineElapsed = elapsed;
+                    data.lastEngineUpdate = now;
+                    saveData();
+                    if (!engineInterval) {
+                        engineInterval = setInterval(updateEngine, 1000);
+                    }
+                    if (!statsInterval) {
+                        statsInterval = setInterval(updateStats, 2000);
+                    }
+                    updateEngine();
+                }
+            }
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            if (!document.hidden) handleResume();
+        });
+
+        window.addEventListener("pageshow", handleResume);
+        window.addEventListener("focus", handleResume);
+
+        window.addEventListener("beforeunload", () => {
+            saveData();
+        });
+
+        // ============================================================
+        // INIT
+        // ============================================================
+
+        (async function init() {
+            console.log("🚀 AVERIQ — DUAL WALLET: META MASK + TON (CORRECTED)");
+            console.log("🦊 MetaMask + 💎 TON");
+
+            loadTheme();
+
+            // Restore wallet type
+            const savedType = localStorage.getItem(WALLET_TYPE_KEY) || 'metamask';
+            walletType = savedType;
+            selectWallet(walletType);
+
+            // Auto-connect
+            const connected = await autoConnectWallet();
+            if (connected) {
+                console.log("✅ Auto-connect successful!");
+            } else {
+                console.log("⏸️ No saved wallet found");
+                updateUI();
+            }
+
+            if (typeof show_11747882 === 'function') {
+                try { show_11747882('preload'); } catch (e) {}
+            }
+
+            const today = new Date().toISOString().slice(0, 10);
+            if (data.todayDate !== today) {
+                data.todayMined = 0;
+                data.todayDate = today;
+                saveData();
+            }
+
+            handleResume();
+            updateChart();
+            updateUI();
+            updateTaskUI();
+
+            if (data.engineRunning) {
+                const engineWrapper = $("engineWrapper");
+                const engineIcon = $("engineIcon");
+                const statusDot = $("statusDot");
+                const statusText = $("statusText");
+                const engineStatusText = $("engineStatusText");
+
+                engineWrapper.classList.add("active");
+                engineIcon.className = "engine-icon spinning";
+                statusDot.className = "dot";
+                statusText.textContent = "Running";
+                engineStatusText.textContent = "🟢 Running";
+                engineStatusText.className = "status-text running";
+
+                $("startBtn").innerHTML = '<span class="icon">⏹️</span>Stop Engine';
+                $("startBtn").className = "action-btn danger";
+            }
+
+            console.log("✅ Dual wallet support ready!");
+            console.log("🦊 MetaMask: Click Connect → MetaMask");
+            console.log("💎 TON: Click Connect → TON wallet");
+            console.log("📱 Works on Desktop, Mobile, AND Telegram!");
+        })();
+    </script>
+</body>
+</html>
