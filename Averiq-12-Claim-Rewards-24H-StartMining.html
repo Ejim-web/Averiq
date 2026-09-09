@@ -1,0 +1,2637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="theme-color" content="#0a0e17">
+    <title>Averiq — Mining Engine</title>
+
+    <!-- Monetag SDK -->
+    <script src="//libtl.com/sdk.js" data-zone="11747882" data-sdk="show_11747882"></script>
+
+    <!-- MetaMask Connect (current EVM SDK) -->
+    <script type="module">
+        import { createEVMClient } from "https://cdn.jsdelivr.net/npm/@metamask/connect-evm@2.1.1/+esm";
+        window.__AveriqCreateEVMClient = createEVMClient;
+        window.dispatchEvent(new Event("averiq-metamask-connect-ready"));
+    </script>
+
+    <!-- Ethers.js for Ethereum -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js">
+    </script>
+
+    <!-- TON Connect UI (current vanilla-JS wallet picker + mobile return flow) -->
+    <script src="https://unpkg.com/@tonconnect/ui@3.0.0/dist/tonconnect-ui.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg: #0a0e17;
+            --card: #111927;
+            --card2: #1a2332;
+            --text: #ffffff;
+            --muted: #7a8ba3;
+            --line: rgba(255, 255, 255, .06);
+            --accent: #00d4ff;
+            --accent2: #7c5cff;
+            --success: #00ff88;
+            --danger: #ff5d73;
+            --warning: #ffc857;
+            --gold: #ffd700;
+            --orange: #f5a623;
+            --green: #00ff88;
+            --ton: #0088cc;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        body {
+            padding-bottom: 90px;
+        }
+
+        button {
+            border: 0;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 520px;
+            margin: auto;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            padding: 12px 15px;
+            background: rgba(10, 14, 23, .95);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .logo {
+            width: 36px;
+            height: 36px;
+            flex: 0 0 36px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            font-weight: 900;
+            font-size: 14px;
+            box-shadow: 0 0 25px rgba(0, 212, 255, .2);
+        }
+
+        .brand h1 {
+            font-size: 16px;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        .live {
+            font-size: 10px;
+            color: var(--success);
+            margin-top: 2px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 7px;
+            flex-shrink: 0;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--card);
+            color: var(--text);
+            border: 1px solid var(--line);
+            font-size: 14px;
+        }
+
+        .connect-btn {
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #0098ea, #0088d4);
+            color: #fff;
+            font-weight: 700;
+            max-width: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .connect-btn:disabled {
+            opacity: .6;
+            cursor: wait;
+        }
+
+        .connect-btn.connected {
+            background: rgba(0, 152, 234, 0.15);
+            color: #0098ea;
+            border: 1px solid rgba(0, 152, 234, 0.2);
+        }
+
+        .connect-btn.ton-connected {
+            background: rgba(0, 136, 204, 0.15);
+            color: #0088cc;
+            border: 1px solid rgba(0, 136, 204, 0.2);
+        }
+
+        .wallet-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .wallet-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            background: var(--card);
+            border: 2px solid var(--line);
+            color: var(--text);
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .wallet-btn.active {
+            border-color: var(--accent);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .wallet-btn.metamask.active {
+            border-color: #f6851b;
+            background: rgba(246, 133, 27, 0.05);
+        }
+
+        .wallet-btn.ton.active {
+            border-color: #0088cc;
+            background: rgba(0, 136, 204, 0.05);
+        }
+
+        main {
+            padding: 12px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .mining-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0 12px;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 14px;
+        }
+
+        .mining-header .title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .mining-header .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .status-badge .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .status-badge .dot.idle {
+            background: var(--warning);
+            animation: none;
+        }
+
+        .engine-visual {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 30px 20px;
+            margin-bottom: 14px;
+            border: 1px solid var(--line);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .engine-visual::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(0, 212, 255, .05), transparent 60%);
+            pointer-events: none;
+        }
+
+        .engine-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .engine-wrapper {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 400px) {
+            .engine-wrapper {
+                width: 240px;
+                height: 240px;
+            }
+        }
+
+        @media (min-width: 500px) {
+            .engine-wrapper {
+                width: 280px;
+                height: 280px;
+            }
+        }
+
+        .engine-icon {
+            font-size: 140px;
+            line-height: 1;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s linear;
+            text-shadow: 0 0 60px rgba(0, 212, 255, .3);
+        }
+
+        @media (min-width: 400px) {
+            .engine-icon {
+                font-size: 170px;
+            }
+        }
+
+        @media (min-width: 500px) {
+            .engine-icon {
+                font-size: 200px;
+            }
+        }
+
+        .engine-icon.spinning {
+            animation: spinEngine 1s linear infinite;
+        }
+
+        .engine-icon.spinning-fast {
+            animation: spinEngine 0.3s linear infinite;
+        }
+
+        @keyframes spinEngine {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg) scale(1);
+            }
+            to {
+                transform: translate(-50%, -50%) rotate(360deg) scale(1);
+            }
+        }
+
+        .engine-glow-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 212, 255, .1);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: all 0.5s;
+        }
+
+        .engine-glow-ring:nth-child(1) {
+            width: 100%;
+            height: 100%;
+            border-color: rgba(0, 212, 255, .05);
+        }
+
+        .engine-glow-ring:nth-child(2) {
+            width: 85%;
+            height: 85%;
+            border-color: rgba(0, 212, 255, .08);
+        }
+
+        .engine-glow-ring:nth-child(3) {
+            width: 70%;
+            height: 70%;
+            border-color: rgba(0, 212, 255, .12);
+        }
+
+        .engine-wrapper.active .engine-glow-ring {
+            animation: pulseRing 2s ease-in-out infinite;
+        }
+
+        .engine-wrapper.active .engine-glow-ring:nth-child(1) {
+            animation-delay: 0s;
+        }
+        .engine-wrapper.active .engine-glow-ring:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+        .engine-wrapper.active .engine-glow-ring:nth-child(3) {
+            animation-delay: 1s;
+        }
+
+        @keyframes pulseRing {
+            0%,
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.05);
+                opacity: 1;
+            }
+        }
+
+        .engine-stats-below {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .engine-stats-below .stat-item {
+            text-align: center;
+        }
+
+        .engine-stats-below .stat-item .label {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .engine-stats-below .stat-item .value {
+            font-size: 24px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .engine-stats-below .stat-item .value.green {
+            background: linear-gradient(135deg, var(--success), #00cc66);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .engine-stats-below .stat-item .sub {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .stat-box {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid var(--line);
+        }
+
+        .stat-box .label {
+            font-size: 9px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-box .value {
+            font-size: 16px;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+
+        .stat-box .value.green {
+            color: var(--success);
+        }
+
+        .stat-box .value.gold {
+            color: var(--gold);
+        }
+
+        .stat-box .value.orange {
+            color: var(--orange);
+        }
+
+        .stat-box .value.red {
+            color: var(--danger);
+        }
+
+        .stat-box .value.cyan {
+            color: var(--accent);
+        }
+
+        .chart-container {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 14px;
+            border: 1px solid var(--line);
+        }
+
+        .chart-container .chart-title {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 80px;
+            gap: 4px;
+        }
+
+        .chart-bar-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .chart-bar {
+            width: 100%;
+            max-width: 20px;
+            border-radius: 4px 4px 0 0;
+            background: linear-gradient(180deg, var(--accent), var(--accent2));
+            transition: height 0.5s ease;
+            min-height: 4px;
+        }
+
+        .chart-bar.active {
+            background: linear-gradient(180deg, var(--success), #00cc66);
+        }
+
+        .chart-bar-label {
+            font-size: 7px;
+            color: var(--muted);
+        }
+
+        .temp-fan {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .temp-fan .item {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid var(--line);
+        }
+
+        .temp-fan .item .label {
+            font-size: 9px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .temp-fan .item .value {
+            font-size: 16px;
+            font-weight: 800;
+            margin-top: 3px;
+        }
+
+        .temp-fan .item .value.hot {
+            color: var(--orange);
+        }
+
+        .temp-fan .item .value.critical {
+            color: var(--danger);
+        }
+
+        .temp-fan .item .value.green {
+            color: var(--success);
+        }
+
+        .balance-card {
+            background:
+                radial-gradient(circle at 20% 10%, rgba(0, 212, 255, .08), transparent 30%),
+                radial-gradient(circle at 90% 90%, rgba(124, 92, 255, .1), transparent 35%),
+                var(--card);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 14px;
+        }
+
+        .balance-card .small {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .balance-card .balance {
+            font-size: 32px;
+            font-weight: 900;
+            margin: 4px 0;
+            background: linear-gradient(135deg, #ffd700, #f5a623);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .balance-card .unit {
+            font-size: 13px;
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .balance-card .wallet-status {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 8px;
+        }
+
+        .balance-card .wallet-status .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--danger);
+        }
+
+        .balance-card .wallet-status .dot.connected {
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .action-btn {
+            min-height: 48px;
+            padding: 12px;
+            border-radius: 12px;
+            color: var(--text);
+            background: var(--card);
+            border: 1px solid var(--line);
+            font-weight: 700;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+
+        .action-btn .icon {
+            font-size: 16px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .action-btn.primary {
+            color: #fff;
+            background: linear-gradient(135deg, var(--accent2), #4f8cff);
+            border-color: transparent;
+        }
+
+        .action-btn.success {
+            color: #04150d;
+            background: var(--success);
+            border-color: transparent;
+        }
+
+        .action-btn.danger {
+            color: var(--danger);
+            border-color: rgba(255, 93, 115, 0.3);
+        }
+
+        .action-btn.task-btn {
+            color: #fff;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            border-color: transparent;
+        }
+
+        .action-btn:active {
+            transform: scale(0.96);
+        }
+
+        .action-btn:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        .wallet-address {
+            background: var(--card2);
+            border-radius: 12px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 11px;
+            word-break: break-all;
+            margin: 10px 0;
+            border: 1px solid var(--line);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 520px;
+            z-index: 30;
+            padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+            background: rgba(10, 14, 23, .95);
+            backdrop-filter: blur(18px);
+            border-top: 1px solid var(--line);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .nav-btn {
+            background: transparent;
+            color: var(--muted);
+            padding: 7px 2px;
+            font-size: 10px;
+            font-weight: 700;
+            transition: color 0.2s;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .nav-btn.active {
+            color: var(--accent);
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 90px;
+            transform: translateX(-50%) translateY(20px);
+            width: calc(100% - 30px);
+            max-width: 480px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: #13243a;
+            color: #fff;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            opacity: 0;
+            pointer-events: none;
+            transition: .25s;
+            z-index: 200;
+            border: 1px solid rgba(255, 255, 255, .1);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success {
+            border-color: rgba(56, 229, 140, .4);
+        }
+
+        .toast.error {
+            border-color: rgba(255, 93, 115, .5);
+        }
+
+        .toast.info {
+            border-color: rgba(0, 212, 255, .4);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            border-top-color: #0098ea;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, .8);
+            padding: 20px;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+        }
+
+        .modal {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 24px 24px 15px 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .modal h2 {
+            margin-top: 0;
+        }
+
+        .modal .modal-icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .engine-status-overlay {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+            z-index: 2;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .engine-status-overlay .status-text {
+            color: var(--warning);
+        }
+
+        .engine-status-overlay .status-text.running {
+            color: var(--success);
+        }
+        .engine-start-btn {
+            position: absolute;
+            left: 50%;
+            bottom: 52px;
+            transform: translateX(-50%);
+            z-index: 5;
+            min-width: 180px;
+            min-height: 46px;
+            padding: 11px 18px;
+            border-radius: 14px;
+            color: #04150d;
+            background: var(--success);
+            font-weight: 900;
+            font-size: 13px;
+            box-shadow: 0 8px 28px rgba(0,255,136,.22);
+        }
+        .engine-start-btn:active { transform: translateX(-50%) scale(.97); }
+        .engine-start-btn.stop {
+            color: #fff;
+            background: rgba(255,93,115,.92);
+            box-shadow: 0 8px 28px rgba(255,93,115,.18);
+        }
+        .engine-start-btn:disabled { opacity: .55; cursor: wait; }
+        .engine-start-btn .icon { margin-right: 6px; }
+
+
+        @media (max-width: 390px) {
+            .brand h1 {
+                font-size: 14px;
+            }
+            .connect-btn {
+                padding: 8px 12px;
+                max-width: 120px;
+                font-size: 11px;
+            }
+            .engine-wrapper {
+                width: 160px;
+                height: 160px;
+            }
+            .engine-icon {
+                font-size: 110px;
+            }
+            .engine-stats-below .stat-item .value {
+                font-size: 18px;
+            }
+            .balance-card .balance {
+                font-size: 26px;
+            }
+            .engine-visual {
+                min-height: 240px;
+                padding: 20px 15px;
+            }
+        }
+
+        @media (min-width: 600px) {
+            body {
+                background: #060a12;
+            }
+            .app {
+                background: var(--bg);
+            }
+        }
+        /* Optional light theme */
+        body.light {
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --card2: #eef2f7;
+            --text: #101828;
+            --muted: #667085;
+            --line: rgba(16, 24, 40, .10);
+        }
+
+        body.light header,
+        body.light .bottom-nav {
+            background: rgba(244, 247, 251, .95);
+        }
+
+        body.light .engine-status-overlay {
+            background: rgba(255, 255, 255, .9);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <header>
+            <div class="top">
+                <div class="brand">
+                    <div class="logo">A</div>
+                    <div>
+                        <h1>AVERIQ</h1>
+                        <div class="live">● Engine Online</div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="icon-btn" id="themeBtn" type="button">☀️</button>
+                    <button class="connect-btn" id="connectBtn" type="button">
+                        <span id="connectText">Connect Wallet</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+
+            <section class="page active" id="homePage">
+
+                <div class="mining-header">
+                    <div class="title">⚡ Mining Engine</div>
+                    <div class="status-badge">
+                        <span class="dot" id="statusDot"></span>
+                        <span id="statusText">Idle</span>
+                    </div>
+                </div>
+
+                <!-- Wallet Selector -->
+                <div class="wallet-selector">
+                    <button class="wallet-btn metamask active" id="walletMetaMask" onclick="selectWallet('metamask')">
+                        🦊 MetaMask
+                    </button>
+                    <button class="wallet-btn ton" id="walletTON" onclick="selectWallet('ton')">
+                        💎 TON
+                    </button>
+                </div>
+
+                <div class="engine-visual">
+                    <div class="engine-display">
+                        <div class="engine-wrapper" id="engineWrapper">
+                            <div class="engine-glow-ring"></div>
+                            <div class="engine-glow-ring"></div>
+                            <div class="engine-glow-ring"></div>
+                            <div class="engine-icon" id="engineIcon">⚙️</div>
+                        </div>
+                        <div class="engine-status-overlay">
+                            Status: <span class="status-text idle" id="engineStatusText">⏸️ Idle</span>
+                        </div>
+                        <button class="engine-start-btn" id="engineStartBtn" type="button">
+                            <span class="icon">⚙️</span><span id="engineStartBtnText">Start Mining</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="engine-stats-below">
+                    <div class="stat-item">
+                        <div class="label">Hashrate</div>
+                        <div class="value green" id="hashrate">125.67</div>
+                        <div class="sub">TH/s</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="label">Efficiency</div>
+                        <div class="value gold" id="efficiency">99.85%</div>
+                        <div class="sub">Accepted / Rejected</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="label">Time Remaining</div>
+                        <div class="value cyan" id="timeRemaining">24:00:00</div>
+                        <div class="sub">Hours</div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="label">Accepted</div>
+                        <div class="value green" id="accepted">842,391</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">Rejected</div>
+                        <div class="value red" id="rejected">1,234</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">Sessions</div>
+                        <div class="value cyan" id="sessionsCount">0</div>
+                    </div>
+                </div>
+
+                <div class="balance-card">
+                    <div class="small" id="balanceLabel">Your AVQ Balance</div>
+                    <div class="balance" id="balance">0.0000</div>
+                    <div class="unit" id="balanceUnit">AVQ</div>
+                    <div class="wallet-status">
+                        <span class="dot" id="walletDot"></span>
+                        <span id="walletStatus">Wallet not connected</span>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">📊 Mining Performance</div>
+                    <div class="chart-bars" id="chartBars">
+                        <div class="chart-bar-wrap"><div class="chart-bar" style="height:30%"></div><span class="chart-bar-label">12:00</span></div>
+                        <div class="chart-bar-wrap"><div class="chart-bar" style="height:50%"></div><span class="chart-bar-label">14:00</span></div>
+                        <div class="chart-bar-wrap"><div class="chart-bar" style="height:70%"></div><span class="chart-bar-label">16:00</span></div>
+                        <div class="chart-bar-wrap"><div class="chart-bar active" style="height:90%"></div><span class="chart-bar-label">18:00</span></div>
+                        <div class="chart-bar-wrap"><div class="chart-bar" style="height:60%"></div><span class="chart-bar-label">20:00</span></div>
+                    </div>
+                </div>
+
+                <div class="temp-fan">
+                    <div class="item">
+                        <div class="label">🌡️ Temperature</div>
+                        <div class="value hot" id="temperature">62°C</div>
+                    </div>
+                    <div class="item">
+                        <div class="label">🌀 Fan Speed</div>
+                        <div class="value green" id="fanSpeed">4,200 RPM</div>
+                    </div>
+                    <div class="item">
+                        <div class="label">⚡ Power</div>
+                        <div class="value cyan" id="power">2,000W</div>
+                    </div>
+                </div>
+
+                <div class="button-grid">
+                    <button class="action-btn primary" id="startBtn" type="button" style="display:none;">
+                        <span class="icon">⚙️</span>Start Engine
+                    </button>
+                    <button class="action-btn success" id="claimBtn" type="button">
+                        <span class="icon">🎁</span>Claim
+                    </button>
+                    <button class="action-btn" id="checkinBtn" type="button">
+                        <span class="icon">✅</span>Check-In
+                    </button>
+                    <button class="action-btn task-btn" id="tasksBtn" type="button">
+                        <span class="icon">📋</span>Tasks
+                    </button>
+                </div>
+
+            </section>
+
+            <section class="page" id="tasksPage">
+                <div class="balance-card">
+                    <div class="small">📋 Tasks & Rewards</div>
+                    <div class="balance" style="font-size:28px;" id="tasksBalance">0.0000</div>
+                    <div class="unit">AVQ</div>
+                </div>
+                <div class="stats-grid" style="grid-template-columns:1fr;">
+                    <div class="stat-box" style="padding:16px;text-align:left;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                            <span class="label">📺 Watch 2 Videos</span>
+                            <span style="color:var(--gold);font-weight:700;">+0.15 AVQ</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span class="label" style="font-size:11px;">Progress: 0/2</span>
+                            <button class="action-btn primary" style="min-height:28px;padding:4px 12px;font-size:10px;" onclick="startTask('task1')">Go</button>
+                        </div>
+                    </div>
+                    <div class="stat-box" style="padding:16px;text-align:left;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                            <span class="label">✅ Complete Check-In</span>
+                            <span style="color:var(--gold);font-weight:700;">+0.10 AVQ</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span class="label" style="font-size:11px;">Progress: 0/1</span>
+                            <button class="action-btn primary" style="min-height:28px;padding:4px 12px;font-size:10px;" onclick="startTask('task2')">Go</button>
+                        </div>
+                    </div>
+                    <div class="stat-box" style="padding:16px;text-align:left;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                            <span class="label">⛏️ Mine 0.1 AVQ</span>
+                            <span style="color:var(--gold);font-weight:700;">+0.20 AVQ</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span class="label" style="font-size:11px;">Progress: 0/1</span>
+                            <button class="action-btn primary" style="min-height:28px;padding:4px 12px;font-size:10px;" onclick="startTask('task3')">Go</button>
+                        </div>
+                    </div>
+                </div>
+                <div style="background:var(--card);border-radius:16px;padding:16px;border:1px solid var(--line);">
+                    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">📋 How It Works</div>
+                    <div style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6;">
+                        <strong>1.</strong> Click "Go" on any task<br>
+                        <strong>2.</strong> Watch the video<br>
+                        <strong>3.</strong> Earn rewards instantly!
+                    </div>
+                </div>
+            </section>
+
+            <section class="page" id="claimPage">
+                <div class="balance-card">
+                    <div class="small">Claimable Rewards</div>
+                    <div class="balance" id="claimPageBalance">0.0000</div>
+                    <div class="unit">AVQ</div>
+                </div>
+                <div style="background:var(--card);border-radius:16px;padding:16px;border:1px solid var(--line);margin-bottom:14px;">
+                    <div style="font-size:14px;font-weight:800;">🎁 Reward Center</div>
+                    <div style="font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5;">
+                        Tap <strong>Go</strong> to watch a rewarded ad. After the ad completes, that reward is added to your app balance. Each reward becomes available again after 4 hours.
+                    </div>
+                </div>
+                <div id="claimRewardsGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;"></div>
+            </section>
+
+            <section class="page" id="walletPage">
+                <div style="background:var(--card);border-radius:16px;padding:16px;border:1px solid var(--line);">
+                    <div style="font-size:14px;font-weight:700;margin-bottom:8px;">👛 Wallet</div>
+                    <div style="font-size:11px;color:var(--muted);">Connection status</div>
+                    <div style="margin-top:8px;font-weight:900;" id="walletPageStatus">Not connected</div>
+                    <div class="wallet-address" id="walletAddress">No wallet connected</div>
+                    <div style="margin:10px 0;display:flex;gap:8px;">
+                        <button class="action-btn primary" style="flex:1;min-height:40px;padding:8px;font-size:10px;" id="walletConnectPageBtn">
+                            <span id="walletPageConnectText">Connect Wallet</span>
+                        </button>
+                        <button class="action-btn danger" style="flex:1;min-height:40px;padding:8px;font-size:10px;" id="disconnectBtn">Disconnect</button>
+                    </div>
+                </div>
+                <div style="background:var(--card);border-radius:16px;padding:16px;border:1px solid var(--line);margin-top:12px;">
+                    <div style="font-size:14px;font-weight:700;margin-bottom:8px;">🔒 Security</div>
+                    <div style="font-size:11px;color:var(--muted);">Never enter your Secret Recovery Phrase or private key into Averiq.</div>
+                </div>
+            </section>
+
+        </main>
+
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-page="homePage" type="button">
+                <span class="nav-icon">🏠</span>Home
+            </button>
+            <button class="nav-btn" data-page="tasksPage" type="button">
+                <span class="nav-icon">📋</span>Tasks
+            </button>
+            <button class="nav-btn" data-page="claimPage" type="button">
+                <span class="nav-icon">💰</span>Claim
+            </button>
+            <button class="nav-btn" data-page="walletPage" type="button">
+                <span class="nav-icon">👛</span>Wallet
+            </button>
+        </nav>
+
+    </div>
+
+    <div class="modal-backdrop" id="adOverlay" style="display:none;">
+        <div class="modal">
+            <div class="modal-icon">📺</div>
+            <h2>Loading Video...</h2>
+            <p style="color:var(--muted);margin:10px 0;">Please wait</p>
+            <div class="spinner" style="margin:20px auto;"></div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        "use strict";
+
+        // ============================================================
+        // AVERIQ — CORRECTED MINING ENGINE + METAMASK
+        // ============================================================
+        // IMPORTANT:
+        // This browser engine is a client-side reward simulator/ledger.\n        // The deployed AVQ contract is used for reading the real on-chain token balance.
+        // It does NOT mine cryptocurrency with the device and it does
+        // NOT transfer AVQ on-chain. Real payouts require a secure
+        // backend and/or claim smart contract.
+
+        const ENGINE_RUNTIME_HOURS = 24;
+        const ENGINE_RUNTIME_MS = ENGINE_RUNTIME_HOURS * 60 * 60 * 1000;
+        const DAILY_LIMIT = 1;
+        const REWARD_PER_SECOND = DAILY_LIMIT / (ENGINE_RUNTIME_HOURS * 60 * 60);
+        const CLAIM_INTERVAL_MS = 10 * 60 * 1000;
+        const CLAIM_REWARD_COOLDOWN_MS = 4 * 60 * 60 * 1000;
+        const CLAIM_SLOT_REWARD = 0.05;
+        const CLAIM_SLOT_COUNT = 12;
+        const CHECKIN_REWARD = 0.25;
+
+        const SEPOLIA_CHAIN_ID = "0xaa36a7";
+        const SEPOLIA_CHAIN_HEX = "0xaa36a7";
+        const SEPOLIA_RPC = "https://ethereum-sepolia.publicnode.com";
+        const SEPOLIA_EXPLORER = "https://sepolia.etherscan.io";
+
+        // DEPLOYED AVERIQ (AVQ) ERC-20 CONTRACT — SEPOLIA
+        // Contract: 0x586e4A56b8fCA07fa5172D55e8Cdc050A983b6C9
+        // Chain ID: 11155111 (Sepolia)
+        const AVQ_TOKEN_ADDRESS = "0x586e4A56b8fCA07fa5172D55e8Cdc050A983b6C9";
+        const AVQ_DECIMALS = 18;
+        const AVQ_ABI = [
+            "function balanceOf(address owner) view returns (uint256)",
+            "function decimals() view returns (uint8)"
+        ];
+
+        const STORAGE_KEY = "averiq_engine_data";
+        const LEGACY_STORAGE_KEYS = ["averiq_data_v2", "averiq_engine_data"];
+        const WALLET_KEY = "averiq_wallet";
+        const WALLET_CONNECTED_KEY = "averiq_wallet_connected";
+        const WALLET_TYPE_KEY = "averiq_wallet_type";
+        const THEME_KEY = "averiq_theme";
+
+        const DEFAULT_DATA = {
+            balance: 0,
+            claimable: 0,
+            totalEarned: 0,
+            totalClaimed: 0,
+            sessions: 0,
+            checks: 0,
+            streak: 0,
+            lastCheckIn: null,
+            todayMined: 0,
+            todayDate: new Date().toISOString().slice(0, 10),
+            engineRunning: false,
+            engineStartTime: 0,
+            engineElapsed: 0,
+            lastClaimTime: 0,
+            lastEngineUpdate: 0,
+            accepted: 842391,
+            rejected: 1234,
+            efficiency: 99.85,
+            hashrate: 125.67,
+            temperature: 62,
+            fanSpeed: 4200,
+            power: 2000,
+            tasks: { task1: 0, task2: 0, task3: 0 },
+            claimSlots: Array.from({length: 12}, () => ({ claimedAt: 0 }))
+        };
+
+        let data = loadData();
+        let walletConnected = false;
+        let walletAddress = null;
+        let walletType = "metamask";
+        let isConnecting = false;
+        let isAdPlaying = false;
+        let engineInterval = null;
+        let statsInterval = null;
+        let lastChainBalance = null;
+        let metaMaskProvider = null;
+        let listenersAttachedTo = null;
+        let tonConnectUI = null;
+        let tonStatusUnsubscribe = null;
+
+        function $(id) { return document.getElementById(id); }
+
+        // ============================================================
+        // STORAGE
+        // ============================================================
+        function todayKey() {
+            // Keep the app's daily cycle based on the user's local date.
+            const d = new Date();
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, "0");
+            const day = String(d.getDate()).padStart(2, "0");
+            return `${y}-${m}-${day}`;
+        }
+
+        function loadData() {
+            let saved = null;
+            try {
+                for (const key of LEGACY_STORAGE_KEYS) {
+                    const raw = localStorage.getItem(key);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (parsed && typeof parsed === "object") {
+                            saved = parsed;
+                            break;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn("Could not load saved data:", error);
+            }
+
+            const merged = {
+                ...DEFAULT_DATA,
+                ...(saved || {}),
+                tasks: { ...DEFAULT_DATA.tasks, ...((saved && saved.tasks) || {}) },
+                claimSlots: Array.from({length: CLAIM_SLOT_COUNT}, (_, i) => ({
+                    claimedAt: Number(saved?.claimSlots?.[i]?.claimedAt) || 0
+                }))
+            };
+
+            const today = todayKey();
+            if (merged.todayDate !== today) {
+                merged.todayMined = 0;
+                merged.todayDate = today;
+                // A completed previous-day cycle should be allowed to start again.
+                if (!merged.engineRunning) merged.engineElapsed = 0;
+            }
+
+            // Sanitize numeric fields so corrupted localStorage does not break the UI.
+            [
+                "balance", "claimable", "totalEarned", "totalClaimed", "sessions",
+                "checks", "streak", "todayMined", "engineStartTime", "engineElapsed",
+                "lastClaimTime", "lastEngineUpdate", "accepted", "rejected",
+                "efficiency", "hashrate", "temperature", "fanSpeed", "power"
+            ].forEach(key => {
+                const n = Number(merged[key]);
+                if (!Number.isFinite(n)) merged[key] = DEFAULT_DATA[key];
+            });
+
+            return merged;
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            } catch (error) {
+                console.error("Unable to save data:", error);
+            }
+        }
+
+        // ============================================================
+        // HELPERS
+        // ============================================================
+        function cleanNumber(value) {
+            const n = Number(value);
+            return Number.isFinite(n) ? Math.max(0, n) : 0;
+        }
+
+        function formatNumber(value) {
+            return cleanNumber(value).toFixed(4);
+        }
+
+        function shortAddress(address) {
+            if (!address) return "Not connected";
+            return address.length < 12 ? address : `${address.slice(0, 6)}...${address.slice(-4)}`;
+        }
+
+        function formatTime(ms) {
+            const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+        }
+
+        function randomBetween(min, max) {
+            return Math.round((Math.random() * (max - min) + min) * 100) / 100;
+        }
+
+        function showMessage(message, type = "") {
+            const toast = $("toast");
+            if (!toast) return;
+            toast.textContent = message;
+            toast.className = "toast show " + type;
+            clearTimeout(showMessage.timer);
+            showMessage.timer = setTimeout(() => toast.className = "toast", 3000);
+        }
+
+        function canMineToday() {
+            // A mining session is exactly 24 hours. When one session ends,
+            // the user may start a fresh session by watching the start ad.
+            return true;
+        }
+
+        // ============================================================
+        // METAMASK CONNECT — CURRENT MOBILE/WEB CONNECTION
+        // ============================================================
+        let metaMaskConnectClient = null;
+        let metaMaskConnectReady = false;
+        let metaMaskConnectPromise = null;
+
+        function isMobileDevice() {
+            return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
+        }
+
+        function getDappDeepLink() {
+            const dappUrl = window.location.host + window.location.pathname + window.location.search + window.location.hash;
+            return `https://metamask.app.link/dapp/${dappUrl}`;
+        }
+
+        async function initMetaMaskConnect() {
+            if (metaMaskConnectReady && metaMaskConnectClient) return metaMaskConnectClient;
+            if (metaMaskConnectPromise) return metaMaskConnectPromise;
+
+            metaMaskConnectPromise = (async () => {
+                try {
+                    if (typeof window.__AveriqCreateEVMClient !== "function") {
+                        await new Promise(resolve => {
+                            if (typeof window.__AveriqCreateEVMClient === "function") return resolve();
+                            window.addEventListener("averiq-metamask-connect-ready", resolve, { once: true });
+                            setTimeout(resolve, 5000);
+                        });
+                    }
+
+                    if (typeof window.__AveriqCreateEVMClient !== "function") {
+                        throw new Error("MetaMask Connect library did not load.");
+                    }
+
+                    metaMaskConnectClient = await window.__AveriqCreateEVMClient({
+                        dapp: {
+                            name: "Averiq",
+                            url: window.location.origin
+                        },
+                        api: {
+                            supportedNetworks: {
+                                [SEPOLIA_CHAIN_HEX]: SEPOLIA_RPC
+                            }
+                        },
+                        eventHandlers: {
+                            accountsChanged: (accounts) => {
+                                if (!accounts || accounts.length === 0) return;
+                                persistMetaMaskAddress(accounts[0]);
+                            },
+                            chainChanged: (chainId) => {
+                                if (String(chainId).toLowerCase() !== SEPOLIA_CHAIN_ID) {
+                                    showMessage("⚠️ Please switch MetaMask to Sepolia.", "error");
+                                }
+                            }
+                        }
+                    });
+
+                    metaMaskConnectReady = true;
+                    return metaMaskConnectClient;
+                } catch (error) {
+                    console.warn("MetaMask Connect initialization failed:", error);
+                    return null;
+                } finally {
+                    metaMaskConnectPromise = null;
+                }
+            })();
+
+            return metaMaskConnectPromise;
+        }
+
+        function persistMetaMaskAddress(address) {
+            if (!address) return;
+            try {
+                walletAddress = ethers.utils.getAddress(address);
+            } catch (_) {
+                walletAddress = address;
+            }
+            walletConnected = true;
+            walletType = "metamask";
+            localStorage.setItem(WALLET_KEY, walletAddress);
+            localStorage.setItem(WALLET_CONNECTED_KEY, "true");
+            localStorage.setItem(WALLET_TYPE_KEY, "metamask");
+            updateWalletUI(walletAddress);
+            updateUI();
+        }
+
+        async function getMetaMaskProvider() {
+            // Prefer a native MetaMask provider when one is actually present.
+            if (window.ethereum) {
+                const ethereum = window.ethereum;
+                if (Array.isArray(ethereum.providers)) {
+                    const mm = ethereum.providers.find(p => p && p.isMetaMask);
+                    if (mm) return mm;
+                }
+                if (ethereum.isMetaMask) return ethereum;
+            }
+
+            // Otherwise use the current MetaMask Connect provider. It is
+            // specifically designed for Chrome/Safari -> MetaMask Mobile
+            // deeplink connections and session persistence.
+            const client = await initMetaMaskConnect();
+            if (client) {
+                try {
+                    return client.getProvider();
+                } catch (error) {
+                    console.warn("MetaMask Connect provider unavailable:", error);
+                }
+            }
+            return null;
+        }
+
+        async function openMetaMaskMobile() {
+            if (!window.location.host || window.location.protocol === "file:") {
+                showMessage("Host this site on HTTPS (for example Vercel) before using mobile MetaMask.", "error");
+                return;
+            }
+
+            const client = await initMetaMaskConnect();
+            if (client) {
+                try {
+                    const result = await client.connect({
+                        chainIds: [SEPOLIA_CHAIN_HEX],
+                        forceRequest: false
+                    });
+                    if (result && result.accounts && result.accounts.length) {
+                        persistMetaMaskAddress(result.accounts[0]);
+                        const provider = client.getProvider();
+                        metaMaskProvider = provider;
+                        attachMetaMaskListeners(provider);
+                        try { await loadAVQBalance(walletAddress); } catch (_) {}
+                        updateWalletUI(walletAddress);
+                        updateUI();
+                        showMessage("✅ MetaMask connected and session saved!", "success");
+                    }
+                    return;
+                } catch (error) {
+                    console.warn("MetaMask Connect mobile handoff failed:", error);
+                }
+            }
+
+            window.location.href = getDappDeepLink();
+        }
+
+        async function switchToSepolia(provider) {
+            const current = String(await provider.request({ method: "eth_chainId" })).toLowerCase();
+            if (current === SEPOLIA_CHAIN_ID) return true;
+
+            try {
+                await provider.request({
+                    method: "wallet_switchEthereumChain",
+                    params: [{ chainId: SEPOLIA_CHAIN_HEX }]
+                });
+                return true;
+            } catch (error) {
+                if (error && (error.code === 4902 || error.code === -32603)) {
+                    await provider.request({
+                        method: "wallet_addEthereumChain",
+                        params: [{
+                            chainId: SEPOLIA_CHAIN_HEX,
+                            chainName: "Sepolia",
+                            nativeCurrency: { name: "Sepolia Ether", symbol: "ETH", decimals: 18 },
+                            rpcUrls: [SEPOLIA_RPC],
+                            blockExplorerUrls: [SEPOLIA_EXPLORER]
+                        }]
+                    });
+                    return true;
+                }
+                throw error;
+            }
+        }
+
+        function attachMetaMaskListeners(provider) {
+            if (!provider || listenersAttachedTo === provider) return;
+            listenersAttachedTo = provider;
+
+            provider.on?.("accountsChanged", async (accounts) => {
+                // Never let a background MetaMask event overwrite a TON session.
+                if (localStorage.getItem(WALLET_TYPE_KEY) !== "metamask") return;
+
+                if (!accounts || accounts.length === 0) {
+                    // IMPORTANT: A provider disconnect while the phone changes
+                    // apps is not an explicit user disconnect. Keep the saved
+                    // wallet session and let the return/reconnect logic recover it.
+                    updateWalletUI(walletAddress || localStorage.getItem(WALLET_KEY));
+                    return;
+                }
+                persistMetaMaskAddress(accounts[0]);
+                await loadAVQBalance(walletAddress);
+                updateUI();
+            });
+
+            provider.on?.("chainChanged", async (chainId) => {
+                if (localStorage.getItem(WALLET_TYPE_KEY) !== "metamask") return;
+
+                if (String(chainId).toLowerCase() !== SEPOLIA_CHAIN_ID) {
+                    showMessage("⚠️ Please switch MetaMask to Sepolia.", "error");
+                    return;
+                }
+                if (walletAddress) await loadAVQBalance(walletAddress);
+                updateUI();
+            });
+
+            provider.on?.("disconnect", () => {
+                // MetaMask must never change the wallet type while TON is active.
+                if (localStorage.getItem(WALLET_TYPE_KEY) !== "metamask") return;
+
+                // Do not clear localStorage here. MetaMask Mobile can emit a
+                // transient disconnect while returning from the wallet app.
+                walletConnected = true;
+                walletType = "metamask";
+                walletAddress = walletAddress || localStorage.getItem(WALLET_KEY);
+                if (walletAddress) {
+                    localStorage.setItem(WALLET_CONNECTED_KEY, "true");
+                    localStorage.setItem(WALLET_TYPE_KEY, "metamask");
+                    updateWalletUI(walletAddress);
+                }
+            });
+        }
+
+        async function connectMetaMask() {
+            if (isConnecting) return;
+            if (walletConnected && walletType === "metamask") {
+                showMessage("✅ MetaMask is already connected.", "info");
+                return;
+            }
+
+            const button = $("connectBtn");
+            const connectText = $("connectText");
+            isConnecting = true;
+            if (button) button.disabled = true;
+            if (connectText) connectText.innerHTML = '<span class="spinner"></span>';
+
+            try {
+                const client = await initMetaMaskConnect();
+                let provider = client ? client.getProvider() : null;
+                let accounts = [];
+
+                if (client) {
+                    const result = await client.connect({
+                        chainIds: [SEPOLIA_CHAIN_HEX],
+                        forceRequest: false
+                    });
+                    accounts = result?.accounts || [];
+                    provider = client.getProvider();
+                } else if (window.ethereum) {
+                    provider = await getMetaMaskProvider();
+                    accounts = await provider.request({ method: "eth_requestAccounts" });
+                    await switchToSepolia(provider);
+                } else if (isMobileDevice()) {
+                    showMessage("📱 Opening MetaMask…", "info");
+                    await openMetaMaskMobile();
+                    return;
+                } else {
+                    showMessage("🦊 MetaMask is not available.", "error");
+                    window.open("https://metamask.io/download/", "_blank", "noopener,noreferrer");
+                    return;
+                }
+
+                if (!accounts.length) throw new Error("No MetaMask account returned.");
+
+                persistMetaMaskAddress(accounts[0]);
+                walletConnected = true;
+                walletType = "metamask";
+                metaMaskProvider = provider;
+                attachMetaMaskListeners(provider);
+
+                // Wallet connection is already successful here. The public
+                // token RPC is a separate read and must not cause a false
+                // MetaMask connection error if it temporarily fails.
+                try { await loadAVQBalance(walletAddress); } catch (_) {}
+                updateWalletUI(walletAddress);
+                updateUI();
+                showMessage("✅ MetaMask connected on Sepolia!", "success");
+            } catch (error) {
+                console.error("MetaMask connection error:", error);
+                if (error?.code === 4001) showMessage("❌ MetaMask connection was rejected.", "error");
+                else if (error?.code === 4902) showMessage("❌ Sepolia could not be added to MetaMask.", "error");
+                else showMessage("❌ MetaMask connection failed. Please try Connect Wallet again.", "error");
+            } finally {
+                isConnecting = false;
+                if (button) button.disabled = false;
+                if (walletAddress) updateWalletUI(walletAddress);
+            }
+        }
+
+        async function autoConnectMetaMask() {
+            const savedType = localStorage.getItem(WALLET_TYPE_KEY) || "metamask";
+            const savedWallet = localStorage.getItem(WALLET_KEY);
+            const savedConnected = localStorage.getItem(WALLET_CONNECTED_KEY) === "true";
+
+            walletType = savedType;
+            selectWallet(walletType);
+
+            if (!savedConnected || !savedWallet || savedType !== "metamask") return false;
+
+            walletAddress = savedWallet;
+            walletConnected = true;
+            updateWalletUI(walletAddress);
+
+            await refreshMetaMaskSession(false);
+            return true;
+        }
+
+        async function refreshMetaMaskSession(showErrors = false) {
+            // Never let MetaMask restore/overwrite a TON wallet session.
+            if (localStorage.getItem(WALLET_TYPE_KEY) !== "metamask") return false;
+
+            const savedWallet = localStorage.getItem(WALLET_KEY);
+            const savedConnected = localStorage.getItem(WALLET_CONNECTED_KEY) === "true";
+            if (!savedConnected || !savedWallet) return false;
+
+            walletAddress = walletAddress || savedWallet;
+            walletConnected = true;
+            walletType = "metamask";
+            updateWalletUI(walletAddress);
+
+            try {
+                const client = await initMetaMaskConnect();
+                if (!client) {
+                    updateWalletUI(walletAddress);
+                    return false;
+                }
+
+                const provider = client.getProvider();
+                if (!provider) {
+                    updateWalletUI(walletAddress);
+                    return false;
+                }
+
+                metaMaskProvider = provider;
+                attachMetaMaskListeners(provider);
+
+                // MetaMask Connect keeps the remote mobile session. Prefer the
+                // SDK account first, then silently ask the EIP-1193 provider.
+                let account = null;
+                try {
+                    account = client.getAccount?.() || null;
+                } catch (_) {}
+
+                if (!account) {
+                    try {
+                        const accounts = await provider.request({ method: "eth_accounts" });
+                        account = accounts && accounts[0] ? accounts[0] : null;
+                    } catch (_) {}
+                }
+
+                if (account) {
+                    persistMetaMaskAddress(account);
+                    // Reading the token balance is optional. A temporary RPC
+                    // failure must never turn a successful wallet connection
+                    // into a "MetaMask connection failed" message.
+                    try { await loadAVQBalance(walletAddress); } catch (_) {}
+                    updateWalletUI(walletAddress);
+                    updateUI();
+                    return true;
+                }
+
+                // Keep the saved wallet visible while the mobile relay is
+                // reconnecting after the user returns from MetaMask.
+                updateWalletUI(walletAddress);
+                updateUI();
+                return false;
+            } catch (error) {
+                console.warn("MetaMask session refresh failed:", error);
+                if (showErrors) showMessage("⚠️ Could not refresh MetaMask connection.", "error");
+                updateWalletUI(walletAddress);
+                updateUI();
+                return false;
+            }
+        }
+
+        async function syncMetaMaskAfterReturn() {
+            // IMPORTANT: TON and MetaMask use the same visible wallet state in
+            // the UI, so MetaMask must never run while TON is selected.
+            if (localStorage.getItem(WALLET_TYPE_KEY) !== "metamask") return;
+
+            const savedWallet = localStorage.getItem(WALLET_KEY);
+            const savedConnected = localStorage.getItem(WALLET_CONNECTED_KEY) === "true";
+            if (!savedConnected || !savedWallet) return;
+
+            // Restore the UI immediately on every return, before waiting for
+            // MetaMask Connect to re-establish the transport.
+            walletAddress = savedWallet;
+            walletConnected = true;
+            walletType = "metamask";
+            updateWalletUI(walletAddress);
+            updateUI();
+
+            const delays = [0, 300, 800, 1500, 3000, 5000, 8000];
+            for (const delay of delays) {
+                if (delay) await new Promise(resolve => setTimeout(resolve, delay));
+                if (localStorage.getItem(WALLET_CONNECTED_KEY) !== "true") return;
+                const restored = await refreshMetaMaskSession(false);
+                if (restored || walletAddress) updateWalletUI(walletAddress);
+                if (restored) break;
+            }
+        }
+
+        function startMetaMaskSessionWatcher() {
+            if (window.__averiqMetaMaskWatcher) return;
+            window.__averiqMetaMaskWatcher = setInterval(() => {
+                if (
+                    localStorage.getItem(WALLET_CONNECTED_KEY) === "true" &&
+                    localStorage.getItem(WALLET_TYPE_KEY) === "metamask"
+                ) {
+                    syncMetaMaskAfterReturn();
+                }
+            }, 5000);
+        }
+
+        // ============================================================
+        // TON CONNECT — REAL WALLET UI + MOBILE/TELEGRAM RETURN SUPPORT
+        // ============================================================
+        // TON Connect UI is the official UI layer for vanilla JavaScript.
+        // It provides the wallet picker, universal/deep links and session
+        // restoration. The manifest must be publicly reachable at the same
+        // site path as this page.
+        function getTONManifestURL() {
+            return new URL("tonconnect-manifest.json", window.location.href).href;
+        }
+
+        function persistTONWallet(address) {
+            if (!address) return;
+            walletAddress = address;
+            walletConnected = true;
+            walletType = "ton";
+            localStorage.setItem(WALLET_KEY, address);
+            localStorage.setItem(WALLET_CONNECTED_KEY, "true");
+            localStorage.setItem(WALLET_TYPE_KEY, "ton");
+        }
+
+        function clearTONWalletState() {
+            if (walletType === "ton") {
+                walletConnected = false;
+                walletAddress = null;
+                localStorage.removeItem(WALLET_KEY);
+                localStorage.removeItem(WALLET_CONNECTED_KEY);
+                localStorage.removeItem(WALLET_TYPE_KEY);
+                updateWalletUI(null);
+                updateUI();
+            }
+        }
+
+        async function initTONConnectUI() {
+            if (tonConnectUI) return tonConnectUI;
+
+            if (!window.TON_CONNECT_UI || !window.TON_CONNECT_UI.TonConnectUI) {
+                throw new Error("TON Connect UI library did not load.");
+            }
+
+            tonConnectUI = new window.TON_CONNECT_UI.TonConnectUI({
+                manifestUrl: getTONManifestURL(),
+                restoreConnection: true,
+                buttonRootId: null
+            });
+
+            tonStatusUnsubscribe = tonConnectUI.onStatusChange((wallet) => {
+                if (wallet && wallet.account) {
+                    persistTONWallet(wallet.account.address);
+                    updateWalletUI(wallet.account.address);
+                    updateUI();
+                    console.log("💎 TON wallet connected:", wallet.account.address);
+                } else if (walletType === "ton") {
+                    clearTONWalletState();
+                    console.log("💎 TON wallet disconnected");
+                }
+            });
+
+            // Wait until TON Connect has finished restoring its persisted
+            // session. This prevents a false "not connected" state on reload.
+            try {
+                const restored = await tonConnectUI.connectionRestored;
+                if (restored && tonConnectUI.wallet?.account) {
+                    persistTONWallet(tonConnectUI.wallet.account.address);
+                    updateWalletUI(walletAddress);
+                    updateUI();
+                }
+            } catch (e) {
+                console.warn("TON connection restore warning:", e);
+            }
+
+            return tonConnectUI;
+        }
+
+        async function connectTON() {
+            if (isConnecting) return;
+
+            const button = $("connectBtn");
+            const connectText = $("connectText");
+            isConnecting = true;
+            if (button) button.disabled = true;
+            if (connectText) connectText.innerHTML = '<span class="spinner"></span>';
+
+            try {
+                const ui = await initTONConnectUI();
+
+                // If TON is already connected, don't accidentally open another
+                // connection request. The Wallet page has the Disconnect button.
+                if (ui.connected && ui.account) {
+                    persistTONWallet(ui.account.address);
+                    updateWalletUI(walletAddress);
+                    updateUI();
+                    showMessage("✅ TON wallet is already connected.", "info");
+                    return;
+                }
+
+                // Official TON Connect UI flow. On Android this opens the
+                // wallet picker and uses the wallet's universal/deep link.
+                ui.openModal();
+            } catch (error) {
+                console.error("TON Connect UI error:", error);
+                const message = String(error?.message || error || "");
+                if (/manifest/i.test(message)) {
+                    showMessage("❌ TON manifest is missing or unavailable.", "error");
+                } else if (/cancel|abort/i.test(message)) {
+                    showMessage("❌ TON connection cancelled.", "error");
+                } else {
+                    showMessage("❌ Could not open TON wallet connection. Try again.", "error");
+                }
+            } finally {
+                isConnecting = false;
+                if (button) button.disabled = false;
+                if (walletAddress && walletType === "ton") updateWalletUI(walletAddress);
+            }
+        }
+
+        async function restoreTONConnection() {
+            const savedType = localStorage.getItem(WALLET_TYPE_KEY);
+            if (savedType !== "ton") return false;
+
+            walletType = "ton";
+            selectWallet("ton");
+
+            try {
+                const ui = await initTONConnectUI();
+                if (ui.connected && ui.account) {
+                    persistTONWallet(ui.account.address);
+                    updateWalletUI(walletAddress);
+                    updateUI();
+                    return true;
+                }
+            } catch (error) {
+                console.warn("TON restore failed:", error);
+            }
+
+            return false;
+        }
+
+        function selectWallet(type) {
+            walletType = type === "ton" ? "ton" : "metamask";
+            document.querySelectorAll(".wallet-btn").forEach(btn => btn.classList.remove("active"));
+
+            if (walletType === "metamask") {
+                $("walletMetaMask")?.classList.add("active");
+                $("connectBtn").style.background = "linear-gradient(135deg, #0098ea, #0088d4)";
+            } else {
+                $("walletTON")?.classList.add("active");
+                $("connectBtn").style.background = "linear-gradient(135deg, #0088cc, #0066aa)";
+            }
+
+            const text = $("connectText");
+            if (text) text.textContent = walletConnected ? `✅ ${shortAddress(walletAddress)}` : `Connect ${walletType === "metamask" ? "MetaMask" : "TON"}`;
+        }
+
+        function connectWallet() {
+            return walletType === "metamask" ? connectMetaMask() : connectTON();
+        }
+
+        async function disconnectWallet(showToast = true) {
+            // This is the ONLY app action that intentionally clears the
+            // persistent wallet session. For TON, also tell TON Connect UI
+            // to terminate its real protocol session.
+            const wasTON = walletType === "ton";
+            if (wasTON && tonConnectUI) {
+                try { await tonConnectUI.disconnect(); } catch (e) {
+                    console.warn("TON disconnect warning:", e);
+                }
+            }
+
+            walletConnected = false;
+            walletAddress = null;
+            lastChainBalance = null;
+            metaMaskProvider = null;
+            localStorage.removeItem(WALLET_KEY);
+            localStorage.removeItem(WALLET_CONNECTED_KEY);
+            localStorage.removeItem(WALLET_TYPE_KEY);
+
+            updateWalletUI(null);
+            updateUI();
+            if (showToast) showMessage("Wallet disconnected.", "info");
+        }
+
+        function updateWalletUI(address) {
+            const button = $("connectBtn");
+            const connectText = $("connectText");
+            const pageButton = $("walletConnectPageBtn");
+            const pageText = $("walletPageConnectText");
+
+            if (button) {
+                button.className = address ? "connect-btn connected" : "connect-btn";
+                button.disabled = false;
+            }
+            if (connectText) connectText.textContent = address ? `✅ ${shortAddress(address)}` : `Connect ${walletType === "metamask" ? "MetaMask" : "TON"}`;
+
+            if (pageButton) {
+                pageButton.className = address ? "action-btn success" : "action-btn primary";
+                pageButton.disabled = false;
+            }
+            if (pageText) pageText.textContent = address ? "✅ Connected" : "Connect Wallet";
+
+            if (address) {
+                $("walletStatus").textContent = `✅ ${walletType === "metamask" ? "MetaMask connected" : "TON connected"}`;
+                $("walletDot").className = "dot connected";
+                $("walletPageStatus").textContent = walletType === "metamask" ? "Connected to MetaMask" : "TON selected";
+                $("walletAddress").textContent = address;
+            } else {
+                $("walletStatus").textContent = "Wallet not connected";
+                $("walletDot").className = "dot";
+                $("walletPageStatus").textContent = "Not connected";
+                $("walletAddress").textContent = "No wallet connected";
+            }
+        }
+
+        // ============================================================
+        // ON-CHAIN AVQ BALANCE
+        // ============================================================
+        async function loadAVQBalance(address) {
+            if (!address || !window.ethers) return null;
+
+            try {
+                const provider = new ethers.providers.JsonRpcProvider(SEPOLIA_RPC, { name: "sepolia", chainId: 11155111 });
+                const contract = new ethers.Contract(AVQ_TOKEN_ADDRESS, AVQ_ABI, provider);
+                const raw = await contract.balanceOf(address);
+                const formatted = ethers.utils.formatUnits(raw, AVQ_DECIMALS);
+                lastChainBalance = formatted;
+
+                $("balanceLabel").textContent = "AVQ On-Chain Balance";
+                $("balanceUnit").textContent = "AVQ";
+                $("balance").textContent = Number(formatted).toFixed(4);
+                return { raw, formatted };
+            } catch (error) {
+                console.warn("Could not read AVQ balance:", error);
+                lastChainBalance = null;
+                return null;
+            }
+        }
+
+        // Add the deployed AVQ token to MetaMask when supported.
+        async function addAVQToMetaMask() {
+            try {
+                if (!window.ethereum) {
+                    showMessage("🦊 MetaMask is not available.", "error");
+                    return false;
+                }
+                const added = await window.ethereum.request({
+                    method: "wallet_watchAsset",
+                    params: {
+                        type: "ERC20",
+                        options: {
+                            address: AVQ_TOKEN_ADDRESS,
+                            symbol: "AVQ",
+                            decimals: AVQ_DECIMALS
+                        }
+                    }
+                });
+                if (added) showMessage("✅ AVQ token added to MetaMask.", "success");
+                return !!added;
+            } catch (error) {
+                console.warn("Could not add AVQ to MetaMask:", error);
+                showMessage("⚠️ MetaMask could not add AVQ automatically.", "error");
+                return false;
+            }
+        }
+
+        // ============================================================
+        // ADS / REWARDED VIDEO
+        // ============================================================
+        function showAdAndThen(callback, rewardAmount = 0) {
+            return new Promise(resolve => {
+                if (isAdPlaying) {
+                    showMessage("⏳ A video is already playing.", "info");
+                    resolve(false);
+                    return;
+                }
+
+                const finishSuccess = () => {
+                    if (rewardAmount > 0) addReward(rewardAmount);
+                    if (typeof callback === "function") callback();
+                    resolve(true);
+                };
+
+                if (typeof show_11747882 !== "function") {
+                    // Do not silently invent an ad completion/reward.
+                    showMessage("📺 Reward video is not available right now.", "error");
+                    resolve(false);
+                    return;
+                }
+
+                isAdPlaying = true;
+                $("adOverlay").style.display = "flex";
+
+                let settled = false;
+                const success = () => {
+                    if (settled) return;
+                    settled = true;
+                    finishSuccess();
+                };
+                const failure = error => {
+                    if (settled) return;
+                    settled = true;
+                    console.error("Rewarded ad error:", error);
+                    showMessage("❌ Video did not complete. No reward was added.", "error");
+                    resolve(false);
+                };
+
+                try {
+                    Promise.resolve(show_11747882({
+                        type: "end",
+                        ymid: walletAddress || undefined,
+                        requestVar: "averiq_engine"
+                    })).then(success).catch(failure).finally(() => {
+                        isAdPlaying = false;
+                        $("adOverlay").style.display = "none";
+                    });
+                } catch (error) {
+                    failure(error);
+                    isAdPlaying = false;
+                    $("adOverlay").style.display = "none";
+                }
+            });
+        }
+
+        function addReward(amount) {
+            const reward = cleanNumber(amount);
+            if (!reward) return;
+            data.balance += reward;
+            data.claimable += reward;
+            data.totalEarned += reward;
+            saveData();
+            updateUI();
+        }
+
+        // ============================================================
+        // ENGINE
+        // ============================================================
+        function setEngineVisual(running) {
+            const wrapper = $("engineWrapper");
+            const icon = $("engineIcon");
+            const dot = $("statusDot");
+            const text = $("statusText");
+            const status = $("engineStatusText");
+            const oldButton = $("startBtn");
+            const miningButton = $("engineStartBtn");
+            const miningText = $("engineStartBtnText");
+
+            wrapper.classList.toggle("active", running);
+            icon.className = running ? "engine-icon spinning" : "engine-icon";
+            dot.className = running ? "dot" : "dot idle";
+            text.textContent = running ? "Running" : "Stopped";
+            status.textContent = running ? "🟢 Running" : "⏸️ Stopped";
+            status.className = running ? "status-text running" : "status-text idle";
+
+            if (oldButton) {
+                oldButton.innerHTML = running ? '<span class="icon">⏹️</span>Stop Engine' : '<span class="icon">⚙️</span>Start Engine';
+                oldButton.className = running ? "action-btn danger" : "action-btn primary";
+            }
+            if (miningButton) {
+                miningButton.classList.toggle("stop", running);
+                miningButton.disabled = false;
+                miningButton.innerHTML = running
+                    ? '<span class="icon">⏹️</span><span id="engineStartBtnText">Stop Mining</span>'
+                    : '<span class="icon">⚙️</span><span id="engineStartBtnText">Start Mining</span>';
+            }
+        }
+
+        function startEngine() {
+            if (data.engineRunning) {
+                stopEngine(true);
+                return;
+            }
+
+            const miningButton = $("engineStartBtn");
+            if (miningButton) miningButton.disabled = true;
+
+            // Every new 24-hour cycle starts only after a successful rewarded ad.
+            showAdAndThen(() => {
+                const now = Date.now();
+                data.engineRunning = true;
+                data.engineElapsed = 0;
+                data.todayMined = 0;
+                data.todayDate = todayKey();
+                data.engineStartTime = now;
+                data.lastEngineUpdate = now;
+                data.lastClaimTime = now;
+                data.sessions += 1;
+                saveData();
+
+                setEngineVisual(true);
+                startIntervals();
+                updateEngine();
+                showMessage("⚙️ Mining started. The engine will run for 24 hours.", "success");
+            }, 0).finally(() => {
+                if (miningButton) miningButton.disabled = false;
+            });
+        }
+
+        function stopEngine(manual = false) {
+            if (data.engineRunning) updateEngine(true);
+            data.engineRunning = false;
+            clearIntervals();
+            setEngineVisual(false);
+            saveData();
+            updateUI();
+            if (manual) showMessage("⏹️ Engine stopped.", "info");
+        }
+
+        function clearIntervals() {
+            if (engineInterval) clearInterval(engineInterval);
+            if (statsInterval) clearInterval(statsInterval);
+            engineInterval = null;
+            statsInterval = null;
+        }
+
+        function startIntervals() {
+            clearIntervals();
+            engineInterval = setInterval(() => updateEngine(false), 1000);
+            statsInterval = setInterval(updateStats, 2000);
+        }
+
+        function updateEngine(forceFinal = false) {
+            if (!data.engineRunning && !forceFinal) return;
+
+            const now = Date.now();
+            const start = cleanNumber(data.engineStartTime);
+            const elapsed = Math.max(0, now - start);
+            const cappedElapsed = Math.min(elapsed, ENGINE_RUNTIME_MS);
+            data.engineElapsed = cappedElapsed;
+
+            // Reward only the time since the last accounting checkpoint.
+            const checkpoint = cleanNumber(data.lastEngineUpdate) || start || now;
+            const effectiveNow = Math.min(now, start + ENGINE_RUNTIME_MS);
+            const deltaMs = Math.max(0, effectiveNow - checkpoint);
+            const reward = (deltaMs / 1000) * REWARD_PER_SECOND;
+            const remainingDaily = Math.max(0, DAILY_LIMIT - cleanNumber(data.todayMined));
+            const actualReward = Math.min(reward, remainingDaily);
+
+            if (actualReward > 0) {
+                data.balance += actualReward;
+                data.claimable += actualReward;
+                data.totalEarned += actualReward;
+                data.todayMined += actualReward;
+            }
+            data.lastEngineUpdate = effectiveNow;
+
+            updateHardwareStats();
+
+            if (cappedElapsed >= ENGINE_RUNTIME_MS) {
+                data.engineRunning = false;
+                data.engineElapsed = ENGINE_RUNTIME_MS;
+                clearIntervals();
+                setEngineVisual(false);
+                saveData();
+                updateUI();
+                showMessage("⏰ 24-hour mining cycle complete. Tap Start Mining to begin a new cycle.", "success");
+                return;
+            }
+
+            saveData();
+            updateUI();
+            updateChart();
+        }
+
+        function updateHardwareStats() {
+            data.hashrate = 125 + randomBetween(-5, 5);
+            data.accepted += Math.floor(randomBetween(10, 30));
+            data.rejected += Math.floor(randomBetween(0, 3));
+            const total = data.accepted + data.rejected;
+            data.efficiency = total ? (data.accepted / total) * 100 : 99.85;
+            data.temperature = 58 + randomBetween(-3, 8);
+            data.fanSpeed = 3800 + (data.temperature - 58) * 40 + randomBetween(-100, 100);
+            data.power = 1800 + (data.temperature - 58) * 20 + randomBetween(-50, 50);
+
+            $("hashrate").textContent = data.hashrate.toFixed(2);
+            $("accepted").textContent = Math.floor(data.accepted).toLocaleString();
+            $("rejected").textContent = Math.floor(data.rejected).toLocaleString();
+            $("efficiency").textContent = data.efficiency.toFixed(2) + "%";
+
+            const temp = $("temperature");
+            temp.textContent = data.temperature.toFixed(0) + "°C";
+            temp.className = "value" + (data.temperature > 68 ? " critical" : data.temperature > 63 ? " hot" : " green");
+
+            const fan = $("fanSpeed");
+            fan.textContent = Math.round(data.fanSpeed).toLocaleString() + " RPM";
+            fan.className = "value" + (data.fanSpeed > 5000 ? " hot" : " green");
+            $("power").textContent = Math.round(data.power) + "W";
+
+            if (data.engineRunning) {
+                $("engineIcon").className = data.temperature > 66 ? "engine-icon spinning-fast" : "engine-icon spinning";
+            }
+        }
+
+        function updateStats() {
+            if (data.engineRunning) updateChart();
+            renderClaimRewards();
+        }
+
+        // ============================================================
+        // CLAIM / CHECK-IN / TASKS
+        // ============================================================
+        function manualClaim() {
+            const amount = cleanNumber(data.claimable);
+            if (amount <= 0) {
+                showMessage("You have no claimable rewards.", "error");
+                return;
+            }
+
+            // This button claims the existing app-ledger balance only.
+            data.claimable = 0;
+            data.totalClaimed += amount;
+            saveData();
+            updateUI();
+            showMessage(`✅ ${amount.toFixed(4)} AVQ moved to claimed rewards.`, "success");
+            showMessage("ℹ️ This is an app ledger claim; no blockchain transfer is performed by this page.", "info");
+        }
+
+        function claimRewardSlot(slotIndex) {
+            if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= CLAIM_SLOT_COUNT) return;
+            if (!Array.isArray(data.claimSlots)) {
+                data.claimSlots = Array.from({length: CLAIM_SLOT_COUNT}, () => ({ claimedAt: 0 }));
+            }
+
+            const slot = data.claimSlots[slotIndex] || { claimedAt: 0 };
+            const now = Date.now();
+            const remaining = CLAIM_REWARD_COOLDOWN_MS - (now - cleanNumber(slot.claimedAt));
+            if (remaining > 0) {
+                showMessage(`⏳ Reward ${slotIndex + 1} returns in ${formatTime(remaining)}.`, "info");
+                renderClaimRewards();
+                return;
+            }
+
+            const button = document.querySelector(`[data-claim-slot="${slotIndex}"]`);
+            if (button) button.disabled = true;
+
+            showAdAndThen(() => {
+                // Reward is added only after the rewarded ad promise completes.
+                addReward(CLAIM_SLOT_REWARD);
+                data.claimSlots[slotIndex] = { claimedAt: Date.now() };
+                saveData();
+                renderClaimRewards();
+                showMessage(`🎁 Reward ${slotIndex + 1} claimed: +${CLAIM_SLOT_REWARD.toFixed(2)} AVQ`, "success");
+            }, 0).then(ok => {
+                if (!ok) renderClaimRewards();
+            });
+        }
+
+        function renderClaimRewards() {
+            const grid = $("claimRewardsGrid");
+            if (!grid) return;
+            if (!Array.isArray(data.claimSlots)) {
+                data.claimSlots = Array.from({length: CLAIM_SLOT_COUNT}, () => ({ claimedAt: 0 }));
+            }
+
+            const now = Date.now();
+            grid.innerHTML = Array.from({length: CLAIM_SLOT_COUNT}, (_, i) => {
+                const claimedAt = cleanNumber(data.claimSlots[i]?.claimedAt);
+                const remaining = Math.max(0, CLAIM_REWARD_COOLDOWN_MS - (now - claimedAt));
+                const ready = remaining <= 0;
+                return `
+                    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center;">
+                        <div style="font-size:20px;">🎁</div>
+                        <div style="font-size:12px;font-weight:800;margin-top:4px;">Reward ${i + 1}</div>
+                        <div style="font-size:11px;color:var(--gold);font-weight:700;margin:4px 0 8px;">+${CLAIM_SLOT_REWARD.toFixed(2)} AVQ</div>
+                        ${ready
+                            ? `<button class="action-btn primary" data-claim-slot="${i}" onclick="claimRewardSlot(${i})" style="width:100%;min-height:38px;padding:8px;font-size:11px;">▶ Go</button>`
+                            : `<button class="action-btn success" disabled style="width:100%;min-height:38px;padding:8px;font-size:10px;">✅ Claimed<br><span style="font-size:9px;font-weight:600;">${formatTime(remaining)} left</span></button>`}
+                    </div>`;
+            }).join("");
+        }
+
+        function startClaimRewardTimer() {
+            clearInterval(window.averiqClaimRewardTimer);
+            window.averiqClaimRewardTimer = setInterval(renderClaimRewards, 1000);
+        }
+
+        function checkIn() {
+            const today = todayKey();
+            if (data.lastCheckIn === today) {
+                showMessage("You already checked in today.", "error");
+                return;
+            }
+
+            showAdAndThen(() => {
+                data.balance += CHECKIN_REWARD;
+                data.claimable += CHECKIN_REWARD;
+                data.totalEarned += CHECKIN_REWARD;
+                data.checks += 1;
+                data.streak += 1;
+                data.lastCheckIn = today;
+                saveData();
+                updateUI();
+                showMessage(`🎁 Daily check-in +${CHECKIN_REWARD.toFixed(4)} AVQ`, "success");
+            }, 0);
+        }
+
+        function startTask(taskId) {
+            if (!data.tasks) data.tasks = { task1: 0, task2: 0, task3: 0 };
+            const current = cleanNumber(data.tasks[taskId]);
+            if (current >= 1) {
+                showMessage("✅ Task already completed!", "info");
+                return;
+            }
+
+            const rewards = { task1: 0.15, task2: 0.10, task3: 0.20 };
+            const reward = rewards[taskId];
+            if (!reward) return;
+
+            showAdAndThen(() => {
+                data.tasks[taskId] = 1;
+                addReward(reward);
+                updateTaskUI();
+                showMessage(`🎉 Task completed! +${reward.toFixed(2)} AVQ`, "success");
+            }, 0);
+        }
+
+        function updateTaskUI() {
+            const cards = document.querySelectorAll("#tasksPage .stat-box");
+            const ids = ["task1", "task2", "task3"];
+            cards.forEach((card, index) => {
+                const id = ids[index];
+                if (!id) return;
+                const progress = cleanNumber(data.tasks[id]);
+                const progressLabel = card.querySelector("div:nth-child(2) .label");
+                const button = card.querySelector("button");
+                if (progressLabel) progressLabel.textContent = `Progress: ${Math.min(1, progress)}/1`;
+                if (button) {
+                    button.disabled = progress >= 1;
+                    button.textContent = progress >= 1 ? "✅ Done" : "Go";
+                    button.className = progress >= 1 ? "action-btn success" : "action-btn primary";
+                }
+            });
+        }
+
+        // ============================================================
+        // UI
+        // ============================================================
+        function updateUI() {
+            // The visible AVQ balance is the app reward ledger.
+            $("balance").textContent = formatNumber(data.balance);
+            $("tasksBalance").textContent = formatNumber(data.balance);
+            $("claimPageBalance").textContent = formatNumber(data.claimable);
+            $("sessionsCount").textContent = String(data.sessions);
+
+            const remaining = data.engineRunning
+                ? Math.max(0, ENGINE_RUNTIME_MS - data.engineElapsed)
+                : (cleanNumber(data.engineElapsed) >= ENGINE_RUNTIME_MS ? 0 : ENGINE_RUNTIME_MS);
+            $("timeRemaining").textContent = formatTime(remaining);
+
+            if (walletConnected && lastChainBalance !== null) {
+                $("walletStatus").textContent = `✅ Connected • On-chain: ${Number(lastChainBalance).toFixed(4)} AVQ`;
+            }
+        }
+
+        function updateChart() {
+            const bars = document.querySelectorAll(".chart-bar");
+            const heights = [30, 50, 70, 90, 60];
+            const currentIndex = Math.floor(Date.now() / 2000) % bars.length;
+            bars.forEach((bar, index) => {
+                const target = index === currentIndex ? 80 + randomBetween(0, 20) : heights[index] + randomBetween(-5, 5);
+                bar.style.height = Math.min(100, Math.max(10, target)) + "%";
+                bar.className = "chart-bar" + (index === currentIndex ? " active" : "");
+            });
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+            const page = $(pageId);
+            if (page) page.classList.add("active");
+            document.querySelectorAll(".nav-btn").forEach(button => {
+                button.classList.toggle("active", button.dataset.page === pageId);
+            });
+            if (pageId === "tasksPage") updateTaskUI();
+            if (pageId === "claimPage") renderClaimRewards();
+        }
+
+        // ============================================================
+        // THEME
+        // ============================================================
+        function loadTheme() {
+            const theme = localStorage.getItem(THEME_KEY) || "dark";
+            document.body.classList.toggle("light", theme === "light");
+            $("themeBtn").textContent = theme === "light" ? "🌙" : "☀️";
+        }
+
+        function toggleTheme() {
+            const isLight = !document.body.classList.contains("light");
+            document.body.classList.toggle("light", isLight);
+            localStorage.setItem(THEME_KEY, isLight ? "light" : "dark");
+            $("themeBtn").textContent = isLight ? "🌙" : "☀️";
+        }
+
+        // ============================================================
+        // LIFECYCLE — IMPORTANT: DO NOT RESET lastEngineUpdate ON RESUME
+        // ============================================================
+        function handleResume() {
+            if (!data.engineRunning) return;
+            updateEngine();
+            if (data.engineRunning) {
+                setEngineVisual(true);
+                startIntervals();
+            }
+        }
+
+        // ============================================================
+        // EVENTS
+        // ============================================================
+        $("connectBtn").addEventListener("click", connectWallet);
+        $("walletConnectPageBtn").addEventListener("click", connectWallet);
+        $("disconnectBtn").addEventListener("click", () => disconnectWallet(true));
+        $("startBtn").addEventListener("click", startEngine);
+        $("engineStartBtn").addEventListener("click", startEngine);
+        $("claimBtn").addEventListener("click", manualClaim);
+        $("checkinBtn").addEventListener("click", checkIn);
+        $("tasksBtn").addEventListener("click", () => showPage("tasksPage"));
+        $("themeBtn").addEventListener("click", toggleTheme);
+
+        document.querySelectorAll(".nav-btn").forEach(button => {
+            button.addEventListener("click", () => showPage(button.dataset.page));
+        });
+
+        function handleAppReturn() {
+            handleResume();
+
+            // Read the persisted wallet type every time the app returns.
+            // This prevents an old MetaMask session from replacing TON.
+            const currentType = localStorage.getItem(WALLET_TYPE_KEY);
+
+            if (currentType === "ton") {
+                walletType = "ton";
+                restoreTONConnection();
+            } else if (currentType === "metamask") {
+                walletType = "metamask";
+                syncMetaMaskAfterReturn();
+            }
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            if (!document.hidden) handleAppReturn();
+        });
+        window.addEventListener("pageshow", handleAppReturn);
+        window.addEventListener("focus", handleAppReturn);
+        window.addEventListener("resume", handleAppReturn);
+        window.addEventListener("beforeunload", () => {
+            if (data.engineRunning) updateEngine();
+            saveData();
+        });
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        (async function init() {
+            loadTheme();
+
+            // Initialize the current MetaMask Connect client early.
+            await initMetaMaskConnect();
+
+            const savedWalletType = localStorage.getItem(WALLET_TYPE_KEY) || "metamask";
+            selectWallet(savedWalletType === "ton" ? "ton" : "metamask");
+            updateWalletUI(null);
+            updateChart();
+            updateUI();
+            updateTaskUI();
+
+            // Restore TON using TON Connect's own persisted session when the
+            // last selected wallet was TON. Otherwise restore MetaMask.
+            let restoredWallet = false;
+            if (savedWalletType === "ton") {
+                restoredWallet = await restoreTONConnection();
+            } else {
+                restoredWallet = await autoConnectMetaMask();
+            }
+
+            const today = todayKey();
+            if (data.todayDate !== today) {
+                data.todayDate = today;
+                data.todayMined = 0;
+                data.engineElapsed = 0;
+                data.engineRunning = false;
+                saveData();
+            }
+
+            if (!restoredWallet) {
+                updateWalletUI(null);
+            }
+
+            // Keep the persisted MetaMask session visible across reloads and
+            // allow the provider to reappear later (MetaMask Mobile).
+            // Only start MetaMask background restoration when MetaMask is
+            // actually the selected/persisted wallet.
+            if (walletType === "metamask") {
+                startMetaMaskSessionWatcher();
+                syncMetaMaskAfterReturn();
+            }
+
+            handleResume();
+            updateUI();
+            updateTaskUI();
+
+            setEngineVisual(!!data.engineRunning);
+            renderClaimRewards();
+
+            // Preload only if the SDK exists. No reward is granted by preload.
+            if (typeof show_11747882 === "function") {
+                try { show_11747882("preload"); } catch (_) {}
+            }
+
+            console.log("✅ Averiq corrected engine loaded.");
+            console.log("🦊 MetaMask desktop + MetaMask Mobile deep-link support enabled.");
+            console.log("💎 TON Connect UI + mobile wallet picker + session restore enabled.");
+            console.log("📄 TON manifest:", getTONManifestURL());
+        })();
+    </script>
+</body>
+</html>
